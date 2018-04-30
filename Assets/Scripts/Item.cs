@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Item : MonoBehaviour {
 
-	float maxX = 5.0f;
-	float maxZ = 5.0f;
+	float minX = -3.0f;
+	float maxX = 2.0f;
+	float minZ = -3.0f;
+	float maxZ = 2.0f;
 
 	float yAxis = 0.5f;
 
@@ -16,8 +18,8 @@ public class Item : MonoBehaviour {
     	float distance;
     	if(plane.Raycast(ray, out distance)) {
 			Vector3 mousePosition = ray.GetPoint(distance);
-			float x = Mathf.Clamp(Mathf.Round(mousePosition.x - 0.5f), 0.0f, maxX) + 0.5f;
-			float z = Mathf.Clamp(Mathf.Round(mousePosition.z - 0.5f), 0.0f, maxX) + 0.5f;
+			float x = Mathf.Clamp(Mathf.Round(mousePosition.x - 0.5f), minX, maxX) + 0.5f;
+			float z = Mathf.Clamp(Mathf.Round(mousePosition.z - 0.5f), minZ, maxZ) + 0.5f;
 			Vector3 objPosition = new Vector3(x, yAxis, z);
        		transform.position = objPosition;
     	}
