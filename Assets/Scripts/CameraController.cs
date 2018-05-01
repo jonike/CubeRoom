@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour {
 	private float perspectiveZoomSpeed = 0.5f;        // The rate of change of the field of view in perspective mode.
     private float orthoZoomSpeed = 0.05f;        // The rate of change of the orthographic size in orthographic mode.
 
-    private float moveSpeed = 0.1f;
+    private float MoveSpeed = 0.1f;
 	private float orthographicMin = 2.0f;
 	private float orthographicMax = 5.0f;
 
@@ -18,27 +18,27 @@ public class CameraController : MonoBehaviour {
 #if UNITY_EDITOR
 	void OnGUI() {
 		if (GUI.RepeatButton(new Rect(0, 0, 50, 20), "放大")) {  
-            zoom(-1f);
+            Zoom(-1f);
         }
 
 		if (GUI.RepeatButton(new Rect(60, 0, 50, 20), "缩小")) {  
-            zoom(1f);
+            Zoom(1f);
         }
 
         if (GUI.RepeatButton(new Rect(30, 30, 50, 20), "↑")) {  
-            move(new Vector2(0, 1));
+            Move(new Vector2(0, 1));
         }
 
         if (GUI.RepeatButton(new Rect(30, 90, 50, 20), "↓")) {  
-            move(new Vector2(0, -1));
+            Move(new Vector2(0, -1));
         }
 
         if (GUI.RepeatButton(new Rect(0, 60, 50, 20), "←")) {  
-            move(new Vector2(-1, 0));
+            Move(new Vector2(-1, 0));
         }
 
         if (GUI.RepeatButton(new Rect(60, 60, 50, 20), "→")) {  
-            move(new Vector2(1, 0));
+            Move(new Vector2(1, 0));
         }
     
 	}
@@ -69,11 +69,11 @@ public class CameraController : MonoBehaviour {
 
             // If the camera is orthographic...
 
-			zoom(deltaMagnitudeDiff);
+			Zoom(deltaMagnitudeDiff);
         }
     }
 
-	private void zoom(float deltaMagnitudeDiff) {
+	private void Zoom(float deltaMagnitudeDiff) {
 		if (camera.orthographic) {
             camera.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
             camera.orthographicSize = Mathf.Clamp(camera.orthographicSize, orthographicMin, orthographicMax);
@@ -83,12 +83,12 @@ public class CameraController : MonoBehaviour {
         }
 	}
 
-    private void move(Vector2 deltaVec) {
+    private void Move(Vector2 deltaVec) {
         float rotationY = camera.transform.rotation.y;
         Vector3 cameraPosition =  camera.transform.position;
-        cameraPosition.y += deltaVec.y * moveSpeed;
-        cameraPosition.x += -Mathf.Cos(rotationY) * deltaVec.x * moveSpeed;
-        cameraPosition.z += -Mathf.Sin(rotationY) * deltaVec.x * moveSpeed;
+        cameraPosition.y += deltaVec.y * MoveSpeed;
+        cameraPosition.x += -Mathf.Cos(rotationY) * deltaVec.x * MoveSpeed;
+        cameraPosition.z += -Mathf.Sin(rotationY) * deltaVec.x * MoveSpeed;
 
         camera.transform.position = cameraPosition;
     }
