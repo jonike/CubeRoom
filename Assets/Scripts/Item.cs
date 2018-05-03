@@ -9,7 +9,7 @@ public class Item : MonoBehaviour {
 	float minZ = -3.0f;
 	float maxZ = 2.0f;
 
-	float yAxis = 0.5f;
+	public float yAxis = 0.5f;
 
 	void OnMouseDrag() {
 		
