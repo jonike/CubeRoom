@@ -8,6 +8,7 @@ using Sorumi.UI;
 public class ButtonCellView : MonoBehaviour {
 
 	// Use this for initialization
+	public int count;
 	private CellView cellView;
 
 	void Start () {
@@ -25,6 +26,6 @@ public class ButtonCellView : MonoBehaviour {
 		gameObject.transform.Find("Text").GetComponent<Text>().text = index.ToString();
 	}
 	int CountOfCell() {
-		return 40;
+		return count;
 	}
 }

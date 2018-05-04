@@ -20,10 +20,11 @@ namespace Sorumi.UI {
 		public GameObject cellObject;
 		public float cellWidth;
 		public float cellHeight;
-		public float minItemSpace = 0.0f;
-		public float minLineSpace = 0.0f;
+		public float minHorizontalSpace = 0.0f;
+		public float minVerticalSpace = 0.0f;
 
-		public float max
+		public float maxHorizontalPadding = 0.0f;
+		public float maxVerticalPadding = 0.0f;
 
 		private ScrollRect scrollRect;
 
@@ -32,6 +33,9 @@ namespace Sorumi.UI {
 
 		private float itemSpace = 0.0f;
 		private float lineSpace = 0.0f;
+
+		private float itemPadding = 0.0f;
+		private float linePadding = 0.0f;
 
 		private int countOfCell;
 		private int countPreLine;
@@ -51,44 +55,74 @@ namespace Sorumi.UI {
 		public GameObjectIntAction CellAtIndex;
 
 		void Start () {
+
+			PrepareLayout();
+		}
+
+		private void PrepareLayout() {
 			scrollRect = GetComponent<ScrollRect>();
 			Rect sr = scrollRect.GetComponent<RectTransform>().rect;
 			scrollSize = new Vector2(sr.width, sr.height);
 			Rect cr = scrollRect.content.GetComponent<RectTransform>().rect;
 			contentSize = new Vector2(cr.width, cr.height);
-			// Debug.Log(scrollSize + " " + contentSize);
-			PrepareLayout();
-		}
 
-		private void PrepareLayout() {
+			// item padding
+			float horizontalPadding = maxHorizontalPadding;
+			float verticalPadding = maxVerticalPadding;
+			if (horizontalPadding * 2 > (scrollSize.x - cellWidth)) {
+				horizontalPadding = (scrollSize.x - cellWidth) / 2;
+				horizontalPadding = horizontalPadding < 0 ? 0 : horizontalPadding;
+			}
+			if (verticalPadding * 2 > (scrollSize.y - cellHeight)) {
+				verticalPadding = (scrollSize.y - cellHeight) / 2;
+				verticalPadding = verticalPadding < 0 ? 0 : verticalPadding;
+			}
+
 			if (direction == Direction.Horizontal) {
-				countPreLine = (int) Mathf.Floor((contentSize.y - cellHeight) / (cellHeight + minItemSpace));
+				itemPadding = verticalPadding;
+				linePadding = horizontalPadding;
 			} else if (direction == Direction.Vertical) {
-				countPreLine = (int) Mathf.Floor((contentSize.x - cellWidth) / (cellWidth + minItemSpace));
+				itemPadding = horizontalPadding;
+				linePadding = verticalPadding;
+			}
+
+
+			if (direction == Direction.Horizontal) {
+				countPreLine = (int) Mathf.Floor((scrollSize.y - cellHeight - itemPadding * 2) / (cellHeight + minVerticalSpace));
+			} else if (direction == Direction.Vertical) {
+				countPreLine = (int) Mathf.Floor((scrollSize.x - cellWidth - itemPadding * 2) / (cellWidth + minHorizontalSpace));
 			}
 
 			countOfCell = CountOfCell != null ? CountOfCell() : 0;
 			countPreLine = countPreLine + 1;
 			countOfLine = countOfCell / countPreLine + (countOfCell % countPreLine == 0 ? 0 : 1);
 
+			// item space
 			if (countPreLine == 1) {
 				itemSpace = 0;
 			} else if (direction == Direction.Horizontal) {
-				itemSpace = (contentSize.y - countPreLine * cellHeight) / (countPreLine - 1);
+				itemSpace = (contentSize.y - itemPadding * 2 - countPreLine * cellHeight) / (countPreLine - 1);
 			} else if (direction == Direction.Vertical) {
-				itemSpace = (contentSize.x - countPreLine * cellWidth) / (countPreLine - 1);
+				itemSpace = (contentSize.x - itemPadding * 2 - countPreLine * cellWidth) / (countPreLine - 1);
 			}
 
-			lineSpace = itemSpace > minLineSpace ? itemSpace : minLineSpace;
+			// line space
+			if (direction == Direction.Horizontal) {
+				lineSpace = itemSpace > minHorizontalSpace ? itemSpace : minHorizontalSpace;
+			} else if (direction == Direction.Vertical) {
+				lineSpace = itemSpace > minVerticalSpace ? itemSpace : minVerticalSpace;
+			}
 
 			// Renew contentSize
 			if (direction == Direction.Horizontal) {
-				contentSize.x = countOfLine * (cellWidth + lineSpace) - lineSpace;
+				contentSize.y = scrollSize.y;
+				contentSize.x = countOfLine * (cellWidth + lineSpace) - lineSpace + linePadding * 2;
 				contentSize.x = contentSize.x < 0 ? 0 : contentSize.x;
 				scrollRect.content.sizeDelta = contentSize;
 				scrollRect.content.anchoredPosition = Vector3.zero;
 			} else if (direction == Direction.Vertical) {
-				contentSize.y = countOfLine * (cellHeight + lineSpace) - lineSpace;
+				contentSize.x = scrollSize.x;
+				contentSize.y = countOfLine * (cellHeight + lineSpace) - lineSpace + linePadding * 2;
 				contentSize.y = contentSize.y < 0 ? 0 : contentSize.y;
 				scrollRect.content.sizeDelta = contentSize;
 				scrollRect.content.anchoredPosition = Vector3.zero;
@@ -108,15 +142,11 @@ namespace Sorumi.UI {
 		
 		private GameObject CreateCell() {
 			GameObject cell = GameObject.Instantiate(cellObject, Vector3.zero, Quaternion.identity);
-			// RectTransform rt = cell.GetComponent<RectTransform>();
-			// rt.anchoredPosition = new Vector2(-cellWidth, cellHeight);
 			cell.transform.SetParent(poolGO.transform);
 			return cell;
 		}
 
 		private void ResetCell(GameObject cell) {
-			// RectTransform rt = cell.GetComponent<RectTransform>();
-			// rt.anchoredPosition = new Vector2(-cellWidth, cellHeight);
 			cell.transform.SetParent(poolGO.transform);
 		}
 
@@ -127,8 +157,6 @@ namespace Sorumi.UI {
 			float deltaX = scrollSize.x - contentSize.x;
 			float startX = - value.x * deltaX;
 			
-			Debug.Log(value.x + " " + startX);
-
 			Rect rect = new Rect(startX, startY, scrollSize.x, scrollSize.y);
 
 			UpdateInRect(rect);
@@ -156,6 +184,7 @@ namespace Sorumi.UI {
 				for (int i = startIndex; i <= endIndex; i++) {
 					if (!dictionary.ContainsKey(i)) {
 						GameObject cell = cellPool.GetObject();
+						cell.name = i.ToString();
 						SetCellPositionHorizontal(cell, i);
 						dictionary.Add(i, cell);
 						if (CellAtIndex != null)
@@ -166,6 +195,7 @@ namespace Sorumi.UI {
 				for (int i = startIndex; i <= endIndex; i++) {
 					if (!dictionary.ContainsKey(i)) {
 						GameObject cell = cellPool.GetObject();
+						cell.name = i.ToString();
 						SetCellPositionVertical(cell, i);
 						dictionary.Add(i, cell);
 						if (CellAtIndex != null)
@@ -183,9 +213,8 @@ namespace Sorumi.UI {
 				float startX = rect.x;
 				float endX = rect.x + rect.width;
 				
-
-				int startLine =  (int) Mathf.Floor(startX / (cellWidth + lineSpace));
-				int endLine =  (int) Mathf.Floor(endX / (cellWidth + lineSpace)) + 1;
+				int startLine =  (int) Mathf.Floor((startX - linePadding) / (cellWidth + lineSpace)) - 1;
+				int endLine =  (int) Mathf.Floor((endX - linePadding) / (cellWidth + lineSpace)) + 1;
 				
 				startIndex = startLine * countPreLine;
 				endIndex = (endLine + 1) * countPreLine - 1;
@@ -196,8 +225,8 @@ namespace Sorumi.UI {
 				float startY = rect.y;
 				float endY = rect.y + rect.height;
 
-				int startLine =  (int) Mathf.Floor(startY / (cellHeight + lineSpace));
-				int endLine =  (int) Mathf.Floor(endY / (cellHeight + lineSpace)) + 1;
+				int startLine =  (int) Mathf.Floor((startY - linePadding)/ (cellHeight + lineSpace)) - 1;
+				int endLine =  (int) Mathf.Floor((endY - linePadding)/ (cellHeight + lineSpace)) + 1;
 				
 				startIndex = startLine * countPreLine;
 				endIndex = (endLine + 1) * countPreLine - 1;
@@ -211,16 +240,16 @@ namespace Sorumi.UI {
 		private void SetCellPositionHorizontal(GameObject cell, int index) {
 			cell.transform.SetParent(scrollRect.content);
 			RectTransform rt = cell.GetComponent<RectTransform>();
-			float y = - index % countPreLine * (cellHeight + itemSpace);
-			float x = index / countPreLine * (cellWidth + lineSpace);
+			float y = - itemPadding - index % countPreLine * (cellHeight + itemSpace);
+			float x = linePadding + index / countPreLine * (cellWidth + lineSpace);
 			rt.anchoredPosition = new Vector2(x, y);
 		}
 
 		private void SetCellPositionVertical(GameObject cell, int index) {
 			cell.transform.SetParent(scrollRect.content);
 			RectTransform rt = cell.GetComponent<RectTransform>();
-			float x = index % countPreLine * (cellWidth + itemSpace);
-			float y = - index / countPreLine * (cellHeight + lineSpace);
+			float x = itemPadding + index % countPreLine * (cellWidth + itemSpace);
+			float y = - linePadding - index / countPreLine * (cellHeight + lineSpace);
 			rt.anchoredPosition = new Vector2(x, y);
 		}
 	}

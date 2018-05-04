@@ -244,8 +244,10 @@ MonoBehaviour:
   cellObject: {fileID: 1942282725429572, guid: 6ccf3fef4a33c420583a13e3deb96ebd, type: 2}
   cellWidth: 80
   cellHeight: 80
-  minItemSpace: 10
-  minLineSpace: 10
+  minHorizontalSpace: 10
+  minVerticalSpace: 10
+  maxHorizontalPadding: 10
+  maxVerticalPadding: 10
 --- !u!114 &267923413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1295dc804662e4d099ef753d91875aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  count: 200
 --- !u!1 &293038255
 GameObject:
   m_ObjectHideFlags: 0
@@ -339,7 +342,7 @@ GameObject:
   - component: {fileID: 505501884}
   - component: {fileID: 505501883}
   m_Layer: 5
-  m_Name: Scroll View (1)
+  m_Name: Scroll View Horizontal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -410,6 +413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1295dc804662e4d099ef753d91875aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  count: 4
 --- !u!114 &505501886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,8 +429,10 @@ MonoBehaviour:
   cellObject: {fileID: 1942282725429572, guid: 6ccf3fef4a33c420583a13e3deb96ebd, type: 2}
   cellWidth: 80
   cellHeight: 80
-  minItemSpace: 10
-  minLineSpace: 10
+  minHorizontalSpace: 10
+  minVerticalSpace: 10
+  maxHorizontalPadding: 100
+  maxVerticalPadding: 100
 --- !u!114 &505501887
 MonoBehaviour:
   m_ObjectHideFlags: 0
