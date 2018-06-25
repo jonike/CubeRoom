@@ -37,7 +37,7 @@ public class GameController : MonoBehaviour {
 #endif
 
     private void AddItem() {
-        Vector3i size = new Vector3i(1, 1, 1);
+        Vector3i size = new Vector3i(3, 1, 2); // TODO
         Item item = new Item(size);
 
         GameObject itemGO = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
