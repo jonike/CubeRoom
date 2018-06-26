@@ -27,40 +27,42 @@ public class RoomObject : MonoBehaviour {
 
 
 
-    public void AddItem(ItemObject item) {
+    public bool AddItem(ItemObject item) {
         items.Add(item);
 
         bool isFlipped = item.Dir.IsFlipped();
         Vector3Int size = item.Size;
         Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
-       
+
         if (item.IsOccupid) {
-            for (int z = item.RoomPosition.z - rotateSize.z; z < rotateSize.z + rotateSize.z; z++)
+            for (int z = item.RoomPosition.z - rotateSize.z; z < item.RoomPosition.z + rotateSize.z; z++)
             {
-                for (int x = item.RoomPosition.x - rotateSize.x; x < rotateSize.x + rotateSize.x; x++)
+                for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
                 {
-                    Debug.Log(x + ", " + z);
+					if (groundSpace[z, x] != null)
+						return false; 
                     groundSpace[z, x] = item;
                 }
             }
         
         }
+
+		return true;
     }
 
-	public List<Vector3Int> ConflictSpace(ItemObject item){
-		List<Vector3Int> space = new List<Vector3Int>();
+	public List<Vector2Int> ConflictSpace(ItemObject item){
+		List<Vector2Int> space = new List<Vector2Int>();
 
 		bool isFlipped = item.Dir.IsFlipped();
         Vector3Int size = item.Size;
         Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
-       
-		for (int z = item.RoomPosition.z - rotateSize.z; z < rotateSize.z + rotateSize.z; z++)
+
+		for (int z = item.RoomPosition.z - rotateSize.z; z < item.RoomPosition.z + rotateSize.z; z++)
             {
-                for (int x = item.RoomPosition.x - rotateSize.x; x < rotateSize.x + rotateSize.x; x++)
+                for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
                 {
-                    
                     if (groundSpace[z, x] != null) {
-						space.Add(new Vector3Int(x, 0, z));
+						space.Add(new Vector2Int(x, z));
 					}
                 }
             }

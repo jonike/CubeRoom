@@ -32,9 +32,15 @@ public class GridObject : MonoBehaviour {
 		grid.transform.SetParent(poolGO.transform);
 	}
 
-	// public void SetType(bool type) {
-	// 	gameObject.GetComponent<Renderer>().sharedMaterial = type ? correctMaterial : errorMaterial;
-	// }
+	public void SetGridsType(bool[,] gridTypes) {
+		for (int i = 0; i < gridTypes.GetLength(0); i++)
+		{
+			for (int j = 0; j < gridTypes.GetLength(1); j++)
+			{
+				grids[i,j].GetComponent<Renderer>().sharedMaterial = gridTypes[i,j] ? errorMaterial : correctMaterial;
+			}
+		}
+	}
 
 	public void SetActive() {
 		gameObject.SetActive(true);
@@ -46,7 +52,7 @@ public class GridObject : MonoBehaviour {
 	}
 
 	public void SetGridsSize(Vector2Int size) {
-		// delete
+		// remove
 		for (int i = size.y; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
 				if (grids[i,j]) {
@@ -66,7 +72,7 @@ public class GridObject : MonoBehaviour {
 		}
 
 		Vector3 groupPosition = transform.position;
-
+		// add
 		for (int i = 0; i < size.y; i++)
 		{
 			for (int j = 0; j < size.x; j++)
