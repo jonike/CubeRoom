@@ -17,7 +17,9 @@ public class GameController : MonoBehaviour {
     private Room room;
     private RoomObject roomObject;
 
+    private Item currentItem;
     private ItemObject currentItemObject;
+
     private void Awake(){ 
         room = new Room(roomSize);
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
@@ -26,11 +28,18 @@ public class GameController : MonoBehaviour {
 
 #if UNITY_EDITOR
 	void OnGUI() {
-		if (GUI.Button(new Rect(0, 150, 50, 20), "+ Item")) {  
+		if (GUI.Button(new Rect(0, 150, 50, 20), "+ Item")) { 
+            if (currentItem != null) return; 
             AddItem();
         }
 
-        if (GUI.Button(new Rect(0, 180, 50, 20), "Ok Item")) {  
+        if (GUI.Button(new Rect(0, 180, 50, 20), "Rotate Item")) { 
+            if (currentItem == null) return; 
+            RotateItem();
+        }
+
+        if (GUI.Button(new Rect(0, 210, 50, 20), "Ok Item")) {
+            if (currentItem == null) return; 
             PlaceItem();
         }
 	}
@@ -38,14 +47,19 @@ public class GameController : MonoBehaviour {
 
     private void AddItem() {
         Vector3i size = new Vector3i(3, 1, 2); // TODO
-        Item item = new Item(size);
+        currentItem = new Item(size);
 
         GameObject itemGO = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
         currentItemObject = itemGO.GetComponent<ItemObject>();
+
         currentItemObject.OnDrag = DragItem;
         currentItemObject.OnDragBefore = BeforeDragItem;
         currentItemObject.OnDragAfter = AfterDragItem;
-        currentItemObject.Size = size;
+
+        currentItemObject.Size = currentItem.Size;
+        currentItemObject.RotateSize = currentItem.Size;
+
+        currentItemObject.transform.position = realPos(Vector3.zero, size.x, size.z);
 
         currentItemObject.SetActive();
     }
@@ -53,9 +67,25 @@ public class GameController : MonoBehaviour {
     private void PlaceItem() {
         if (!currentItemObject) return;
         currentItemObject.SetInactive();
+        // TODO current item
+        currentItem = null;
         currentItemObject = null;
     }
 
+    private void RotateItem() {
+        currentItem.Dir.Next();
+        Vector3 eulerAngles = currentItemObject.transform.eulerAngles;
+        eulerAngles.y = currentItem.Dir.Rotation();
+        currentItemObject.transform.eulerAngles = eulerAngles;
+
+        bool isFlipped = currentItem.Dir.IsFlipped();
+        Vector3i size = currentItem.Size;
+        Vector3i rotateSize = isFlipped ? new Vector3i(size.z, size.y, size.x) : size;
+        currentItemObject.RotateSize = rotateSize;
+        Vector3 pos = currentItemObject.transform.position;
+        
+        currentItemObject.transform.position = realPos(pos, rotateSize.x, rotateSize.z);
+    }
     private void BeforeDragItem() {
         float z = currentItemObject.transform.position.z;
         Plane plane = new Plane(Vector3.back, z);
@@ -69,16 +99,16 @@ public class GameController : MonoBehaviour {
     }
 
     private void DragItem() {
-        Vector3i size = currentItemObject.Size;
+        Vector3i size = currentItemObject.RotateSize;
+    
 		Plane plane = new Plane(Vector3.down, currentItemObject.dragY);
 
     	Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
     	float distance;
     	if(plane.Raycast(ray, out distance)) {
 			Vector3 mousePosition = ray.GetPoint(distance);
-			float x = Mathf.Clamp(Mathf.Round(mousePosition.x - 0.5f * size.x % 2) + 0.5f * size.x % 2, minX + 0.5f * size.x, maxX - 0.5f * size.x);
-			float z = Mathf.Clamp(Mathf.Round(mousePosition.z - 0.5f * size.z % 2) + 0.5f * size.z % 2, minZ + 0.5f * size.z, maxZ - 0.5f * size.z);
-			Vector3 objPosition = new Vector3(x, 0, z);
+            Vector3 objPosition = realPos(mousePosition, size.x, size.z);
+            objPosition.y = 0;
        		currentItemObject.transform.position = objPosition;
     	}
 	
@@ -86,6 +116,14 @@ public class GameController : MonoBehaviour {
 
      private void AfterDragItem() {
          currentItemObject.dragY = 0.0f;
+     }
+
+     // util
+     private Vector3 realPos(Vector3 pos, int sx, int sz) {
+        float x = Mathf.Clamp(Mathf.Round(pos.x - 0.5f * sx % 2) + 0.5f * sx % 2, minX + 0.5f * sx, maxX - 0.5f * sx);
+		float z = Mathf.Clamp(Mathf.Round(pos.z - 0.5f * sz % 2) + 0.5f * sz % 2, minZ + 0.5f * sz, maxZ - 0.5f * sz);
+		
+        return new Vector3(x, pos.y, z);
      }
 
 }

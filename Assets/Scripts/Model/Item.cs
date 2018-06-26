@@ -10,6 +10,7 @@ public class Item {
 
     public Item (Vector3i size) {
         this.Size = size;
+        this.Dir = Direction.A;
     }
 
 }

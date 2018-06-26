@@ -18,6 +18,7 @@ public class ItemObject : MonoBehaviour {
 	public float dragY = 0.0f;
 
 	public Vector3i Size { get; set; } 
+	public Vector3i RotateSize { get; set; } 
 	private GameObject grids;
 
 	private bool isActive;
@@ -39,7 +40,7 @@ public class ItemObject : MonoBehaviour {
 		if (isActive) return;
 		isActive = true;
 		
-		grids = new GameObject();
+		grids = new GameObject("grids");
 		grids.transform.localScale = Vector3.one;
 		grids.transform.parent = transform;
 		Vector3 gridsPos = transform.position;
