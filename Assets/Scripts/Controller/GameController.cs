@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 
     // temp
-    private Vector3i roomSize = new Vector3i(6, 6, 6);
+    private Vector3Int roomSize = new Vector3Int(6, 6, 6);
 
 	private float minX = -3f;
 	private float maxX = 3f;
@@ -14,77 +14,98 @@ public class GameController : MonoBehaviour {
 
     // end temp
 
-    private Room room;
     private RoomObject roomObject;
-
-    private Item currentItem;
     private ItemObject currentItemObject;
+    private GridObject gridObject;
 
     private void Awake(){ 
-        room = new Room(roomSize);
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
         roomObject = roomGO.GetComponent<RoomObject>();
+        roomObject.Init(roomSize);
+
+        GameObject gridGO = new GameObject("grids");
+        gridObject = gridGO.AddComponent<GridObject>();
+        gridObject.Init();
     }
 
 #if UNITY_EDITOR
 	void OnGUI() {
 		if (GUI.Button(new Rect(0, 150, 50, 20), "+ Item")) { 
-            if (currentItem != null) return; 
+            if (currentItemObject != null) return; 
             AddItem();
         }
 
         if (GUI.Button(new Rect(0, 180, 50, 20), "Rotate Item")) { 
-            if (currentItem == null) return; 
+            if (currentItemObject == null) return; 
             RotateItem();
         }
 
         if (GUI.Button(new Rect(0, 210, 50, 20), "Ok Item")) {
-            if (currentItem == null) return; 
+            if (currentItemObject == null) return; 
             PlaceItem();
         }
 	}
 #endif
 
     private void AddItem() {
-        Vector3i size = new Vector3i(3, 1, 2); // TODO
-        currentItem = new Item(size);
+        Vector3Int size = new Vector3Int(3, 1, 2); // TODO
+       
 
         GameObject itemGO = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
         currentItemObject = itemGO.GetComponent<ItemObject>();
+        currentItemObject.Init(size);
 
         currentItemObject.OnDrag = DragItem;
         currentItemObject.OnDragBefore = BeforeDragItem;
         currentItemObject.OnDragAfter = AfterDragItem;
 
-        currentItemObject.Size = currentItem.Size;
-        currentItemObject.RotateSize = currentItem.Size;
+        Vector3 pos = currentItemObject.transform.position;
+        pos = realPos(pos, size.x, size.z);
+        currentItemObject.transform.position = pos;
+        currentItemObject.RoomPosition = roomPos(pos);
 
-        currentItemObject.transform.position = realPos(Vector3.zero, size.x, size.z);
+        gridObject.SetGridsSize(new Vector2Int(size.x, size.z));
+        Vector3 gridPos = gridObject.transform.position;
+        gridPos.x = pos.x - size.x / 2f;
+        gridPos.z = pos.z - size.z / 2f;
+        gridObject.transform.position = gridPos;
 
         currentItemObject.SetActive();
+        gridObject.SetActive();
     }
 
     private void PlaceItem() {
         if (!currentItemObject) return;
         currentItemObject.SetInactive();
+        gridObject.SetInactive();
         // TODO current item
-        currentItem = null;
+        // currentItem.Position = currentItemObject.transform.position;
+        currentItemObject.RoomPosition = roomPos(currentItemObject.transform.position);
+        roomObject.AddItem(currentItemObject);
+        currentItemObject = null;
         currentItemObject = null;
     }
 
     private void RotateItem() {
-        currentItem.Dir.Next();
+        currentItemObject.Dir.Next();
         Vector3 eulerAngles = currentItemObject.transform.eulerAngles;
-        eulerAngles.y = currentItem.Dir.Rotation();
+        eulerAngles.y = currentItemObject.Dir.Rotation();
         currentItemObject.transform.eulerAngles = eulerAngles;
 
-        bool isFlipped = currentItem.Dir.IsFlipped();
-        Vector3i size = currentItem.Size;
-        Vector3i rotateSize = isFlipped ? new Vector3i(size.z, size.y, size.x) : size;
+        bool isFlipped = currentItemObject.Dir.IsFlipped();
+        Vector3Int size = currentItemObject.Size;
+        Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
         currentItemObject.RotateSize = rotateSize;
         Vector3 pos = currentItemObject.transform.position;
-        
-        currentItemObject.transform.position = realPos(pos, rotateSize.x, rotateSize.z);
+        pos = realPos(pos, rotateSize.x, rotateSize.z);
+        currentItemObject.transform.position = pos;
+        currentItemObject.RoomPosition = roomPos(pos);
+
+        gridObject.SetGridsSize(new Vector2Int(rotateSize.x, rotateSize.z));
+        Vector3 gridPos = gridObject.transform.position;
+        gridPos.x = pos.x - rotateSize.x / 2f;
+        gridPos.z = pos.z - rotateSize.z / 2f;
+        gridObject.transform.position = gridPos;
     }
     private void BeforeDragItem() {
         float z = currentItemObject.transform.position.z;
@@ -99,7 +120,7 @@ public class GameController : MonoBehaviour {
     }
 
     private void DragItem() {
-        Vector3i size = currentItemObject.RotateSize;
+        Vector3Int size = currentItemObject.RotateSize;
     
 		Plane plane = new Plane(Vector3.down, currentItemObject.dragY);
 
@@ -107,9 +128,15 @@ public class GameController : MonoBehaviour {
     	float distance;
     	if(plane.Raycast(ray, out distance)) {
 			Vector3 mousePosition = ray.GetPoint(distance);
-            Vector3 objPosition = realPos(mousePosition, size.x, size.z);
-            objPosition.y = 0;
-       		currentItemObject.transform.position = objPosition;
+            Vector3 pos = realPos(mousePosition, size.x, size.z);
+            pos.y = 0;
+       		currentItemObject.transform.position = pos;
+            currentItemObject.RoomPosition = roomPos(pos);
+
+            Vector3 gridPos = gridObject.transform.position;
+            gridPos.x = pos.x - size.x / 2f;
+            gridPos.z = pos.z - size.z / 2f;
+            gridObject.transform.position = gridPos;
     	}
 	
     }
@@ -119,11 +146,21 @@ public class GameController : MonoBehaviour {
      }
 
      // util
+     // 相对于世界的绝对位置
      private Vector3 realPos(Vector3 pos, int sx, int sz) {
         float x = Mathf.Clamp(Mathf.Round(pos.x - 0.5f * sx % 2) + 0.5f * sx % 2, minX + 0.5f * sx, maxX - 0.5f * sx);
 		float z = Mathf.Clamp(Mathf.Round(pos.z - 0.5f * sz % 2) + 0.5f * sz % 2, minZ + 0.5f * sz, maxZ - 0.5f * sz);
 		
         return new Vector3(x, pos.y, z);
+     }
+
+    // 相对于房间的位置
+     private Vector3Int roomPos(Vector3 pos) {
+           pos = pos * 2;
+           return new Vector3Int(
+            (int)pos.x + roomSize.x,
+            (int)pos.y,
+            (int)pos.z + roomSize.z);
      }
 
 }

@@ -9,7 +9,7 @@ using UnityEditor;
 /// <seealso cref="UnityEditor.PropertyDrawer" />
 // [CustomPropertyDrawer(typeof(Vector2i))]
 // [CustomPropertyDrawer(typeof(Vector2d))]
-[CustomPropertyDrawer(typeof(Vector3i))]
+// [CustomPropertyDrawer(typeof(Vector3i))]
 // [CustomPropertyDrawer(typeof(Vector3d))]
 // [CustomPropertyDrawer(typeof(Vector4d))]
 // [CustomPropertyDrawer(typeof(Quaterniond))]

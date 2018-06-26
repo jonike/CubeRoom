@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33716042148446472}
   - component: {fileID: 23597343678327038}
   - component: {fileID: 64306024963898498}
+  - component: {fileID: 114728770783859156}
   m_Layer: 0
   m_Name: ItemGrid
   m_TagString: Untagged
@@ -98,3 +99,16 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &114728770783859156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1168164337607024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50969625e0f8549be96d6fd71f8f108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  correctMaterial: {fileID: 2100000, guid: 8f41d8e2f8efb47a5b6756bcb28ef36f, type: 2}
+  errorMaterial: {fileID: 2100000, guid: 0696f039821494cb78e142869c8de52c, type: 2}
