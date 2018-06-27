@@ -27,7 +27,7 @@ public class RoomObject : MonoBehaviour {
 
 
 
-    public bool AddItem(ItemObject item) {
+    public void AddItem(ItemObject item) {
         items.Add(item);
 
         bool isFlipped = item.Dir.IsFlipped();
@@ -39,15 +39,11 @@ public class RoomObject : MonoBehaviour {
             {
                 for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
                 {
-					if (groundSpace[z, x] != null)
-						return false; 
                     groundSpace[z, x] = item;
                 }
             }
         
         }
-
-		return true;
     }
 
 	public List<Vector2Int> ConflictSpace(ItemObject item){

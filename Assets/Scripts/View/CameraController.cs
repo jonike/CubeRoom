@@ -5,15 +5,24 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
 	// Use this for initialization
-
+    private float defaultRotationY = -135f;
+    private float defaultPositionX = 9f;
+    private float defaultPositionZ = 9f;
+    private float defaultPositionY = 10.3f;
 	private float perspectiveZoomSpeed = 0.5f;        // The rate of change of the field of view in perspective mode.
     private float orthoZoomSpeed = 0.05f;        // The rate of change of the orthographic size in orthographic mode.
 
     private float MoveSpeed = 0.1f;
+    private float RotateSpeed = 1f;
 	private float orthographicMin = 2.0f;
 	private float orthographicMax = 5.0f;
 
 	private Camera camera;
+
+    // record
+    private float rotateDegree = 0;
+    private float moveVertical = 0;
+    private float moveHorizontal = 0;
 
 #if UNITY_EDITOR
 	void OnGUI() {
@@ -25,19 +34,27 @@ public class CameraController : MonoBehaviour {
             Zoom(1f);
         }
 
-        if (GUI.RepeatButton(new Rect(30, 30, 50, 20), "↑")) {  
+        if (GUI.RepeatButton(new Rect(0, 30, 50, 20), "左转")) {  
+            Rotate(-1f);
+        }
+
+		if (GUI.RepeatButton(new Rect(60, 30, 50, 20), "右转")) {  
+            Rotate(1f);
+        }
+
+        if (GUI.RepeatButton(new Rect(30, 60, 50, 20), "↑")) {  
             Move(new Vector2(0, 1));
         }
 
-        if (GUI.RepeatButton(new Rect(30, 90, 50, 20), "↓")) {  
+        if (GUI.RepeatButton(new Rect(30, 120, 50, 20), "↓")) {  
             Move(new Vector2(0, -1));
         }
 
-        if (GUI.RepeatButton(new Rect(0, 60, 50, 20), "←")) {  
+        if (GUI.RepeatButton(new Rect(0, 90, 50, 20), "←")) {  
             Move(new Vector2(-1, 0));
         }
 
-        if (GUI.RepeatButton(new Rect(60, 60, 50, 20), "→")) {  
+        if (GUI.RepeatButton(new Rect(60, 90, 50, 20), "→")) {  
             Move(new Vector2(1, 0));
         }
     
@@ -83,15 +100,39 @@ public class CameraController : MonoBehaviour {
         }
 	}
 
-    private void Move(Vector2 deltaVec) {
-        float rotationY = camera.transform.rotation.y;
-        Vector3 cameraPosition =  camera.transform.position;
-        cameraPosition.y += deltaVec.y * MoveSpeed;
-        cameraPosition.x += -Mathf.Cos(rotationY) * deltaVec.x * MoveSpeed;
-        cameraPosition.z += -Mathf.Sin(rotationY) * deltaVec.x * MoveSpeed;
+    private void Rotate(float deltaDegree) {
 
-        camera.transform.position = cameraPosition;
+        rotateDegree += deltaDegree * RotateSpeed;
+
+        SetCameraTransform();
+    }
+
+    private void Move(Vector2 deltaVec) {
+        moveHorizontal += deltaVec.x * MoveSpeed;
+        moveVertical += deltaVec.y * MoveSpeed;
+        
+        SetCameraTransform();
     }
     
+    private void SetCameraTransform() {
+        Vector3 cameraPosition =  camera.transform.position;
+        Vector3 cameraRotation = camera.transform.eulerAngles;
+
+        cameraRotation.y = defaultRotationY - rotateDegree;
+
+        float rotateRad = rotateDegree * Mathf.Deg2Rad;
+        float moveDegree = (defaultRotationY + rotateDegree + 180);
+        float moveRad = moveDegree * Mathf.Deg2Rad;
+        
+        cameraPosition.x = defaultPositionX * Mathf.Cos(rotateRad) - defaultPositionZ * Mathf.Sin(rotateRad);
+        cameraPosition.z = defaultPositionX * Mathf.Sin(rotateRad) + defaultPositionZ * Mathf.Cos(rotateRad);
+        cameraPosition.x += - Mathf.Sin(moveRad) * moveHorizontal;
+        cameraPosition.z += + Mathf.Cos(moveRad) * moveHorizontal;
+
+        cameraPosition.y = defaultPositionY + moveVertical;
+
+        camera.transform.position = cameraPosition;
+        camera.transform.eulerAngles = cameraRotation;
+    }
 
 }
