@@ -7,12 +7,14 @@ using UnityEngine.EventSystems;
 public class ItemButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     public ScrollRect parentScroll;
+    public ButtonCellView cellView;
 
     private bool scroll;
 
     void Start () 
     {
-        parentScroll = GetComponentInParent<ScrollRect> ();
+        parentScroll = GetComponentInParent<ScrollRect>();
+        cellView = GetComponentInParent<ButtonCellView>();
     }
  	public void OnBeginDrag(PointerEventData eventData)
      {
@@ -22,11 +24,11 @@ public class ItemButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 		float diffX = Mathf.Abs(eventData.position.x - eventData.pressPosition.x);
 		float diffY = Mathf.Abs(eventData.position.y - eventData.pressPosition.y);
 		if (diffX < diffY){
-            Debug.Log(1);
 			scroll = true;
             parentScroll.OnBeginDrag(eventData);
 		} else {
             scroll = false;
+            cellView.OnItemBeginDrag(eventData);
         }
      }
  
@@ -34,13 +36,17 @@ public class ItemButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
      {
         if (scroll) {
             parentScroll.OnDrag(eventData);
+        } else {
+            cellView.OnItemDrag(eventData);
         }
      }
  
      public void OnEndDrag(PointerEventData eventData)
      {
-		 if (scroll) {
+		if (scroll) {
             parentScroll.OnEndDrag(eventData);
+        } else {
+            cellView.OnItemEndDrag(eventData);
         }
      }
 }

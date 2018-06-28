@@ -13,6 +13,8 @@ public class ButtonCellView : MonoBehaviour {
     private CellView cellView;
 
 	private ScrollRect scrollRect;
+
+	private GameObject curItem;
     void Start()
     {
 		scrollRect = GetComponent<ScrollRect>();
@@ -53,12 +55,33 @@ public class ButtonCellView : MonoBehaviour {
     
     }
 
-    void CellAtIndex(GameObject gameObject, int index)
+	public void OnItemBeginDrag(PointerEventData eventData) {
+		curItem = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
+		SetItemPos(eventData.position);
+	}
+
+	public void OnItemDrag(PointerEventData eventData) {
+		SetItemPos(eventData.position);
+	}
+
+	public void OnItemEndDrag(PointerEventData eventData) {
+		SetItemPos(eventData.position);
+	}
+
+	void SetItemPos(Vector2 mousePosition) {
+		Vector3 pos = mousePosition;
+ 		pos.z = 10.0f;
+ 		pos = Camera.main.ScreenToWorldPoint(pos);
+
+		curItem.transform.position = pos;
+	}
+
+    public void CellAtIndex(GameObject gameObject, int index)
     {
 		// gameObject.GetComponent<ItemButton>().parentScroll = scrollRect;
         gameObject.transform.Find("Text").GetComponent<Text>().text = index.ToString();
     }
-    int CountOfCell()
+    public int CountOfCell()
     {
         return count;
     }
