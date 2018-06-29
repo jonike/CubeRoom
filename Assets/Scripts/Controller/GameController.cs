@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sorumi.Util;
 
 public class GameController : MonoBehaviour
 {
@@ -15,12 +16,16 @@ public class GameController : MonoBehaviour
 
     // end temp
 
+    private RoomCamera camera;
     private RoomObject roomObject;
     private ItemObject currentItemObject;
     private GridObject gridObject;
 
-    private void Awake()
+    private void Start()
     {
+        camera = Camera.main.GetComponent<RoomCamera>();
+        camera.OnCameraRotate = onCameraRotate;
+
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
         roomObject = roomGO.GetComponent<RoomObject>();
         roomObject.Init(roomSize);
@@ -53,10 +58,13 @@ public class GameController : MonoBehaviour
     }
 #endif
 
+    private void onCameraRotate(float angle) {
+        roomObject.RefreshByAngle(Math.mod(angle, 360));
+    }
+
     private void AddItem()
     {
         Vector3Int size = new Vector3Int(3, 1, 2); // TODO
-
 
         GameObject itemGO = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
         currentItemObject = itemGO.GetComponent<ItemObject>();

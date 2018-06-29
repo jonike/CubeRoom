@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class CameraController : MonoBehaviour {
+public class RoomCamera : MonoBehaviour {
 
 	// Use this for initialization
     private float defaultRotationY = -135f;
@@ -18,6 +17,9 @@ public class CameraController : MonoBehaviour {
 	private float orthographicMax = 5.0f;
 
 	private Camera camera;
+
+    public delegate void FloatDelegate(float value);
+    public FloatDelegate OnCameraRotate;
 
     // record
     private float rotateDegree = 0;
@@ -133,6 +135,10 @@ public class CameraController : MonoBehaviour {
 
         camera.transform.position = cameraPosition;
         camera.transform.eulerAngles = cameraRotation;
+
+        if (OnCameraRotate != null) {
+            OnCameraRotate(moveDegree);
+        }
     }
 
 }

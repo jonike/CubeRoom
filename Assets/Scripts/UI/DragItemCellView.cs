@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using Sorumi.UI;
 
 [RequireComponent(typeof(CellView))]
-public class ButtonCellView : MonoBehaviour {
+public class DragItemCellView : MonoBehaviour {
 
     // Use this for initialization
     public int count;
@@ -74,6 +74,13 @@ public class ButtonCellView : MonoBehaviour {
  		pos = Camera.main.ScreenToWorldPoint(pos);
 
 		curItem.transform.position = pos;
+
+		// add
+		if (mousePosition.x < 1000) {
+			curItem.layer = 0;
+		} else {
+			curItem.layer = 8;
+		}
 	}
 
     public void CellAtIndex(GameObject gameObject, int index)

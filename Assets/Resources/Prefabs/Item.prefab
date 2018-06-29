@@ -110,4 +110,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7aaeef88e1084552be3a21c32cc93e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yAxis: 0
+  dragY: 0

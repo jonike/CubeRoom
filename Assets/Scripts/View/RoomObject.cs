@@ -6,6 +6,14 @@ public class RoomObject : MonoBehaviour {
 
     public Vector3Int Size { get; set; }
 
+	private Ground ground;
+
+	private Wall[] walls;
+
+	private Pillar[] pillars;
+
+	private string[] wallNames = {"a", "b", "c", "d"};
+
     private List<ItemObject> items;
 
     // private Item[,,] occupiedSpace;
@@ -23,8 +31,35 @@ public class RoomObject : MonoBehaviour {
         this.wallBSpace = new ItemObject[size.y * 2, size.z * 2];
         this.wallCSpace = new ItemObject[size.y * 2, size.x * 2];
         this.wallDSpace = new ItemObject[size.y * 2, size.z * 2];
+
+		//
+		ground = transform.Find("ground").GetComponent<Ground>();
+		walls = new Wall[4];
+		pillars = new Pillar[4];
+		for (int i = 0; i < 4; i++)
+		{
+			Wall wall  = transform.Find("wall_" + wallNames[i]).GetComponent<Wall>();
+			walls[i] = wall;
+			Pillar pillar  = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
+			pillars[i] = pillar;
+		}
+
     }
 
+	public void RefreshByAngle(float angle) {
+		Debug.Log(angle);
+
+		walls[0].Hide(angle > 270 || angle < 90);
+		walls[1].Hide(angle > 0 && angle < 180);
+		walls[2].Hide(angle > 90 && angle < 270);
+		walls[3].Hide(angle > 180 && angle < 360);
+
+		pillars[0].Hide(angle > 270 || angle < 180);
+		pillars[1].Hide(angle > 0 && angle < 270);
+		pillars[2].Hide(angle > 90 && angle < 360);
+		pillars[3].Hide(angle > 180 || angle < 90);
+
+	}
 
 
     public void AddItem(ItemObject item) {

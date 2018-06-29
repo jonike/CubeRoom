@@ -34,6 +34,7 @@ public class ItemObject : MonoBehaviour {
         this.IsOccupid = true; // TODO
     }
 	void OnMouseDrag() {
+		Debug.Log(1);
 		if (OnDrag != null) OnDrag();
 	}
 

@@ -4,17 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class ItemButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+public class ItemCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     public ScrollRect parentScroll;
-    public ButtonCellView cellView;
+    public DragItemCellView cellView;
 
     private bool scroll;
 
     void Start () 
     {
         parentScroll = GetComponentInParent<ScrollRect>();
-        cellView = GetComponentInParent<ButtonCellView>();
+        cellView = GetComponentInParent<DragItemCellView>();
     }
  	public void OnBeginDrag(PointerEventData eventData)
      {
