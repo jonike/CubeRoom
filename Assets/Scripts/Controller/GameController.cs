@@ -17,8 +17,11 @@ public class GameController : MonoBehaviour
     // end temp
 
     private RoomCamera camera;
-    private RoomObject roomObject;
-    private ItemObject currentItemObject;
+    private Room room;
+
+    private bool isItemEdited;
+    private ItemObject currentItem;
+    private DragableItem currentItemDrag;
     private GridObject gridObject;
 
     private void Start()
@@ -27,154 +30,228 @@ public class GameController : MonoBehaviour
         camera.OnCameraRotate = onCameraRotate;
 
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
-        roomObject = roomGO.GetComponent<RoomObject>();
-        roomObject.Init(roomSize);
+        room = roomGO.GetComponent<Room>();
+        room.Init(roomSize);
 
         GameObject gridGO = Instantiate(Resources.Load("Prefabs/Grids")) as GameObject;
         gridObject = gridGO.GetComponent<GridObject>();
         gridObject.Init();
+
     }
 
 #if UNITY_EDITOR
     void OnGUI()
     {
-        if (GUI.Button(new Rect(0, 150, 50, 20), "+ Item"))
+        if (GUI.Button(new Rect(0, 150, 60, 20), "+ H Item"))
         {
-            if (currentItemObject != null) return;
-            AddItem();
+            if (isItemEdited) return;
+            AddItem(ItemType.Horizontal);
         }
 
-        if (GUI.Button(new Rect(0, 180, 50, 20), "Rotate Item"))
+        if (GUI.Button(new Rect(80, 150, 60, 20), "+ V Item"))
         {
-            if (currentItemObject == null) return;
+            if (isItemEdited) return;
+            AddItem(ItemType.Vertical);
+        }
+
+        if (GUI.Button(new Rect(0, 180, 60, 20), "Rotate Item"))
+        {
+            if (!isItemEdited) return;
             RotateItem();
         }
 
-        if (GUI.Button(new Rect(0, 210, 50, 20), "Ok Item"))
+        if (GUI.Button(new Rect(0, 210, 60, 20), "Ok Item"))
         {
-            if (currentItemObject == null) return;
+            if (!isItemEdited) return;
             PlaceItem();
         }
     }
 #endif
 
-    private void onCameraRotate(float angle) {
-        roomObject.RefreshByAngle(Math.mod(angle, 360));
+    private void onCameraRotate(float angle)
+    {
+        room.RefreshByAngle(Math.mod(angle, 360));
     }
 
-    private void AddItem()
+    private void AddItem(ItemType type)
     {
         Vector3Int size = new Vector3Int(3, 1, 2); // TODO
 
-        GameObject itemGO = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
-        currentItemObject = itemGO.GetComponent<ItemObject>();
-        currentItemObject.Init(size);
+        GameObject itemGO = null;
+        if (type == ItemType.Horizontal)
+        {
+            itemGO = Instantiate(Resources.Load("Prefabs/HItem")) as GameObject;
+        }
+        else if (type == ItemType.Vertical)
+        {
+            itemGO = Instantiate(Resources.Load("Prefabs/VItem")) as GameObject;
+        }
 
-        currentItemObject.OnDrag = DragItem;
-        currentItemObject.OnDragBefore = BeforeDragItem;
-        currentItemObject.OnDragAfter = AfterDragItem;
+        itemGO.transform.position = new Vector3(0, 2, 0);
+        currentItem = itemGO.GetComponent<ItemObject>();
+        currentItemDrag = itemGO.GetComponent<DragableItem>();
 
-        Vector3 pos = currentItemObject.transform.position;
-        pos = realPos(pos, size.x, size.z);
-        currentItemObject.transform.position = pos;
-        currentItemObject.RoomPosition = roomPos(pos);
+        currentItem.Init(type, size);
 
-        gridObject.SetGridsSize(new Vector2Int(size.x, size.z));
-        Vector3 gridPos = gridObject.transform.position;
-        gridPos.x = pos.x - size.x / 2f;
-        gridPos.z = pos.z - size.z / 2f;
-        gridObject.transform.position = gridPos;
+        currentItemDrag.OnDrag = OnDragItem;
+        currentItemDrag.OnDragBefore = OnBeginDragItem;
+        currentItemDrag.OnDragAfter = OnEndDragItem;
 
-        currentItemObject.SetActive();
-        gridObject.SetActive();
+        isItemEdited = true;
+        room.RefreshGrids(true, type);
 
-        gridObject.SetGridsType(itemGridTypes(currentItemObject));
+        // Vector3 pos = currentItem.transform.position;
+        // pos = realPos(pos, size.x, size.z);
+        // currentItem.transform.position = pos;
+        // currentItem.RoomPosition = roomPos(pos);
+
+        // gridObject.SetGridsSize(new Vector2Int(size.x, size.z));
+        // Vector3 gridPos = gridObject.transform.position;
+        // gridPos.x = pos.x - size.x / 2f;
+        // gridPos.z = pos.z - size.z / 2f;
+        // gridObject.transform.position = gridPos;
+
+        // currentItem.SetActive();
+        // gridObject.SetActive();
+
+        // gridObject.SetGridsType(itemGridTypes(currentItem));
 
     }
 
     private void PlaceItem()
     {
-        if (!currentItemObject) return;
-        
+
+        isItemEdited = false;
+        room.RefreshGrids(false, currentItem.Type);
+        currentItem = null;
+
         // TODO current item
-        bool success = roomObject.ConflictSpace(currentItemObject).Count == 0;
-        if (success) {
-            roomObject.AddItem(currentItemObject);
-            currentItemObject.SetInactive();
-            gridObject.SetInactive();
-            currentItemObject = null;
-        }
+        // bool success = room.ConflictSpace(currentItem).Count == 0;
+        // if (success) {
+        //     room.AddItem(currentItem);
+        //     currentItem.SetInactive();
+        //     gridObject.SetInactive();
+        //     currentItem = null;
+        // }
     }
 
     private void RotateItem()
     {
-        currentItemObject.Dir.Next();
-        Vector3 eulerAngles = currentItemObject.transform.eulerAngles;
-        eulerAngles.y = currentItemObject.Dir.Rotation();
-        currentItemObject.transform.eulerAngles = eulerAngles;
+        // currentItem.Dir.Next();
+        // Vector3 eulerAngles = currentItem.transform.eulerAngles;
+        // eulerAngles.y = currentItem.Dir.Rotation();
+        // currentItem.transform.eulerAngles = eulerAngles;
 
-        bool isFlipped = currentItemObject.Dir.IsFlipped();
-        Vector3Int size = currentItemObject.Size;
-        Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
-        currentItemObject.RotateSize = rotateSize;
-        Vector3 pos = currentItemObject.transform.position;
-        pos = realPos(pos, rotateSize.x, rotateSize.z);
-        currentItemObject.transform.position = pos;
-        currentItemObject.RoomPosition = roomPos(pos);
+        // bool isFlipped = currentItem.Dir.IsFlipped();
+        // Vector3Int size = currentItem.Size;
+        // Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
+        // currentItem.RotateSize = rotateSize;
+        // Vector3 pos = currentItem.transform.position;
+        // pos = realPos(pos, rotateSize.x, rotateSize.z);
+        // currentItem.transform.position = pos;
+        // currentItem.RoomPosition = roomPos(pos);
 
-        gridObject.SetGridsSize(new Vector2Int(rotateSize.x, rotateSize.z));
-        Vector3 gridPos = gridObject.transform.position;
-        gridPos.x = pos.x - rotateSize.x / 2f;
-        gridPos.z = pos.z - rotateSize.z / 2f;
-        gridObject.transform.position = gridPos;
+        // gridObject.SetGridsSize(new Vector2Int(rotateSize.x, rotateSize.z));
+        // Vector3 gridPos = gridObject.transform.position;
+        // gridPos.x = pos.x - rotateSize.x / 2f;
+        // gridPos.z = pos.z - rotateSize.z / 2f;
+        // gridObject.transform.position = gridPos;
 
-        gridObject.SetGridsType(itemGridTypes(currentItemObject));
+        // gridObject.SetGridsType(itemGridTypes(currentItem));
     }
-    private void BeforeDragItem()
+    private void OnBeginDragItem()
     {
-        float z = currentItemObject.transform.position.z;
-        Plane plane = new Plane(Vector3.back, z);
+        Plane plane = currentItem.Item.GetOffsetPlane(currentItem.transform.position);
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        float distance;
-        if (plane.Raycast(ray, out distance))
+        Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
+
+        // currentItemDrag.DragAnchor = mousePosition;
+        currentItemDrag.SetDragOffset(mousePosition);
+        // currentItemDrag.DragPlane = itemDragPlane(currentItem, currentItemDrag);
+    }
+
+    private void OnDragItem()
+    {
+        // Vector3Int size = currentItem.RotateSize;
+
+        // Plane plane = currentItemDrag.DragPlane;
+        // Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
+        // Vector3 realPosition = itemRealPostion(currentItem, mousePosition);
+
+        Vector3 realPosition = Vector3.zero;
+        if (currentItem.Type == ItemType.Horizontal)
         {
-            Vector3 mousePosition = ray.GetPoint(distance);
-            currentItemObject.dragY = mousePosition.y;
+            realPosition = room.ScreenToWorldOfGround(Input.mousePosition, currentItemDrag.DragOffset);
         }
-    }
-
-    private void DragItem()
-    {
-        Vector3Int size = currentItemObject.RotateSize;
-
-        Plane plane = new Plane(Vector3.down, currentItemObject.dragY);
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        float distance;
-        if (plane.Raycast(ray, out distance))
+        else if (currentItem.Type == ItemType.Vertical)
         {
-            Vector3 mousePosition = ray.GetPoint(distance);
-            Vector3 pos = realPos(mousePosition, size.x, size.z);
-            pos.y = 0;
-            currentItemObject.transform.position = pos;
-            currentItemObject.RoomPosition = roomPos(pos);
-
-            Vector3 gridPos = gridObject.transform.position;
-            gridPos.x = pos.x - size.x / 2f;
-            gridPos.z = pos.z - size.z / 2f;
-            gridObject.transform.position = gridPos;
-
-            gridObject.SetGridsType(itemGridTypes(currentItemObject));
+            realPosition = room.ScreenToWorldOfWall(Input.mousePosition, currentItemDrag.DragOffset, currentItem.Item.Dir);
         }
+        currentItem.transform.position = realPosition;
+
+
+
+        // Debug.Log(mousePosition);
+
+        // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        // float distance;
+        // if (plane.Raycast(ray, out distance))
+        // {
+        //     Vector3 mousePosition = ray.GetPoint(distance);
+        //     Vector3 pos = realPos(mousePosition, size.x, size.z);
+        //     pos.y = 0;
+        //     currentItem.transform.position = pos;
+        //     currentItem.RoomPosition = roomPos(pos);
+
+        //     Vector3 gridPos = gridObject.transform.position;
+        //     gridPos.x = pos.x - size.x / 2f;
+        //     gridPos.z = pos.z - size.z / 2f;
+        //     gridObject.transform.position = gridPos;
+
+        //     gridObject.SetGridsType(itemGridTypes(currentItem));
+        // }
 
     }
 
-    private void AfterDragItem()
+    private void OnEndDragItem()
     {
-        currentItemObject.dragY = 0.0f;
+        // currentItem.dragY = 0.0f;
     }
 
+    // private Plane itemDragPlane(ItemObject item, DragableItem itemDrag) {
+    //     if (item.Type == ItemType.Horizontal) {
+    //         return new Plane(Vector3.down, itemDrag.DragOffset.y);
+
+    //     } else if (item.Type == ItemType.Vertical) {
+    //         Vector3 dirVec = item.Item.Dir.Vector;
+    //         Vector3 size = room.Size;
+    //         float distance = (- Vector3.Scale(dirVec, size / 2) + itemDrag.DragAnchor).magnitude; 
+    //         Plane plane = new Plane(- dirVec, - distance);
+    //         Debug.Log("plane: " + plane);
+    //         return plane;
+    //     }
+
+    //     return new Plane(Vector3.down, 0);
+
+    // }
+    // private Vector3 itemRealPostion(ItemObject item, Vector3 position) {
+    //     if (item.Type == ItemType.Horizontal) {
+    //         position.y = 0;
+    //         return position;
+    //     } else if (item.Type == ItemType.Vertical) {
+    //         Vector3 dirVec = item.Item.Dir.Vector;
+    //         Vector3 size = room.Size;
+    //         Vector3 result = Vector3.Scale(- dirVec, size / 2);
+    //         result += Vector3.Scale((Vector3.one - dirVec.normalized), position);
+    //         Debug.Log("real pos: " + "  " + result);
+    //         return result;
+    //     }
+    //     return Vector3.zero;
+    // }
+
+
+
+    // ----------------
     // util
     // 相对于世界的绝对位置
     private Vector3 realPos(Vector3 pos, int sx, int sz)
@@ -195,33 +272,33 @@ public class GameController : MonoBehaviour
          (int)pos.z + roomSize.z);
     }
 
-    private bool[,] itemGridTypes(ItemObject item) {
-        List<Vector2Int> conflictSpaces = roomObject.ConflictSpace(item);
-        List<Vector2Int> conflictGrids = conflictSpaceToGrid(item, conflictSpaces);
-        bool[,] gridTypes = new bool[item.RotateSize.z, item.RotateSize.x];
+    // private bool[,] itemGridTypes(ItemBehaviour item) {
+    //     List<Vector2Int> conflictSpaces = room.ConflictSpace(item);
+    //     List<Vector2Int> conflictGrids = conflictSpaceToGrid(item, conflictSpaces);
+    //     bool[,] gridTypes = new bool[item.RotateSize.z, item.RotateSize.x];
 
-        foreach (Vector2Int grid in conflictGrids)
-        {
-            gridTypes[grid.y, grid.x] = true;
-        }
+    //     foreach (Vector2Int grid in conflictGrids)
+    //     {
+    //         gridTypes[grid.y, grid.x] = true;
+    //     }
 
-        return gridTypes;
-    }
-    private List<Vector2Int> conflictSpaceToGrid(ItemObject item, List<Vector2Int> spaces)
-    {
-        List<Vector2Int> grids = new List<Vector2Int>();
-        Vector2Int roomPos = new Vector2Int(item.RoomPosition.x, item.RoomPosition.z);
-        Vector2Int rotateSize = new Vector2Int(item.RotateSize.x, item.RotateSize.z);
+    //     return gridTypes;
+    // }
+    // private List<Vector2Int> conflictSpaceToGrid(ItemBehaviour item, List<Vector2Int> spaces)
+    // {
+    //     List<Vector2Int> grids = new List<Vector2Int>();
+    //     Vector2Int roomPos = new Vector2Int(item.RoomPosition.x, item.RoomPosition.z);
+    //     Vector2Int rotateSize = new Vector2Int(item.RotateSize.x, item.RotateSize.z);
 
-        foreach (Vector2Int space in spaces)
-        {
-            Vector2Int grid = space + rotateSize - roomPos;
-            grid.x /= 2;
-            grid.y /= 2;
-            grids.Add(grid);
-            Debug.Log(grid);
-        }
-        return grids;
-    }
+    //     foreach (Vector2Int space in spaces)
+    //     {
+    //         Vector2Int grid = space + rotateSize - roomPos;
+    //         grid.x /= 2;
+    //         grid.y /= 2;
+    //         grids.Add(grid);
+    //         Debug.Log(grid);
+    //     }
+    //     return grids;
+    // }
 
 }

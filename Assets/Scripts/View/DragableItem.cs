@@ -1,0 +1,58 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DragableItem : MonoBehaviour {
+
+	public Item Item;
+
+	public delegate void VoidAction();
+	public VoidAction OnDrag;
+	public VoidAction OnDragBefore;
+	public VoidAction OnDragAfter;
+	
+	/* 
+	 * VerticalItem 计算 y 和 x
+	 * HorizontalItem 只计算 y
+	 */
+	public Vector2 DragOffset;
+	// private Vector3 dragAnchor;
+	// public Vector3 DragAnchor {
+	// 	set {
+	// 		value = value - transform.position;
+	// 		dragAnchor = Item.GetDragAnchor(value);
+	// 		Debug.Log("dragAnchor: " + dragAnchor);
+	// 	}
+	// 	get {
+	// 		return dragAnchor;
+	// 	}
+	// }
+	
+	public Plane DragPlane {
+		set; get;
+	}
+
+
+	void Start() {
+		Item = GetComponent<ItemObject>().Item;
+	}
+	void OnMouseDown() {
+		if (OnDragBefore != null) OnDragBefore();
+	}
+
+	void OnMouseDrag() {
+		if (OnDrag != null) OnDrag();
+	}
+
+	void OnMouseUp() {
+		if (OnDragAfter != null) OnDragAfter();
+	}
+
+	public void SetDragOffset(Vector3 position) {
+		// Debug.Log("relative pos: " + position + transform.position);
+		position = position - transform.position;
+		// Debug.Log("relative pos: " + position);
+		DragOffset = Item.GetDragOffset(position);
+		Debug.Log("dragOffset: " + DragOffset);
+	}
+}

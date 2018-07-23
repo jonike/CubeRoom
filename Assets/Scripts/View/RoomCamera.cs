@@ -91,6 +91,10 @@ public class RoomCamera : MonoBehaviour {
 			Zoom(deltaMagnitudeDiff);
         }
     }
+    public void OnMouseDown()
+    {
+        Debug.Log("camera");
+    }
 
 	private void Zoom(float deltaMagnitudeDiff) {
 		if (camera.orthographic) {
@@ -116,7 +120,7 @@ public class RoomCamera : MonoBehaviour {
         SetCameraTransform();
     }
     
-    private void SetCameraTransform() {
+    public void SetCameraTransform() {
         Vector3 cameraPosition =  camera.transform.position;
         Vector3 cameraRotation = camera.transform.eulerAngles;
 

@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class Ground : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	private GameObject grid;
+	void Start () 
+	{
+		grid = transform.Find("grid").gameObject;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	public void ShowGrid(bool show)
+	{
+		grid.SetActive(show);
 	}
 }
