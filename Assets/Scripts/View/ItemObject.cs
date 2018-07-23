@@ -24,6 +24,13 @@ public class ItemObject : MonoBehaviour {
 	public void Init (Vector3Int size) {
 		Init(ItemType.Horizontal, size);
 	}
+
+	public void SetDir(Direction dir) {
+		Item.Dir = dir;
+		Vector3 eulerAngles = transform.eulerAngles;
+        eulerAngles.y = dir.Rotation();
+        transform.eulerAngles = eulerAngles;
+	}
 	
 	
 	// Update is called once per frame

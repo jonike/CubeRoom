@@ -21,7 +21,7 @@ public class VerticalItem : Item {
 		Vector3 dir = Vector3.Cross(Dir.Vector, Vector3.up);
         float distance = Vector3.Dot(dir.normalized, position);
 		Plane plane = new Plane(dir, - distance);
-		Debug.Log("offset plane: " + plane);
+		// Debug.Log("offset plane: " + plane);
         return plane;
     }
 

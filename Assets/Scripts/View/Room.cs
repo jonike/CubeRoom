@@ -91,16 +91,17 @@ public class Room : MonoBehaviour
 
         Vector3 dirVec = dir.Vector;
         Vector3 size = Size;
-        float distance =  Vector3.Dot(dirVec, size / 2) - offset.x;
-        Plane plane = new Plane(- dirVec, - distance);
-        Debug.Log("plane: " + plane);
+        float distanceRoom = Mathf.Abs(Vector3.Dot(dirVec, size / 2));
+        float distance =  distanceRoom - offset.x;
+        Plane plane = new Plane(dirVec, distance);
+        // Debug.Log("plane: " + plane);
 
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
 
         position -= offset.x * dirVec;
         position.y -= offset.y;
 
-        Debug.Log("real pos: " + "  " + position);
+        // Debug.Log("real pos: " + "  " + position);
 
         return position;
     }

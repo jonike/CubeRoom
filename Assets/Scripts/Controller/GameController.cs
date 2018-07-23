@@ -137,6 +137,7 @@ public class GameController : MonoBehaviour
 
     private void RotateItem()
     {
+        currentItem.SetDir(currentItem.Item.Dir.Next());
         // currentItem.Dir.Next();
         // Vector3 eulerAngles = currentItem.transform.eulerAngles;
         // eulerAngles.y = currentItem.Dir.Rotation();

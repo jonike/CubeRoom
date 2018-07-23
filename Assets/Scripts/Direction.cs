@@ -48,6 +48,7 @@ public class Direction {
         }
     }
 
+    private static Direction[] directions = {A, B, C, D, E, F, G, H};
     public int Value;
     public Vector3 Vector;
 
@@ -59,8 +60,8 @@ public class Direction {
         return this.Value * 45;
     }
 
-    public void Next() {
-        Value = (Value + 2) % 8;
+    public Direction Next() {
+        return directions[(Value + 2) % 8];
     }
 
     public bool IsFlipped() {
