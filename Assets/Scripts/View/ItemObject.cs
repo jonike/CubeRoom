@@ -2,39 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemObject : MonoBehaviour {
+public class ItemObject : MonoBehaviour
+{
 
-	public ItemType Type;
-	public Item Item;
+    public ItemType Type;
+    public Item Item;
 
 
-	// Use this for initialization
-	public void Init (ItemType type, Vector3Int size) {
-		if (type == ItemType.Horizontal) {
-			Item = new HorizontalItem();
-		} else if (type == ItemType.Vertical) {
-			Item = new VerticalItem();
-		}
-		this.Type = type;
-		Item.Size = size;
-		Item.RotateSize = size;
-		Item.Dir = Direction.A;
-		Item.IsOccupid = true; // TODO
-	}
-	public void Init (Vector3Int size) {
-		Init(ItemType.Horizontal, size);
-	}
+    // Use this for initialization
+    public void Init(ItemType type, Vector3Int size)
+    {
+        if (type == ItemType.Horizontal)
+        {
+            Item = new HorizontalItem();
+        }
+        else if (type == ItemType.Vertical)
+        {
+            Item = new VerticalItem();
+        }
+        this.Type = type;
+        Item.Dir = Direction.A; // TODO
+        Item.Size = size;
+        Item.FlippedSize = new Vector3Int(size.z, size.y, size.x);
+        Item.RotateSize = Item.Dir.IsFlipped() ? Item.FlippedSize : Item.Size;
 
-	public void SetDir(Direction dir) {
-		Item.Dir = dir;
-		Vector3 eulerAngles = transform.eulerAngles;
+        Item.IsOccupid = true; // TODO
+    }
+    public void Init(Vector3Int size)
+    {
+        Init(ItemType.Horizontal, size);
+    }
+
+    public void SetDir(Direction dir)
+    {
+        Item.Dir = dir;
+        Item.RotateSize = dir.IsFlipped() ? Item.FlippedSize : Item.Size;
+        Vector3 eulerAngles = transform.eulerAngles;
         eulerAngles.y = dir.Rotation();
         transform.eulerAngles = eulerAngles;
-	}
-	
-	
-	// Update is called once per frame
-	// void Update () {
-		
-	// }
+    }
 }

@@ -76,6 +76,50 @@ public class Room : MonoBehaviour
         }
     }
 
+    public Vector3 ItemPositionOfGround(
+       Item item,
+       Vector3 screenPosition,
+       Vector2 offset)
+    {
+        Vector3 worldPosition = ScreenToWorldOfGround(screenPosition, offset);
+        float maxX = (Size.x - item.RotateSize.x) / 2.0f;
+        float minX = -maxX;
+        float maxZ = (Size.z - item.RotateSize.z) / 2.0f;
+        float minZ = -maxZ;
+        float x = Mathf.Clamp(worldPosition.x, minX, maxX);
+        float z = Mathf.Clamp(worldPosition.z, minZ, maxZ);
+
+        return new Vector3(x, worldPosition.y, z);
+    }
+
+    public Vector3 ItemPositionOfWall(
+        Item item,
+        Vector3 screenPosition,
+        Vector2 offset,
+        Direction dir)
+    {
+        Vector3 worldPosition = ScreenToWorldOfWall(screenPosition, offset, dir);
+        Vector3Int itemSize = item.Size;
+        float maxY = Size.y - itemSize.y / 2.0f;
+        float minY = itemSize.y / 2.0f;
+        float y = Mathf.Clamp(worldPosition.y, minY, maxY);
+
+        if (!dir.IsFlipped())
+        {
+            float maxX = (Size.x - itemSize.x) / 2.0f;
+            float minX = -maxX;
+            float x = Mathf.Clamp(worldPosition.x, minX, maxX);
+            return new Vector3(x, y, worldPosition.z);
+        }
+        else
+        {
+            float maxZ = (Size.z - itemSize.z) / 2.0f;
+            float minZ = -maxZ;
+            
+            float z = Mathf.Clamp(worldPosition.z, minZ, maxZ);
+            return new Vector3(worldPosition.x, y, z);
+        }
+    }
     public Vector3 ScreenToWorldOfGround(Vector3 screenPosition, Vector2 offset)
     {
         Plane plane = new Plane(Vector3.down, offset.y);
@@ -92,7 +136,7 @@ public class Room : MonoBehaviour
         Vector3 dirVec = dir.Vector;
         Vector3 size = Size;
         float distanceRoom = Mathf.Abs(Vector3.Dot(dirVec, size / 2));
-        float distance =  distanceRoom - offset.x;
+        float distance = distanceRoom - offset.x;
         Plane plane = new Plane(dirVec, distance);
         // Debug.Log("plane: " + plane);
 

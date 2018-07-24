@@ -75,7 +75,7 @@ public class GameController : MonoBehaviour
 
     private void AddItem(ItemType type)
     {
-        Vector3Int size = new Vector3Int(3, 1, 2); // TODO
+        Vector3Int size = new Vector3Int(1, 1, 2); // TODO
 
         GameObject itemGO = null;
         if (type == ItemType.Horizontal)
@@ -182,11 +182,11 @@ public class GameController : MonoBehaviour
         Vector3 realPosition = Vector3.zero;
         if (currentItem.Type == ItemType.Horizontal)
         {
-            realPosition = room.ScreenToWorldOfGround(Input.mousePosition, currentItemDrag.DragOffset);
+            realPosition = room.ItemPositionOfGround(currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset);
         }
         else if (currentItem.Type == ItemType.Vertical)
         {
-            realPosition = room.ScreenToWorldOfWall(Input.mousePosition, currentItemDrag.DragOffset, currentItem.Item.Dir);
+            realPosition = room.ItemPositionOfWall(currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset, currentItem.Item.Dir);
         }
         currentItem.transform.position = realPosition;
 

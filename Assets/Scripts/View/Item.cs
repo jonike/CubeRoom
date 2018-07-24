@@ -9,6 +9,8 @@ public enum ItemType {
 
 public abstract class Item {
 	public Vector3Int Size { get; set; } 
+
+	public Vector3Int FlippedSize { get; set; } 
 	public Vector3Int RotateSize { get; set; }  
 	public Direction Dir { get; set; }
 

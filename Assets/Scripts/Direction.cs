@@ -1,52 +1,54 @@
 using UnityEngine;
 public class Direction {
+
     public static Direction A {
         get {
-            return new Direction(0, new Vector3(1, 0, 0));
+            return new Direction(0, new Vector3(0, 0, 1));
         }
     }
 
     public static Direction B {
         get {
-            return new Direction(1, new Vector3(1, 0, -1));
+            return new Direction(1, new Vector3(1, 0, 1));
         }
     }
 
     public static Direction C {
         get {
-            return new Direction(2, new Vector3(0, 0, -1));
+            return new Direction(2, new Vector3(1, 0, 0));
         }
     }
 
     public static Direction D {
         get {
-            return new Direction(3, new Vector3(-1, 0, -1));
+            return new Direction(3, new Vector3(1, 0, -1));
         }
     }
 
     public static Direction E {
         get {
-            return new Direction(4, new Vector3(-1, 0, 0));
+            return new Direction(4, new Vector3(0, 0, -1));
         }
     }
 
     public static Direction F {
         get {
-            return new Direction(5, new Vector3(-1, 0, 1));
+            return new Direction(5, new Vector3(-1, 0, -1));
         }
     }
 
     public static Direction G {
         get {
-            return new Direction(6, new Vector3(0, 0, 1));
+            return new Direction(6, new Vector3(-1, 0, 0));
         }
     }
 
     public static Direction H {
         get {
-            return new Direction(7, new Vector3(1, 0, 1));
+            return new Direction(7, new Vector3(-1, 0, 1));
         }
     }
+
 
     private static Direction[] directions = {A, B, C, D, E, F, G, H};
     public int Value;

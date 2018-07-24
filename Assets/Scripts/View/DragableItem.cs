@@ -16,17 +16,6 @@ public class DragableItem : MonoBehaviour {
 	 * HorizontalItem 只计算 y
 	 */
 	public Vector2 DragOffset;
-	// private Vector3 dragAnchor;
-	// public Vector3 DragAnchor {
-	// 	set {
-	// 		value = value - transform.position;
-	// 		dragAnchor = Item.GetDragAnchor(value);
-	// 		Debug.Log("dragAnchor: " + dragAnchor);
-	// 	}
-	// 	get {
-	// 		return dragAnchor;
-	// 	}
-	// }
 	
 	public Plane DragPlane {
 		set; get;
@@ -53,6 +42,6 @@ public class DragableItem : MonoBehaviour {
 		position = position - transform.position;
 		// Debug.Log("relative pos: " + position);
 		DragOffset = Item.GetDragOffset(position);
-		Debug.Log("dragOffset: " + DragOffset);
+		// Debug.Log("dragOffset: " + DragOffset);
 	}
 }
