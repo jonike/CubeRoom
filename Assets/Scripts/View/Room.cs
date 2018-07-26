@@ -99,7 +99,7 @@ public class Room : MonoBehaviour
         Direction dir)
     {
         Vector3 worldPosition = ScreenToWorldOfWall(screenPosition, offset, dir);
-        Vector3Int itemSize = item.Size;
+        Vector3Int itemSize = item.RotateSize;
         float maxY = Size.y - itemSize.y / 2.0f;
         float minY = itemSize.y / 2.0f;
         float y = Mathf.Clamp(worldPosition.y, minY, maxY);

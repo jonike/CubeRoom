@@ -22,7 +22,8 @@ public class GameController : MonoBehaviour
     private bool isItemEdited;
     private ItemObject currentItem;
     private DragableItem currentItemDrag;
-    private GridObject gridObject;
+    // private GridObject gridObject;
+    private GridGroup gridGroup;
 
     private void Start()
     {
@@ -33,9 +34,9 @@ public class GameController : MonoBehaviour
         room = roomGO.GetComponent<Room>();
         room.Init(roomSize);
 
-        GameObject gridGO = Instantiate(Resources.Load("Prefabs/Grids")) as GameObject;
-        gridObject = gridGO.GetComponent<GridObject>();
-        gridObject.Init();
+        GameObject gridGO = Instantiate(Resources.Load("Prefabs/GridGroup")) as GameObject;
+        gridGroup = gridGO.GetComponent<GridGroup>();
+        gridGroup.Init();
 
     }
 
@@ -75,7 +76,7 @@ public class GameController : MonoBehaviour
 
     private void AddItem(ItemType type)
     {
-        Vector3Int size = new Vector3Int(1, 1, 2); // TODO
+        Vector3Int size = new Vector3Int(2, 1, 1); // TODO
 
         GameObject itemGO = null;
         if (type == ItemType.Horizontal)
@@ -87,18 +88,11 @@ public class GameController : MonoBehaviour
             itemGO = Instantiate(Resources.Load("Prefabs/VItem")) as GameObject;
         }
 
-        itemGO.transform.position = new Vector3(0, 2, 0);
-        currentItem = itemGO.GetComponent<ItemObject>();
-        currentItemDrag = itemGO.GetComponent<DragableItem>();
+        itemGO.transform.position = new Vector3(0, 0, 0);
+        ItemObject item = itemGO.GetComponent<ItemObject>();
+        item.Init(type, size);
 
-        currentItem.Init(type, size);
-
-        currentItemDrag.OnDrag = OnDragItem;
-        currentItemDrag.OnDragBefore = OnBeginDragItem;
-        currentItemDrag.OnDragAfter = OnEndDragItem;
-
-        isItemEdited = true;
-        room.RefreshGrids(true, type);
+        SetEdited(itemGO);
 
         // Vector3 pos = currentItem.transform.position;
         // pos = realPos(pos, size.x, size.z);
@@ -118,13 +112,30 @@ public class GameController : MonoBehaviour
 
     }
 
+    private void SetEdited(GameObject itemGO)
+    {
+        isItemEdited = true;
+
+        currentItem = itemGO.GetComponent<ItemObject>();
+        currentItemDrag = itemGO.GetComponent<DragableItem>();
+
+        room.RefreshGrids(true, currentItem.Type);
+
+        currentItemDrag.OnDrag = OnDragItem;
+        currentItemDrag.OnDragBefore = OnBeginDragItem;
+        currentItemDrag.OnDragAfter = OnEndDragItem;
+
+        gridGroup.SetGrids(currentItem);
+
+        gridGroup.SetTransform(currentItem);
+    }
+
     private void PlaceItem()
     {
 
         isItemEdited = false;
         room.RefreshGrids(false, currentItem.Type);
         currentItem = null;
-
         // TODO current item
         // bool success = room.ConflictSpace(currentItem).Count == 0;
         // if (success) {
@@ -138,6 +149,7 @@ public class GameController : MonoBehaviour
     private void RotateItem()
     {
         currentItem.SetDir(currentItem.Item.Dir.Next());
+        gridGroup.SetTransform(currentItem);
         // currentItem.Dir.Next();
         // Vector3 eulerAngles = currentItem.transform.eulerAngles;
         // eulerAngles.y = currentItem.Dir.Rotation();
@@ -190,7 +202,7 @@ public class GameController : MonoBehaviour
         }
         currentItem.transform.position = realPosition;
 
-
+        gridGroup.SetTransform(currentItem);
 
         // Debug.Log(mousePosition);
 
