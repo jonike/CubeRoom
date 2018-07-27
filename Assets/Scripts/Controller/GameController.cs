@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour
     private RoomCamera camera;
     private Room room;
 
+    private bool isRestricted;
     private bool isItemEdited;
     private ItemObject currentItem;
     private DragableItem currentItemDrag;
@@ -37,6 +38,9 @@ public class GameController : MonoBehaviour
         GameObject gridGO = Instantiate(Resources.Load("Prefabs/GridGroup")) as GameObject;
         gridGroup = gridGO.GetComponent<GridGroup>();
         gridGroup.Init();
+
+        // TODO
+        isRestricted = true;
 
     }
 
@@ -94,22 +98,6 @@ public class GameController : MonoBehaviour
 
         SetEdited(itemGO);
 
-        // Vector3 pos = currentItem.transform.position;
-        // pos = realPos(pos, size.x, size.z);
-        // currentItem.transform.position = pos;
-        // currentItem.RoomPosition = roomPos(pos);
-
-        // gridObject.SetGridsSize(new Vector2Int(size.x, size.z));
-        // Vector3 gridPos = gridObject.transform.position;
-        // gridPos.x = pos.x - size.x / 2f;
-        // gridPos.z = pos.z - size.z / 2f;
-        // gridObject.transform.position = gridPos;
-
-        // currentItem.SetActive();
-        // gridObject.SetActive();
-
-        // gridObject.SetGridsType(itemGridTypes(currentItem));
-
     }
 
     private void SetEdited(GameObject itemGO)
@@ -150,79 +138,31 @@ public class GameController : MonoBehaviour
     {
         currentItem.SetDir(currentItem.Item.Dir.Next());
         gridGroup.SetTransform(currentItem);
-        // currentItem.Dir.Next();
-        // Vector3 eulerAngles = currentItem.transform.eulerAngles;
-        // eulerAngles.y = currentItem.Dir.Rotation();
-        // currentItem.transform.eulerAngles = eulerAngles;
-
-        // bool isFlipped = currentItem.Dir.IsFlipped();
-        // Vector3Int size = currentItem.Size;
-        // Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
-        // currentItem.RotateSize = rotateSize;
-        // Vector3 pos = currentItem.transform.position;
-        // pos = realPos(pos, rotateSize.x, rotateSize.z);
-        // currentItem.transform.position = pos;
-        // currentItem.RoomPosition = roomPos(pos);
-
-        // gridObject.SetGridsSize(new Vector2Int(rotateSize.x, rotateSize.z));
-        // Vector3 gridPos = gridObject.transform.position;
-        // gridPos.x = pos.x - rotateSize.x / 2f;
-        // gridPos.z = pos.z - rotateSize.z / 2f;
-        // gridObject.transform.position = gridPos;
-
-        // gridObject.SetGridsType(itemGridTypes(currentItem));
     }
+
     private void OnBeginDragItem()
     {
         Plane plane = currentItem.Item.GetOffsetPlane(currentItem.transform.position);
 
         Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
 
-        // currentItemDrag.DragAnchor = mousePosition;
         currentItemDrag.SetDragOffset(mousePosition);
-        // currentItemDrag.DragPlane = itemDragPlane(currentItem, currentItemDrag);
     }
 
     private void OnDragItem()
     {
-        // Vector3Int size = currentItem.RotateSize;
-
-        // Plane plane = currentItemDrag.DragPlane;
-        // Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
-        // Vector3 realPosition = itemRealPostion(currentItem, mousePosition);
-
         Vector3 realPosition = Vector3.zero;
         if (currentItem.Type == ItemType.Horizontal)
         {
-            realPosition = room.ItemPositionOfGround(currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset);
+            realPosition = ItemPositionOfGround(room, currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset, isRestricted);
         }
         else if (currentItem.Type == ItemType.Vertical)
         {
-            realPosition = room.ItemPositionOfWall(currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset, currentItem.Item.Dir);
+            realPosition = ItemPositionOfWall(room, currentItem.Item, Input.mousePosition, currentItemDrag.DragOffset, currentItem.Item.Dir, isRestricted);
         }
         currentItem.transform.position = realPosition;
 
         gridGroup.SetTransform(currentItem);
-
-        // Debug.Log(mousePosition);
-
-        // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        // float distance;
-        // if (plane.Raycast(ray, out distance))
-        // {
-        //     Vector3 mousePosition = ray.GetPoint(distance);
-        //     Vector3 pos = realPos(mousePosition, size.x, size.z);
-        //     pos.y = 0;
-        //     currentItem.transform.position = pos;
-        //     currentItem.RoomPosition = roomPos(pos);
-
-        //     Vector3 gridPos = gridObject.transform.position;
-        //     gridPos.x = pos.x - size.x / 2f;
-        //     gridPos.z = pos.z - size.z / 2f;
-        //     gridObject.transform.position = gridPos;
-
-        //     gridObject.SetGridsType(itemGridTypes(currentItem));
-        // }
 
     }
 
@@ -231,36 +171,101 @@ public class GameController : MonoBehaviour
         // currentItem.dragY = 0.0f;
     }
 
-    // private Plane itemDragPlane(ItemObject item, DragableItem itemDrag) {
-    //     if (item.Type == ItemType.Horizontal) {
-    //         return new Plane(Vector3.down, itemDrag.DragOffset.y);
 
-    //     } else if (item.Type == ItemType.Vertical) {
-    //         Vector3 dirVec = item.Item.Dir.Vector;
-    //         Vector3 size = room.Size;
-    //         float distance = (- Vector3.Scale(dirVec, size / 2) + itemDrag.DragAnchor).magnitude; 
-    //         Plane plane = new Plane(- dirVec, - distance);
-    //         Debug.Log("plane: " + plane);
-    //         return plane;
-    //     }
+    // Pure Function
 
-    //     return new Plane(Vector3.down, 0);
+    public Vector3 ItemPositionOfGround(
+        Room room,
+        Item item,
+        Vector3 screenPosition,
+        Vector2 offset,
+        bool isRestricted)
+    {
+        Vector3 worldPosition = ScreenToWorldOfGround(room, screenPosition, offset);
+        Vector3Int itemSize = item.RotateSize;
+        Vector3Int roomSize = room.Size;
+        float maxX = (roomSize.x - itemSize.x) / 2.0f;
+        float minX = -maxX;
+        float maxZ = (roomSize.z - itemSize.z) / 2.0f;
+        float minZ = -maxZ;
+        float x = Mathf.Clamp(worldPosition.x, minX, maxX);
+        float z = Mathf.Clamp(worldPosition.z, minZ, maxZ);
 
-    // }
-    // private Vector3 itemRealPostion(ItemObject item, Vector3 position) {
-    //     if (item.Type == ItemType.Horizontal) {
-    //         position.y = 0;
-    //         return position;
-    //     } else if (item.Type == ItemType.Vertical) {
-    //         Vector3 dirVec = item.Item.Dir.Vector;
-    //         Vector3 size = room.Size;
-    //         Vector3 result = Vector3.Scale(- dirVec, size / 2);
-    //         result += Vector3.Scale((Vector3.one - dirVec.normalized), position);
-    //         Debug.Log("real pos: " + "  " + result);
-    //         return result;
-    //     }
-    //     return Vector3.zero;
-    // }
+        if (isRestricted)
+        {
+            x = Mathf.Round(x * 2) / 2.0f;
+            z = Mathf.Round(z * 2) / 2.0f;
+        }
+
+        return new Vector3(x, worldPosition.y, z);
+    }
+
+    public Vector3 ItemPositionOfWall(
+        Room room,
+        Item item,
+        Vector3 screenPosition,
+        Vector2 offset,
+        Direction dir,
+        bool isRestricted)
+    {
+        Vector3 worldPosition = ScreenToWorldOfWall(room, screenPosition, offset, dir);
+        Vector3Int itemSize = item.RotateSize;
+        Vector3Int roomSize = room.Size;
+        float maxY = roomSize.y - itemSize.y / 2.0f;
+        float minY = itemSize.y / 2.0f;
+        float y = Mathf.Clamp(worldPosition.y, minY, maxY);
+        
+        if (isRestricted)
+                y = Mathf.Round(y * 2) / 2.0f;
+
+        if (!dir.IsFlipped())
+        {
+            float maxX = (roomSize.x - itemSize.x) / 2.0f;
+            float minX = -maxX;
+            float x = Mathf.Clamp(worldPosition.x, minX, maxX);
+
+            if (isRestricted)
+                x = Mathf.Round(x * 2) / 2.0f;
+
+            return new Vector3(x, y, worldPosition.z);
+        }
+        else
+        {
+            float maxZ = (roomSize.z - itemSize.z) / 2.0f;
+            float minZ = -maxZ;
+            float z = Mathf.Clamp(worldPosition.z, minZ, maxZ);
+
+            if (isRestricted)
+                z = Mathf.Round(z * 2) / 2.0f;
+
+            return new Vector3(worldPosition.x, y, z);
+        }
+    }
+    public Vector3 ScreenToWorldOfGround(Room room, Vector3 screenPosition, Vector2 offset)
+    {
+        Plane plane = new Plane(Vector3.down, offset.y);
+        Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
+        position.y = 0;
+        return position;
+    }
+
+    public Vector3 ScreenToWorldOfWall(Room room, Vector3 screenPosition, Vector2 offset, Direction dir)
+    {
+        // TODO
+        if (dir.Value % 2 != 0) return Vector3.zero;
+
+        Vector3 dirVec = dir.Vector;
+        Vector3 size = room.Size;
+        float distanceRoom = Mathf.Abs(Vector3.Dot(dirVec, size / 2));
+        float distance = distanceRoom - offset.x;
+        Plane plane = new Plane(dirVec, distance);
+        Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
+
+        position -= offset.x * dirVec;
+        position.y -= offset.y;
+
+        return position;
+    }
 
 
 
