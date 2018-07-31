@@ -14,5 +14,16 @@ namespace Sorumi.Util
         {
             return (int)(x % m + m) % m;
         }
+
+
+        public static bool inRange(float x, float a, float b)
+        {
+            return x >= a && x <= b;
+        }
+
+        public static bool outRange(float x, float a, float b)
+        {
+            return x < a || x > b;
+        }
     }
 }

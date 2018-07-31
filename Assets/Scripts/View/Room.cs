@@ -15,6 +15,11 @@ public class Room : MonoBehaviour
 
     private string[] wallNames = { "a", "b", "c", "d" };
 
+    private Direction[] wallDirections = {
+        Direction.G, Direction.E, Direction.C, Direction.A
+    };
+    private int[] showWalls;
+
     private List<ItemBehaviour> items;
 
     // private ItemBehaviour[,,] occupiedSpace;
@@ -45,20 +50,24 @@ public class Room : MonoBehaviour
             Pillar pillar = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
             pillars[i] = pillar;
         }
+        showWalls = new int[2];
 
     }
 
     public void RefreshByAngle(float angle)
     {
-        walls[0].Hide(angle > 270 || angle < 90);
-        walls[1].Hide(angle > 0 && angle < 180);
-        walls[2].Hide(angle > 90 && angle < 270);
-        walls[3].Hide(angle > 180 && angle < 360);
+        walls[0].Hide(angle >= 270 || angle < 90);
+        walls[1].Hide(angle >= 0 && angle < 180);
+        walls[2].Hide(angle >= 90 && angle < 270);
+        walls[3].Hide(angle >= 180 && angle < 360);
 
-        pillars[0].Hide(angle > 270 || angle < 180);
-        pillars[1].Hide(angle > 0 && angle < 270);
-        pillars[2].Hide(angle > 90 && angle < 360);
-        pillars[3].Hide(angle > 180 || angle < 90);
+        pillars[0].Hide(angle >= 270 || angle < 180);
+        pillars[1].Hide(angle >= 0 && angle < 270);
+        pillars[2].Hide(angle >= 90 && angle < 360);
+        pillars[3].Hide(angle >= 180 || angle < 90);
+
+        showWalls[0] = Math.mod((angle / 90) + 3, 4);
+        showWalls[1] = Math.mod((angle / 90) + 2, 4);
     }
 
     public void RefreshGrids(bool isEdited, ItemType itemType)
@@ -76,6 +85,9 @@ public class Room : MonoBehaviour
         }
     }
 
+    public Direction[] ShowWallsDirection() {
+        return new Direction[2] {wallDirections[showWalls[0]], wallDirections[showWalls[1]]};
+    }
 
     // ------------
     // public void AddItem(ItemBehaviour item) {
