@@ -180,7 +180,7 @@ public class GameController : MonoBehaviour
         if (currentItem.Type == ItemType.Horizontal)
         {
             float distance;
-            itemPostion = ItemPositionOfGround(room, item.Item, screenPosition, offset, isRestricted, out distance);
+            itemPostion = ItemPositionOfGround(room, item, screenPosition, offset, item.Item.Dir, isRestricted, out distance);
             Debug.Log(distance);
         }
         else if (currentItem.Type == ItemType.Vertical)
@@ -191,10 +191,16 @@ public class GameController : MonoBehaviour
             Direction dirR = showWallsDirection[1];
 
             float distanceL, distanceR;
-            Vector3 itemPostionL = ItemPositionOfWall(room, item.Item, screenPosition, offset, showWallsDirection[0], isRestricted, out distanceL);
-            Vector3 itemPostionR = ItemPositionOfWall(room, item.Item, screenPosition, offset, showWallsDirection[1], isRestricted, out distanceR);
+            Vector3 itemPostionL = ItemPositionOfWall(room, item, screenPosition, offset, showWallsDirection[0], isRestricted, out distanceL);
+            Vector3 itemPostionR = ItemPositionOfWall(room, item, screenPosition, offset, showWallsDirection[1], isRestricted, out distanceR);
 
-            if (itemDir == dirL && distanceL < 0)
+            float distanceG;
+            Vector3 itemPostionG = ItemPositionOfGround(room, item, screenPosition, offset, item.Item.Dir, isRestricted, out distanceG);
+
+            if (distanceG < 0)
+                itemPostion = itemPostionG;
+
+            else if (itemDir == dirL && distanceL < 0)
                 itemPostion = itemPostionL;
             else if (itemDir == dirR && distanceR < 0)
                 itemPostion = itemPostionR;
@@ -216,15 +222,17 @@ public class GameController : MonoBehaviour
     }
     public Vector3 ItemPositionOfGround(
         Room room,
-        Item item,
+        ItemObject item,
         Vector3 screenPosition,
         Vector2 offset,
+        Direction dir,
         bool isRestricted,
         out float distance)
     {
         Vector3 worldPosition = ScreenToWorldOfGround(room, screenPosition, offset);
-        Vector3Int itemSize = item.RotateSize;
+        Vector3Int itemSize = item.Item.RotateSize;
         Vector3Int roomSize = room.Size;
+
         float maxX = (roomSize.x - itemSize.x) / 2.0f;
         float minX = -maxX;
         float maxZ = (roomSize.z - itemSize.z) / 2.0f;
@@ -238,19 +246,50 @@ public class GameController : MonoBehaviour
             z = Mathf.Round(z * 2) / 2.0f;
         }
 
-        Vector3 itemPoition = new Vector3(x, worldPosition.y, z);
+        float y = worldPosition.y;
+
+        Vector3 itemPoition = Vector3.zero;
+        if (item.Type == ItemType.Vertical) {
+            y = itemSize.y / 2.0f;
+
+            // position in normal
+            float normalSize = Mathf.Abs(Vector3.Dot(itemSize, dir.Vector)) / 2.0f;
+            Vector3 offsetVector = normalSize * dir.Vector;
+
+            itemPoition = new Vector3(x, y, z) - offsetVector;
+        } else if (item.Type == ItemType.Horizontal) {
+            itemPoition = new Vector3(x, y, z);
+        }
+
         distance = Vector3.Distance(itemPoition, worldPosition);
-        if (Math.inRange(worldPosition.x, -roomSize.x / 2.0f, roomSize.x / 2.0f) ||
-        Math.inRange(worldPosition.z, -roomSize.z / 2.0f, roomSize.z / 2.0f))
+
+        // if worldPosition on the ground
+        Direction[] showWallsDirection = room.ShowWallsDirection();
+
+        Vector3 axisDirL = Vector3.Cross(Vector3.up, showWallsDirection[0].Vector);
+        float axisL = Vector3.Dot(worldPosition, axisDirL);
+        float axisSizeL = Mathf.Abs(Vector3.Dot(roomSize, axisDirL)) - Mathf.Abs(Vector3.Dot(itemSize, axisDirL));
+
+        Vector3 axisDirR = Vector3.Cross(Vector3.up, showWallsDirection[1].Vector);
+        float axisR = Vector3.Dot(worldPosition, axisDirR);
+        float axisSizeR = Mathf.Abs(Vector3.Dot(roomSize, axisDirR)) - Mathf.Abs(Vector3.Dot(itemSize, axisDirR));
+
+        if (axisL < -axisSizeL / 2.0f || axisR > axisSizeR / 2.0f)
+        {
+
+        }
+        else
+        {
             distance = -distance;
+        }
+
 
         return itemPoition;
     }
 
-    // distance 为负表示 worldPosition 在墙上，为正表示要考虑旋转
     public Vector3 ItemPositionOfWall(
         Room room,
-        Item item,
+        ItemObject item,
         Vector3 screenPosition,
         Vector2 offset,
         Direction dir,
@@ -258,7 +297,7 @@ public class GameController : MonoBehaviour
         out float distance)
     {
         Vector3 worldPosition = ScreenToWorldOfWall(room, screenPosition, offset, dir);
-        Vector3Int itemSize = item.RotateSize;
+        Vector3Int itemSize = item.Item.RotateSize;
         Vector3Int roomSize = room.Size;
         float maxY = roomSize.y - itemSize.y / 2.0f;
         float minY = itemSize.y / 2.0f;
@@ -294,10 +333,11 @@ public class GameController : MonoBehaviour
         distance = Vector3.Distance(itemPoition, worldPosition);
 
         // if worldPosition on the wall
+        Direction[] showWallsDirection = room.ShowWallsDirection();
+
         Vector3 axisDir = Vector3.Cross(Vector3.up, dir.Vector);
         float axis = Vector3.Dot(worldPosition, axisDir);
         float axisSize = Mathf.Abs(Vector3.Dot(roomSize, axisDir));
-        Direction[] showWallsDirection = room.ShowWallsDirection();
 
         if (dir == showWallsDirection[0]) //左
             distance = axis < -axisSize / 2.0f ? distance : -distance;
@@ -330,19 +370,6 @@ public class GameController : MonoBehaviour
         position.y -= offset.y;
 
         return position;
-    }
-
-
-
-    // ----------------
-    // util
-    // 相对于世界的绝对位置
-    private Vector3 realPos(Vector3 pos, int sx, int sz)
-    {
-        float x = Mathf.Clamp(Mathf.Round(pos.x - 0.5f * sx % 2) + 0.5f * sx % 2, minX + 0.5f * sx, maxX - 0.5f * sx);
-        float z = Mathf.Clamp(Mathf.Round(pos.z - 0.5f * sz % 2) + 0.5f * sz % 2, minZ + 0.5f * sz, maxZ - 0.5f * sz);
-
-        return new Vector3(x, pos.y, z);
     }
 
     // 相对于房间的位置
