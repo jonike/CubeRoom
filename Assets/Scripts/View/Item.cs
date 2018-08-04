@@ -17,13 +17,9 @@ public abstract class Item {
     // 相对于房间坐标的
     public Vector3Int RoomPosition { get; set; }
 
+	public PlaceableItem PlaceableItem;
 	public bool IsOccupid { get; set; }
-
 	public abstract void SetEdited(bool edited);
-
-	public abstract Vector3 GetDragAnchor(Vector3 position);
-
 	public abstract Vector2 GetDragOffset(Vector3 position);
-
 	public abstract Plane GetOffsetPlane(Vector3 position);
 }

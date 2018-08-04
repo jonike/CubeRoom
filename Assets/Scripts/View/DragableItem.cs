@@ -16,11 +16,6 @@ public class DragableItem : MonoBehaviour {
 	 * HorizontalItem 只计算 y
 	 */
 	public Vector2 DragOffset;
-	
-	public Plane DragPlane {
-		set; get;
-	}
-
 
 	void Start() {
 		Item = GetComponent<ItemObject>().Item;

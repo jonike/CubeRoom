@@ -9,12 +9,6 @@ public class HorizontalItem : Item
 
     }
 
-    public override Vector3 GetDragAnchor(Vector3 position)
-    {
-        return new Vector3(0, position.y, 0);
-    }
-
-
     public override Vector2 GetDragOffset(Vector3 position)
     {
         return new Vector2(0, position.y);

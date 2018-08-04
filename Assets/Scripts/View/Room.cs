@@ -18,6 +18,8 @@ public class Room : MonoBehaviour
     private Direction[] wallDirections = {
         Direction.G, Direction.E, Direction.C, Direction.A
     };
+
+    private Dictionary<Direction, Wall> dirWallMap;
     private int[] showWalls;
 
     private List<ItemBehaviour> items;
@@ -33,24 +35,34 @@ public class Room : MonoBehaviour
     {
         this.Size = size;
         this.items = new List<ItemBehaviour>();
-        // this.groundSpace = new ItemBehaviour[size.z * 2, size.x * 2];
-        // this.wallASpace = new ItemBehaviour[size.y * 2, size.x * 2];
-        // this.wallBSpace = new ItemBehaviour[size.y * 2, size.z * 2];
-        // this.wallCSpace = new ItemBehaviour[size.y * 2, size.x * 2];
-        // this.wallDSpace = new ItemBehaviour[size.y * 2, size.z * 2];
 
-        //
         ground = transform.Find("ground").GetComponent<Ground>();
+        ground.Init(new Vector2Int(size.x * 2, size.z * 2));
+
         walls = new Wall[4];
         pillars = new Pillar[4];
         for (int i = 0; i < 4; i++)
         {
             Wall wall = transform.Find("wall_" + wallNames[i]).GetComponent<Wall>();
+            Direction dir = wallDirections[i];
+            int x = (int)Mathf.Abs(Vector3.Dot(dir.Vector, size)) * 2;
+            Vector2Int wallSize = new Vector2Int(x, size.y * 2);
+            wall.Init(wallSize, dir);
             walls[i] = wall;
+
             Pillar pillar = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
             pillars[i] = pillar;
         }
+
+        // showWalls
         showWalls = new int[2];
+
+        // direction int map
+        dirWallMap = new Dictionary<Direction, Wall>();
+        for (int i = 0; i < 4; i++)
+        {
+            dirWallMap.Add(wallDirections[i], walls[i]);
+        }
 
     }
 
@@ -85,8 +97,17 @@ public class Room : MonoBehaviour
         }
     }
 
-    public Direction[] ShowWallsDirection() {
-        return new Direction[2] {wallDirections[showWalls[0]], wallDirections[showWalls[1]]};
+    public Direction[] ShowWallsDirection()
+    {
+        return new Direction[2] { wallDirections[showWalls[0]], wallDirections[showWalls[1]] };
+    }
+
+    public Wall WallOfDirection(Direction dir) {
+        return dirWallMap[dir];
+    }
+
+    public Ground Ground() {
+        return ground;
     }
 
     // ------------

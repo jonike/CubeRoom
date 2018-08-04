@@ -8,6 +8,15 @@ public class ItemObject : MonoBehaviour
     public ItemType Type;
     public Item Item;
 
+	public PlaceableItem PlaceableItem {
+		get {
+			return Item.PlaceableItem;
+		}
+		set {
+			Item.PlaceableItem = value;
+		}
+	}
+
 
     // Use this for initialization
     public void Init(ItemType type, Vector3Int size)
@@ -41,4 +50,6 @@ public class ItemObject : MonoBehaviour
         eulerAngles.y = dir.Rotation();
         transform.eulerAngles = eulerAngles;
     }
+
+	
 }
