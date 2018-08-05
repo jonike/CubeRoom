@@ -22,7 +22,7 @@ public class GameController : MonoBehaviour
     private bool isRestricted;
     private bool isItemEdited;
     private ItemObject currentItem;
-    private DragableItem currentItemDrag;
+    private EditedItem editedItem;
     // private GridObject gridObject;
     private GridGroup gridGroup;
 
@@ -105,13 +105,13 @@ public class GameController : MonoBehaviour
         isItemEdited = true;
 
         currentItem = itemGO.GetComponent<ItemObject>();
-        currentItemDrag = itemGO.GetComponent<DragableItem>();
+        editedItem = itemGO.AddComponent<EditedItem>();
 
         room.RefreshGrids(true, currentItem.Type);
 
-        currentItemDrag.OnDrag = OnDragItem;
-        currentItemDrag.OnDragBefore = OnBeginDragItem;
-        currentItemDrag.OnDragAfter = OnEndDragItem;
+        editedItem.OnDrag = OnDragItem;
+        editedItem.OnDragBefore = OnBeginDragItem;
+        editedItem.OnDragAfter = OnEndDragItem;
 
         gridGroup.SetGrids(currentItem);
 
@@ -146,14 +146,14 @@ public class GameController : MonoBehaviour
 
         Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
 
-        currentItemDrag.SetDragOffset(mousePosition);
+        editedItem.SetDragOffset(mousePosition);
     }
 
     private void OnDragItem()
     {
         Vector3 realPosition = Vector3.zero;
 
-        realPosition = ItemPosition(room, currentItem, Input.mousePosition, currentItemDrag.DragOffset, isRestricted);
+        realPosition = ItemPosition(room, currentItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
 
         currentItem.transform.position = realPosition;
 
@@ -402,9 +402,12 @@ public class GameController : MonoBehaviour
     }
 
     /*** grids ***/
-    public void gridTypes(ItemObject item, out bool[,] bottomGrids, out bool[,] sideGrids)
+    public bool gridTypes(ItemObject item, out bool[,] bottomGrids, out bool[,] sideGrids)
     {
         Vector3Int itemSize = item.Item.Size;
+        Vector3Int rotateSize = item.Item.RotateSize;
+        Vector2Int bottomSize = new Vector2Int(itemSize.x, itemSize.z);
+        Direction itemDir = item.Item.Dir;
         int sizeX = itemSize.x;
         int sizeY = itemSize.y;
         int sizeZ = itemSize.z;
@@ -413,33 +416,43 @@ public class GameController : MonoBehaviour
 
         if (item.PlaceableItem == null)
         {
-            for (int i = 0; i < sizeX; i++)
+            for (int i = 0; i < rotateSize.x; i++)
             {
-                for (int j = 0; j < sizeZ; j++)
+                for (int j = 0; j < rotateSize.z; j++)
                 {
-                    bottomGrids[i, j] = false;
+                    Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
+                    bottomGrids[vec.x, vec.y] = false;
                 }
+            }
 
-                for (int j = 0; j < sizeY; j++)
+            for (int i = 0; i < itemSize.x; i++)
+            {
+                for (int j = 0; j < itemSize.y; j++)
                 {
                     sideGrids[i, j] = false;
                 }
             }
-            return;
+            return false;
         }
 
-        for (int i = 0; i < sizeX; i++)
+        for (int i = 0; i < rotateSize.x; i++)
         {
-            for (int j = 0; j < sizeZ; j++)
+            for (int j = 0; j < rotateSize.z; j++)
             {
-                bottomGrids[i, j] = true;
+                Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
+                bottomGrids[vec.x, vec.y] = true;
             }
+        }
 
-            for (int j = 0; j < sizeY; j++)
+        for (int i = 0; i < itemSize.x; i++)
+        {
+            for (int j = 0; j < itemSize.y; j++)
             {
                 sideGrids[i, j] = true;
             }
         }
+
+        return true;
     }
 
     private Vector2Int rotateVector2(Vector2Int size, Direction dir, Vector2Int coordinate)
@@ -450,7 +463,7 @@ public class GameController : MonoBehaviour
                 return coordinate;
             case 2:
                 {
-                    int x = size.y - coordinate.x - 1;
+                    int x = size.x - coordinate.y - 1;
                     int y = coordinate.x;
                     return new Vector2Int(x, y);
                 }
@@ -462,8 +475,9 @@ public class GameController : MonoBehaviour
                 }
             case 6:
                 {
+
                     int x = coordinate.y;
-                    int y = size.x - coordinate.y - 1;
+                    int y = size.y - coordinate.x - 1;
                     return new Vector2Int(x, y);
                 }
             default:

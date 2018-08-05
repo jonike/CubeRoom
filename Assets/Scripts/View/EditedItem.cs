@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DragableItem : MonoBehaviour {
+public class EditedItem : MonoBehaviour {
 
 	public Item Item;
 

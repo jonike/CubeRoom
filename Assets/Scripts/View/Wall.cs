@@ -14,6 +14,8 @@ public class Wall : MonoBehaviour
     private Vector2Int size;
     private Direction dir;
     public PlaceableItem PlaceableItem;
+    private List<ItemObject> items;
+
     void Start()
     {
         mesh = transform.Find("mesh").gameObject;
@@ -27,6 +29,7 @@ public class Wall : MonoBehaviour
         this.size = size;
         this.dir = dir;
         PlaceableItem = new PlaceableItem(size);
+        this.items = new List<ItemObject>();
     }
 
     public void Hide(bool hide)

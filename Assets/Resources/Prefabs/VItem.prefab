@@ -23,7 +23,6 @@ GameObject:
   - component: {fileID: 23724908391809424}
   - component: {fileID: 64523198479004770}
   - component: {fileID: 114958177740301992}
-  - component: {fileID: 114359536318245868}
   m_Layer: 0
   m_Name: VItem
   m_TagString: Untagged
@@ -100,18 +99,6 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 4aeaa374387df4981b76522d72eb9027, type: 3}
---- !u!114 &114359536318245868
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1969341866138064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0673f11b496f74ee68ab376dcef8a058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DragOffset: {x: 0, y: 0}
 --- !u!114 &114958177740301992
 MonoBehaviour:
   m_ObjectHideFlags: 1
