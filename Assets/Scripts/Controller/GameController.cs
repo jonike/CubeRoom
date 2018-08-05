@@ -40,7 +40,7 @@ public class GameController : MonoBehaviour
         gridGroup.Init();
 
         // TODO
-        isRestricted = false;
+        isRestricted = true;
 
     }
 
@@ -162,6 +162,8 @@ public class GameController : MonoBehaviour
         bool[,] bottomGrids, sideGrids;
         gridTypes(currentItem, out bottomGrids, out sideGrids);
         gridGroup.SetBottomGridsType(bottomGrids);
+        if (currentItem.Type == ItemType.Vertical)
+            gridGroup.SetSideGridsType(sideGrids);
     }
 
     private void OnEndDragItem()
@@ -234,7 +236,7 @@ public class GameController : MonoBehaviour
             else
             {
                 itemPostion = itemPostionG;
-            
+
             }
 
         }

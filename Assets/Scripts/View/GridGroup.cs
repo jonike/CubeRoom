@@ -7,16 +7,12 @@ public class GridGroup : MonoBehaviour
 {
     private const int MAX_SIZE = 5;
     private const float GRID_OFFSET = 0.002f;
-    // material
-    public Material correctMaterial;
-    public Material errorMaterial;
-
     // gameobject
 
     private Vector2Int bottomSize;
     private Vector2Int sideSize;
-    private GameObject[,] bottomGrids;
-    private GameObject[,] sideGrids;
+    private Grid[,] bottomGrids;
+    private Grid[,] sideGrids;
 
     private Transform bottomGridsGroup;
     private Transform sideGridsGroup;
@@ -27,8 +23,8 @@ public class GridGroup : MonoBehaviour
 
     public void Init()
     {
-        bottomGrids = new GameObject[MAX_SIZE, MAX_SIZE];
-        sideGrids = new GameObject[MAX_SIZE, MAX_SIZE];
+        bottomGrids = new Grid[MAX_SIZE, MAX_SIZE];
+        sideGrids = new Grid[MAX_SIZE, MAX_SIZE];
 
         bottomGridsGroup = transform.Find("BottomGrids");
         sideGridsGroup = transform.Find("SideGrids");
@@ -42,10 +38,11 @@ public class GridGroup : MonoBehaviour
 
     private GameObject CreateGrid()
     {
-        GameObject grid = Instantiate(Resources.Load("Prefabs/ItemGrid")) as GameObject;
-        grid.GetComponent<Renderer>().material.mainTextureScale = new Vector2(1, 1);
+        GameObject gridGO = Instantiate(Resources.Load("Prefabs/Grid")) as GameObject;
+        Grid grid = gridGO.GetComponent<Grid>();
+        grid.Init();
         grid.transform.SetParent(poolGO.transform);
-        return grid;
+        return gridGO;
     }
 
     private void ResetGrid(GameObject grid)
@@ -71,7 +68,7 @@ public class GridGroup : MonoBehaviour
             {
                 if (bottomGrids[i, j] == null)
                 {
-                    GameObject grid = gridPool.GetObject();
+                    Grid grid = gridPool.GetObject().GetComponent<Grid>();
                     grid.transform.SetParent(bottomGridsGroup);
                     float x = i + offsetX;
                     float z = j + offsetZ;
@@ -89,7 +86,7 @@ public class GridGroup : MonoBehaviour
                 {
                     if (sideGrids[i, j] == null)
                     {
-                        GameObject grid = gridPool.GetObject();
+                        Grid grid = gridPool.GetObject().GetComponent<Grid>();
                         grid.transform.SetParent(sideGridsGroup);
                         float x = i + offsetX;
                         float y = j + offsetY;
@@ -118,20 +115,29 @@ public class GridGroup : MonoBehaviour
 
     public void SetBottomGridsType(bool[,] gridTypes)
     {
+        setGridsType(bottomGrids, bottomSize, gridTypes);
+    }
 
+    public void SetSideGridsType(bool[,] gridTypes)
+    {
+        setGridsType(sideGrids, sideSize, gridTypes);
+    }
+
+    private void setGridsType(Grid[,] grids, Vector2Int size, bool[,] gridTypes)
+    {
         int sizeX = gridTypes.GetLength(0);
         int sizeY = gridTypes.GetLength(1);
 
-        if (sizeX > bottomSize.x || sizeY > bottomSize.y)
+        if (sizeX > size.x || sizeY > size.y)
         {
-            Debug.LogWarning("SetBottomGridsType: GridTypes size error");
+            Debug.LogWarning("SetGridsType: GridTypes size error");
         }
 
         for (int i = 0; i < sizeX; i++)
         {
             for (int j = 0; j < sizeY; j++)
             {
-                bottomGrids[i, j].GetComponent<Renderer>().sharedMaterial = gridTypes[i, j] ? correctMaterial : errorMaterial;
+                grids[i, j].SetType(gridTypes[i, j]);
             }
         }
     }
