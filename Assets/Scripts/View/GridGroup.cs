@@ -7,8 +7,10 @@ public class GridGroup : MonoBehaviour
 {
     private const int MAX_SIZE = 5;
     private const float GRID_OFFSET = 0.002f;
-    // gameobject
 
+    private bool active;
+
+    // gameobject
     private Vector2Int bottomSize;
     private Vector2Int sideSize;
     private Grid[,] bottomGrids;
@@ -34,6 +36,8 @@ public class GridGroup : MonoBehaviour
         poolGO = new GameObject("PoolGameObject");
         poolGO.transform.position = Vector3.zero;
         poolGO.SetActive(false);
+
+        SetActive(false);
     }
 
     private GameObject CreateGrid()
@@ -50,8 +54,20 @@ public class GridGroup : MonoBehaviour
         grid.transform.SetParent(poolGO.transform);
     }
 
+    public void SetActive(bool active)
+    {
+        gameObject.SetActive(active);
+        this.active = active;
+
+        bottomGridsGroup.position = Vector3.zero;
+        bottomGridsGroup.eulerAngles = Vector3.zero;
+
+        sideGridsGroup.position = Vector3.zero;
+        sideGridsGroup.eulerAngles = Vector3.zero;
+    }
     public void SetGrids(ItemObject item)
     {
+        Debug.Log(item.Type);
         sideGridsGroup.gameObject.SetActive(item.Type == ItemType.Vertical);
 
         Vector3Int size = item.Item.Size;
@@ -66,15 +82,26 @@ public class GridGroup : MonoBehaviour
         {
             for (int j = 0; j < size.z; j++)
             {
-                if (bottomGrids[i, j] == null)
+                Grid grid;
+                if ((grid = bottomGrids[i, j]) == null)
                 {
-                    Grid grid = gridPool.GetObject().GetComponent<Grid>();
+                    grid = gridPool.GetObject().GetComponent<Grid>();
                     grid.transform.SetParent(bottomGridsGroup);
-                    float x = i + offsetX;
-                    float z = j + offsetZ;
-                    grid.transform.position = new Vector3(x, GRID_OFFSET, z);
                     bottomGrids[i, j] = grid;
                 }
+                float x = i + offsetX;
+                float z = j + offsetZ;
+                grid.transform.position = new Vector3(x, GRID_OFFSET, z);
+            }
+        }
+
+        for (int i = size.x; i < MAX_SIZE; i++)
+        {
+            for (int j = size.z; j < MAX_SIZE; j++)
+            {
+                Grid grid;
+                if ((grid = bottomGrids[i, j]) != null)
+                    gridPool.PutObject(grid.gameObject);
             }
         }
 
@@ -84,16 +111,28 @@ public class GridGroup : MonoBehaviour
             {
                 for (int j = 0; j < size.y; j++)
                 {
-                    if (sideGrids[i, j] == null)
+                    Grid grid;
+                    if ((grid = sideGrids[i, j]) == null)
                     {
-                        Grid grid = gridPool.GetObject().GetComponent<Grid>();
+                        grid = gridPool.GetObject().GetComponent<Grid>();
                         grid.transform.SetParent(sideGridsGroup);
-                        float x = i + offsetX;
-                        float y = j + offsetY;
-                        grid.transform.position = new Vector3(x, y, GRID_OFFSET);
-                        grid.transform.eulerAngles = new Vector3(90, 0, 0);
                         sideGrids[i, j] = grid;
                     }
+                    float x = i + offsetX;
+                    float y = j + offsetY;
+                    grid.transform.position = new Vector3(x, y, GRID_OFFSET);
+                    grid.transform.eulerAngles = new Vector3(90, 0, 0);
+
+                }
+            }
+
+            for (int i = size.x; i < MAX_SIZE; i++)
+            {
+                for (int j = size.y; j < MAX_SIZE; j++)
+                {
+                    Grid grid;
+                    if ((grid = sideGrids[i, j]) != null)
+                        gridPool.PutObject(grid.gameObject);
                 }
             }
         }
@@ -106,7 +145,7 @@ public class GridGroup : MonoBehaviour
     {
         Vector3 position = item.transform.position;
         Vector3 eulerAngles = item.transform.eulerAngles;
-        bottomGridsGroup.position = new Vector3(position.x, GRID_OFFSET, position.z);
+        bottomGridsGroup.position = new Vector3(position.x, 0, position.z);
         bottomGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0); ;
 
         sideGridsGroup.position = position;

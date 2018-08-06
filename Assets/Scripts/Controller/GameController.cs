@@ -113,25 +113,29 @@ public class GameController : MonoBehaviour
         editedItem.OnDragBefore = OnBeginDragItem;
         editedItem.OnDragAfter = OnEndDragItem;
 
+        gridGroup.SetActive(true);
         gridGroup.SetGrids(currentItem);
-
         gridGroup.SetTransform(currentItem);
     }
 
     private void PlaceItem()
     {
+        if (editedItem == null)
+            return;
+        if (!editedItem.CanPlaced)
+        {
+            Debug.LogWarning("Current item can not be placed!");
+            return;
+        }
 
+        room.PlaceItem(currentItem);
+        // after
+        Destroy(editedItem);
         isItemEdited = false;
         room.RefreshGrids(false, currentItem.Type);
         currentItem = null;
-        // TODO current item
-        // bool success = room.ConflictSpace(currentItem).Count == 0;
-        // if (success) {
-        //     room.AddItem(currentItem);
-        //     currentItem.SetInactive();
-        //     gridObject.SetInactive();
-        //     currentItem = null;
-        // }
+        editedItem = null;
+        gridGroup.SetActive(false);
     }
 
     private void RotateItem()
@@ -156,14 +160,17 @@ public class GameController : MonoBehaviour
         realPosition = ItemPosition(room, currentItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
 
         currentItem.transform.position = realPosition;
+        currentItem.Item.RoomPosition = roomPosition(currentItem.Item, room.Size, realPosition);
 
         gridGroup.SetTransform(currentItem);
 
         bool[,] bottomGrids, sideGrids;
-        gridTypes(currentItem, out bottomGrids, out sideGrids);
+        bool canPlaced = gridTypes(currentItem, out bottomGrids, out sideGrids);
         gridGroup.SetBottomGridsType(bottomGrids);
         if (currentItem.Type == ItemType.Vertical)
             gridGroup.SetSideGridsType(sideGrids);
+
+        editedItem.CanPlaced = canPlaced;
     }
 
     private void OnEndDragItem()
@@ -282,14 +289,9 @@ public class GameController : MonoBehaviour
         if (item.Type == ItemType.Vertical)
         {
             itemPoition.y = itemSize.y / 2.0f;
-
-            // position in normal
-            float normalSize = Mathf.Abs(Vector3.Dot(itemSize, dir.Vector)) / 2.0f;
-            Vector3 offsetVector = normalSize * dir.Vector;
-
-            itemPoition -= offsetVector;
-
+            itemPoition -= item.Item.PositionOffset();
         }
+
         // if worldPosition on the ground
         Direction[] showWallsDirection = room.ShowWallsDirection();
 
@@ -435,23 +437,49 @@ public class GameController : MonoBehaviour
             return false;
         }
 
+        // 
+        HashSet<Vector2Int> xzGrids, xyGrids, zyGrids;
+        List<Vector3Int> conflictSpaces = room.ConflictSpace(item);
+        conflictSpaceToGrids(item, conflictSpaces, out xzGrids, out xyGrids, out zyGrids);
         for (int i = 0; i < rotateSize.x; i++)
-        {
-            for (int j = 0; j < rotateSize.z; j++)
             {
-                Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
-                bottomGrids[vec.x, vec.y] = true;
+                for (int j = 0; j < rotateSize.z; j++)
+                {
+                    Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
+                    bottomGrids[vec.x, vec.y] = true;
+                }
             }
+
+            for (int i = 0; i < itemSize.x; i++)
+            {
+                for (int j = 0; j < itemSize.y; j++)
+                {
+                    sideGrids[i, j] = true;
+                }
+            }
+
+        if ((xzGrids.Count + xyGrids.Count + zyGrids.Count) == 0)
+        {
+            return true;
         }
 
-        for (int i = 0; i < itemSize.x; i++)
+        foreach (Vector2Int grid in xzGrids)
         {
-            for (int j = 0; j < itemSize.y; j++)
-            {
-                sideGrids[i, j] = true;
-            }
+            Vector2Int vec = rotateVector2(bottomSize, itemDir, grid);
+            Debug.Log(vec);
+            bottomGrids[vec.x, vec.y] = false;
         }
 
+        if (item.Item.Dir.Value % 4 == 0)
+        {
+            foreach (Vector2Int grid in xyGrids)
+                sideGrids[grid.x, grid.y] = false;
+        }
+        else
+        {
+            foreach (Vector2Int grid in zyGrids)
+                sideGrids[grid.x, grid.y] = false;
+        }
         return true;
     }
 
@@ -484,14 +512,14 @@ public class GameController : MonoBehaviour
                 return coordinate;
         }
     }
-    // 相对于房间的位置
-    private Vector3Int roomPos(Vector3 pos)
+
+    private Vector3Int roomPosition(Item item, Vector3Int roomSize, Vector3 itemPosition)
     {
-        pos = pos * 2;
+        itemPosition = (itemPosition + item.PositionOffset()) * 2;
         return new Vector3Int(
-         (int)pos.x + roomSize.x,
-         (int)pos.y,
-         (int)pos.z + roomSize.z);
+         (int)Mathf.Round(itemPosition.x + roomSize.x),
+         (int)Mathf.Round(itemPosition.y),
+         (int)Mathf.Round(itemPosition.z + roomSize.z));
     }
 
     // private bool[,] itemGridTypes(ItemBehaviour item) {
@@ -506,21 +534,26 @@ public class GameController : MonoBehaviour
 
     //     return gridTypes;
     // }
-    // private List<Vector2Int> conflictSpaceToGrid(ItemBehaviour item, List<Vector2Int> spaces)
-    // {
-    //     List<Vector2Int> grids = new List<Vector2Int>();
-    //     Vector2Int roomPos = new Vector2Int(item.RoomPosition.x, item.RoomPosition.z);
-    //     Vector2Int rotateSize = new Vector2Int(item.RotateSize.x, item.RotateSize.z);
+    private void conflictSpaceToGrids(ItemObject item, List<Vector3Int> spaces, out HashSet<Vector2Int> xzGrids, out HashSet<Vector2Int> xyGrids, out HashSet<Vector2Int> zyGrids)
+    {
+        xzGrids = new HashSet<Vector2Int>();
+        xyGrids = new HashSet<Vector2Int>();
+        zyGrids = new HashSet<Vector2Int>();
+        Vector3Int roomPosition = item.Item.RoomPosition;
+        Vector3Int rotateSize = item.Item.RotateSize;
 
-    //     foreach (Vector2Int space in spaces)
-    //     {
-    //         Vector2Int grid = space + rotateSize - roomPos;
-    //         grid.x /= 2;
-    //         grid.y /= 2;
-    //         grids.Add(grid);
-    //         Debug.Log(grid);
-    //     }
-    //     return grids;
-    // }
+        foreach (Vector3Int space in spaces)
+        {
+            Vector3Int grid = space + rotateSize - roomPosition;
+            Debug.Log("conflict: " + grid);
+            grid.x /= 2;
+            grid.y /= 2;
+            grid.z /= 2;
+            xzGrids.Add(new Vector2Int(grid.x, grid.z));
+            xyGrids.Add(new Vector2Int(grid.x, grid.y));
+            zyGrids.Add(new Vector2Int(grid.z, grid.y));
+        }
+    }
 
 }
+

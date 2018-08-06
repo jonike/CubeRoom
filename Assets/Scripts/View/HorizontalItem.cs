@@ -21,4 +21,8 @@ public class HorizontalItem : Item
         return new Plane(Vector3.back, distance);
     }
 
+    public override Vector3 PositionOffset()
+    {
+        return Vector3.zero;
+    }
 }

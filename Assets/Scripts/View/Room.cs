@@ -22,8 +22,11 @@ public class Room : MonoBehaviour
     private Dictionary<Direction, Wall> dirWallMap;
     private int[] showWalls;
 
-    private List<ItemBehaviour> items;
+    // private List<ItemBehaviour> items;
 
+    private List<ItemObject> items;
+
+    private ItemObject[,,] space;
     // private ItemBehaviour[,,] occupiedSpace;
     // private ItemBehaviour[,] groundSpace;
     // private ItemBehaviour[,] wallASpace;
@@ -34,7 +37,8 @@ public class Room : MonoBehaviour
     public void Init(Vector3Int size)
     {
         this.Size = size;
-        this.items = new List<ItemBehaviour>();
+        items = new List<ItemObject>();
+        space = new ItemObject[size.x * 2, size.y * 2, size.z * 2];
 
         ground = transform.Find("ground").GetComponent<Ground>();
         ground.Init(new Vector2Int(size.x * 2, size.z * 2));
@@ -102,52 +106,96 @@ public class Room : MonoBehaviour
         return new Direction[2] { wallDirections[showWalls[0]], wallDirections[showWalls[1]] };
     }
 
-    public Wall WallOfDirection(Direction dir) {
+    public Wall WallOfDirection(Direction dir)
+    {
         return dirWallMap[dir];
     }
 
-    public Ground Ground() {
+    public Ground Ground()
+    {
         return ground;
     }
 
-    // ------------
-    // public void AddItem(ItemBehaviour item) {
-    //     items.Add(item);
 
-    //     bool isFlipped = item.Dir.IsFlipped();
-    //     Vector3Int size = item.Size;
-    //     Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
+    public void PlaceItem(ItemObject item)
+    {
+        items.Add(item);
 
-    //     if (item.IsOccupid) {
-    //         for (int z = item.RoomPosition.z - rotateSize.z; z < item.RoomPosition.z + rotateSize.z; z++)
-    //         {
-    //             for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
-    //             {
-    //                 groundSpace[z, x] = item;
-    //             }
-    //         }
+        Vector3Int rotateSize = item.Item.RotateSize;
+        Vector3Int roomPosition = item.Item.RoomPosition;
+        int minX = roomPosition.x - rotateSize.x;
+        int maxX = roomPosition.x + rotateSize.x;
+        int minY = roomPosition.y - rotateSize.y;
+        int maxY = roomPosition.y + rotateSize.y;
+        int minZ = roomPosition.z - rotateSize.z;
+        int maxZ = roomPosition.z + rotateSize.z;
 
-    //     }
-    // }
+        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
+        {
+            Debug.LogWarning("The item position or size is wrong");
+            return;
+        }
 
-    // public List<Vector2Int> ConflictSpace(ItemBehaviour item){
-    // 	List<Vector2Int> space = new List<Vector2Int>();
+        if (item.Item.IsOccupid)
+        {
+            for (int x = minX; x < maxX; x++)
+            {
+                for (int y = minY; y < maxY; y++)
+                {
+                    for (int z = minZ; z < maxZ; z++)
+                    {
+                        
+                        // Debug.Log(coordinate);
+                        if (space[x, y, z] != null)
+                        {
+                            string coordinate = x + ", " + y + ", " + z;
+                            Debug.LogWarning(coordinate + " has already been occupied");
+                        }
+                        space[x, y, z] = item;
+                    }
+                }
+            }
+        }
+    }
 
-    // 	bool isFlipped = item.Dir.IsFlipped();
-    //     Vector3Int size = item.Size;
-    //     Vector3Int rotateSize = isFlipped ? new Vector3Int(size.z, size.y, size.x) : size;
+    public List<Vector3Int> ConflictSpace(ItemObject item)
+    {
+        List<Vector3Int> conflictSpace = new List<Vector3Int>();
 
-    // 	for (int z = item.RoomPosition.z - rotateSize.z; z < item.RoomPosition.z + rotateSize.z; z++)
-    //         {
-    //             for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
-    //             {
-    //                 if (groundSpace[z, x] != null) {
-    // 					space.Add(new Vector2Int(x, z));
-    // 				}
-    //             }
-    //         }
+        Vector3Int rotateSize = item.Item.RotateSize;
+        Vector3Int roomPosition = item.Item.RoomPosition;
+        int minX = roomPosition.x - rotateSize.x;
+        int maxX = roomPosition.x + rotateSize.x;
+        int minY = roomPosition.y - rotateSize.y;
+        int maxY = roomPosition.y + rotateSize.y;
+        int minZ = roomPosition.z - rotateSize.z;
+        int maxZ = roomPosition.z + rotateSize.z;
 
-    // 	return space;
-    // }
+        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
+        {
+            Debug.LogWarning("The item position or size is wrong");
+            return conflictSpace;
+        }
 
+        if (item.Item.IsOccupid)
+        {
+            for (int x = minX; x < maxX; x++)
+            {
+                for (int y = minY; y < maxY; y++)
+                {
+                    for (int z = minZ; z < maxZ; z++)
+                    {
+                      
+                        if (space[x, y, z] != null)
+                        {
+                            string coordinate = x + ", " + y + ", " + z;
+                            Debug.Log("conflict space: " + coordinate);
+                            conflictSpace.Add(new Vector3Int(x, y, z));
+                        }
+                    }
+                }
+            }
+        }
+        return conflictSpace;
+    }
 }

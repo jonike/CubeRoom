@@ -24,4 +24,11 @@ public class VerticalItem : Item
         return plane;
     }
 
+    public override Vector3 PositionOffset()
+    {
+        float normalSize = Mathf.Abs(Vector3.Dot(RotateSize, Dir.Vector)) / 2.0f;
+        Vector3 offsetVector = normalSize * Dir.Vector;
+        return offsetVector;
+    }
 }
+

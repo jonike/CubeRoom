@@ -20,6 +20,8 @@ public abstract class Item {
 	public PlaceableItem PlaceableItem;
 	public bool IsOccupid { get; set; }
 	public abstract void SetEdited(bool edited);
+
+	public abstract Vector3 PositionOffset();
 	public abstract Vector2 GetDragOffset(Vector3 position);
 	public abstract Plane GetOffsetPlane(Vector3 position);
 }

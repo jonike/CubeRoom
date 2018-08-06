@@ -17,7 +17,6 @@ public class ItemObject : MonoBehaviour
 		}
 	}
 
-
     // Use this for initialization
     public void Init(ItemType type, Vector3Int size)
     {

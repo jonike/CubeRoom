@@ -17,6 +17,8 @@ public class EditedItem : MonoBehaviour {
 	 */
 	public Vector2 DragOffset;
 
+	public bool CanPlaced = false;
+
 	void Start() {
 		Item = GetComponent<ItemObject>().Item;
 	}

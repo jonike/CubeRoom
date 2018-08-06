@@ -11,7 +11,6 @@ public class Ground : MonoBehaviour
     private Vector2Int size;
     private Direction dir;
     public PlaceableItem PlaceableItem;
-    private List<ItemObject> items;
 
     void Start()
     {
@@ -22,7 +21,6 @@ public class Ground : MonoBehaviour
     {
         this.size = size;
         PlaceableItem = new PlaceableItem(size);
-        this.items = new List<ItemObject>();
     }
 
     public void ShowGrid(bool show)
@@ -30,23 +28,4 @@ public class Ground : MonoBehaviour
         grid.SetActive(show);
     }
 
-    public void PlaceItem(ItemObject item)
-    {
-        // items.Add(item);
-
-        // Vector3Int rotateSize = item.Item.RotateSize;
-		// Vector2Int size = 
-
-        // if (item.IsOccupid)
-        // {
-        //     for (int z = item.RoomPosition.z - rotateSize.z; z < item.RoomPosition.z + rotateSize.z; z++)
-        //     {
-        //         for (int x = item.RoomPosition.x - rotateSize.x; x < item.RoomPosition.x + rotateSize.x; x++)
-        //         {
-        //             groundSpace[z, x] = item;
-        //         }
-        //     }
-
-        // }
-    }
 }
