@@ -466,7 +466,6 @@ public class GameController : MonoBehaviour
         foreach (Vector2Int grid in xzGrids)
         {
             Vector2Int vec = rotateVector2(bottomSize, itemDir, grid);
-            Debug.Log(vec);
             bottomGrids[vec.x, vec.y] = false;
         }
 
@@ -480,7 +479,7 @@ public class GameController : MonoBehaviour
             foreach (Vector2Int grid in zyGrids)
                 sideGrids[grid.x, grid.y] = false;
         }
-        return true;
+        return false;
     }
 
     private Vector2Int rotateVector2(Vector2Int size, Direction dir, Vector2Int coordinate)
@@ -545,7 +544,6 @@ public class GameController : MonoBehaviour
         foreach (Vector3Int space in spaces)
         {
             Vector3Int grid = space + rotateSize - roomPosition;
-            Debug.Log("conflict: " + grid);
             grid.x /= 2;
             grid.y /= 2;
             grid.z /= 2;

@@ -23,6 +23,7 @@ public class HorizontalItem : Item
 
     public override Vector3 PositionOffset()
     {
-        return Vector3.zero;
+        Vector3 offsetVector = new Vector3(0, Size.y / 2.0f, 0);
+        return offsetVector;
     }
 }

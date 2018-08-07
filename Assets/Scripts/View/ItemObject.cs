@@ -33,7 +33,6 @@ public class ItemObject : MonoBehaviour
         Item.Size = size;
         Item.FlippedSize = new Vector3Int(size.z, size.y, size.x);
         Item.RotateSize = Item.Dir.IsFlipped() ? Item.FlippedSize : Item.Size;
-
         Item.IsOccupid = true; // TODO
     }
     public void Init(Vector3Int size)

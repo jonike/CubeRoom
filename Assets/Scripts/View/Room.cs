@@ -144,8 +144,6 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
-                        
-                        // Debug.Log(coordinate);
                         if (space[x, y, z] != null)
                         {
                             string coordinate = x + ", " + y + ", " + z;
@@ -185,11 +183,10 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
-                      
+
                         if (space[x, y, z] != null)
                         {
                             string coordinate = x + ", " + y + ", " + z;
-                            Debug.Log("conflict space: " + coordinate);
                             conflictSpace.Add(new Vector3Int(x, y, z));
                         }
                     }
