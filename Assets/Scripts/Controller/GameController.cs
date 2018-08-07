@@ -70,6 +70,11 @@ public class GameController : MonoBehaviour
             if (!isItemEdited) return;
             PlaceItem();
         }
+        if (GUI.Button(new Rect(80, 210, 60, 20), "X Item"))
+        {
+            if (!isItemEdited) return;
+            DeleteItem();
+        }
     }
 #endif
 
@@ -129,8 +134,22 @@ public class GameController : MonoBehaviour
         }
 
         room.PlaceItem(currentItem);
+
         // after
         Destroy(editedItem);
+        Reset();
+    }
+
+    private void DeleteItem()
+    {
+        if (editedItem == null)
+            return;
+        Destroy(currentItem.gameObject);
+        Reset();
+    }
+
+    private void Reset()
+    {
         isItemEdited = false;
         room.RefreshGrids(false, currentItem.Type);
         currentItem = null;
@@ -142,6 +161,7 @@ public class GameController : MonoBehaviour
     {
         currentItem.SetDir(currentItem.Item.Dir.Next());
         gridGroup.SetTransform(currentItem);
+
     }
 
     private void OnBeginDragItem()
@@ -409,6 +429,7 @@ public class GameController : MonoBehaviour
         Vector3Int itemSize = item.Item.Size;
         Vector3Int rotateSize = item.Item.RotateSize;
         Vector2Int bottomSize = new Vector2Int(itemSize.x, itemSize.z);
+        Vector2Int sideSize = new Vector2Int(itemSize.x, itemSize.y);
         Direction itemDir = item.Item.Dir;
         int sizeX = itemSize.x;
         int sizeY = itemSize.y;
@@ -422,7 +443,7 @@ public class GameController : MonoBehaviour
             {
                 for (int j = 0; j < rotateSize.z; j++)
                 {
-                    Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
+                    Vector2Int vec = rotateBottomVector(bottomSize, itemDir, new Vector2Int(i, j));
                     bottomGrids[vec.x, vec.y] = false;
                 }
             }
@@ -431,7 +452,8 @@ public class GameController : MonoBehaviour
             {
                 for (int j = 0; j < itemSize.y; j++)
                 {
-                    sideGrids[i, j] = false;
+                    Vector2Int vec = rotateSideVector(sideSize, itemDir, new Vector2Int(i, j));
+                    sideGrids[vec.x, vec.y] = false;
                 }
             }
             return false;
@@ -442,21 +464,22 @@ public class GameController : MonoBehaviour
         List<Vector3Int> conflictSpaces = room.ConflictSpace(item);
         conflictSpaceToGrids(item, conflictSpaces, out xzGrids, out xyGrids, out zyGrids);
         for (int i = 0; i < rotateSize.x; i++)
+        {
+            for (int j = 0; j < rotateSize.z; j++)
             {
-                for (int j = 0; j < rotateSize.z; j++)
-                {
-                    Vector2Int vec = rotateVector2(bottomSize, itemDir, new Vector2Int(i, j));
-                    bottomGrids[vec.x, vec.y] = true;
-                }
+                Vector2Int vec = rotateBottomVector(bottomSize, itemDir, new Vector2Int(i, j));
+                bottomGrids[vec.x, vec.y] = true;
             }
+        }
 
-            for (int i = 0; i < itemSize.x; i++)
+        for (int i = 0; i < itemSize.x; i++)
+        {
+            for (int j = 0; j < itemSize.y; j++)
             {
-                for (int j = 0; j < itemSize.y; j++)
-                {
-                    sideGrids[i, j] = true;
-                }
+                Vector2Int vec = rotateSideVector(sideSize, itemDir, new Vector2Int(i, j));
+                sideGrids[vec.x, vec.y] = true;
             }
+        }
 
         if ((xzGrids.Count + xyGrids.Count + zyGrids.Count) == 0)
         {
@@ -465,24 +488,31 @@ public class GameController : MonoBehaviour
 
         foreach (Vector2Int grid in xzGrids)
         {
-            Vector2Int vec = rotateVector2(bottomSize, itemDir, grid);
+            Vector2Int vec = rotateBottomVector(bottomSize, itemDir, grid);
             bottomGrids[vec.x, vec.y] = false;
         }
 
         if (item.Item.Dir.Value % 4 == 0)
         {
             foreach (Vector2Int grid in xyGrids)
-                sideGrids[grid.x, grid.y] = false;
+            {
+                Vector2Int vec = rotateSideVector(sideSize, itemDir, grid);
+                sideGrids[vec.x, vec.y] = false;
+            }
+
         }
         else
         {
             foreach (Vector2Int grid in zyGrids)
-                sideGrids[grid.x, grid.y] = false;
+            {
+                Vector2Int vec = rotateSideVector(sideSize, itemDir, grid);
+                sideGrids[vec.x, vec.y] = false;
+            }
         }
         return false;
     }
 
-    private Vector2Int rotateVector2(Vector2Int size, Direction dir, Vector2Int coordinate)
+    private Vector2Int rotateBottomVector(Vector2Int size, Direction dir, Vector2Int coordinate)
     {
         switch (dir.Value)
         {
@@ -512,6 +542,25 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private Vector2Int rotateSideVector(Vector2Int size, Direction dir, Vector2Int coordinate)
+    {
+        switch (dir.Value)
+        {
+            case 0:
+            case 6:
+                return coordinate;
+            case 2:
+            case 4:
+                {
+                    int x = size.x - coordinate.x - 1;
+                    int y = coordinate.y;
+                    return new Vector2Int(x, y);
+                }
+            default:
+                return coordinate;
+        }
+    }
+
     private Vector3Int roomPosition(Item item, Vector3Int roomSize, Vector3 itemPosition)
     {
         itemPosition = (itemPosition + item.PositionOffset()) * 2;
@@ -520,19 +569,6 @@ public class GameController : MonoBehaviour
          (int)Mathf.Round(itemPosition.y),
          (int)Mathf.Round(itemPosition.z + roomSize.z));
     }
-
-    // private bool[,] itemGridTypes(ItemBehaviour item) {
-    //     List<Vector2Int> conflictSpaces = room.ConflictSpace(item);
-    //     List<Vector2Int> conflictGrids = conflictSpaceToGrid(item, conflictSpaces);
-    //     bool[,] gridTypes = new bool[item.RotateSize.z, item.RotateSize.x];
-
-    //     foreach (Vector2Int grid in conflictGrids)
-    //     {
-    //         gridTypes[grid.y, grid.x] = true;
-    //     }
-
-    //     return gridTypes;
-    // }
     private void conflictSpaceToGrids(ItemObject item, List<Vector3Int> spaces, out HashSet<Vector2Int> xzGrids, out HashSet<Vector2Int> xyGrids, out HashSet<Vector2Int> zyGrids)
     {
         xzGrids = new HashSet<Vector2Int>();

@@ -67,7 +67,6 @@ public class GridGroup : MonoBehaviour
     }
     public void SetGrids(ItemObject item)
     {
-        Debug.Log(item.Type);
         sideGridsGroup.gameObject.SetActive(item.Type == ItemType.Vertical);
 
         Vector3Int size = item.Item.Size;
@@ -88,6 +87,7 @@ public class GridGroup : MonoBehaviour
                     grid = gridPool.GetObject().GetComponent<Grid>();
                     grid.transform.SetParent(bottomGridsGroup);
                     bottomGrids[i, j] = grid;
+                    grid.name = "(" + i + ", " + j + ")";
                 }
                 float x = i + offsetX;
                 float z = j + offsetZ;
@@ -95,6 +95,7 @@ public class GridGroup : MonoBehaviour
             }
         }
 
+        // remove others
         for (int i = size.x; i < MAX_SIZE; i++)
         {
             for (int j = size.z; j < MAX_SIZE; j++)
@@ -117,6 +118,7 @@ public class GridGroup : MonoBehaviour
                         grid = gridPool.GetObject().GetComponent<Grid>();
                         grid.transform.SetParent(sideGridsGroup);
                         sideGrids[i, j] = grid;
+                        grid.name = "(" + i + ", " + j + ")";
                     }
                     float x = i + offsetX;
                     float y = j + offsetY;
@@ -126,6 +128,7 @@ public class GridGroup : MonoBehaviour
                 }
             }
 
+            // remove others
             for (int i = size.x; i < MAX_SIZE; i++)
             {
                 for (int j = size.y; j < MAX_SIZE; j++)
