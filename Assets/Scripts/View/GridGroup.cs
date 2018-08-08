@@ -77,6 +77,7 @@ public class GridGroup : MonoBehaviour
         float offsetZ = item.Type == ItemType.Vertical ? 0.5f : 0.5f - size.z / 2.0f;
         float offsetY = 0.5f - size.y / 2.0f;
 
+        // float bottomY = item.Type == ItemType.Vertical ? GRID_OFFSET - size.y / 2.0f : GRID_OFFSET;
         for (int i = 0; i < size.x; i++)
         {
             for (int j = 0; j < size.z; j++)
@@ -144,12 +145,16 @@ public class GridGroup : MonoBehaviour
 
     }
 
-    public void SetTransform(ItemObject item)
+    public void SetTransform(ItemObject item, bool canPlaced)
     {
         Vector3 position = item.transform.position;
+        Vector3 size = item.Item.RotateSize;
         Vector3 eulerAngles = item.transform.eulerAngles;
-        bottomGridsGroup.position = new Vector3(position.x, 0, position.z);
-        bottomGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0); ;
+        if (canPlaced)
+            bottomGridsGroup.position = new Vector3(position.x, 0, position.z);
+        else
+            bottomGridsGroup.position = item.Type == ItemType.Vertical ? new Vector3(position.x, position.y - size.y / 2.0f, position.z) : position;
+        bottomGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0);
 
         sideGridsGroup.position = position;
         sideGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0);

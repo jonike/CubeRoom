@@ -16,16 +16,13 @@ public class Wall : MonoBehaviour
     public PlaceableItem PlaceableItem;
     private List<ItemObject> items;
 
-    void Start()
+    public void Init(Vector2Int size, Direction dir)
     {
         mesh = transform.Find("mesh").gameObject;
         grid = transform.Find("grid").gameObject;
         meshRenderer = mesh.GetComponent<MeshRenderer>();
         boxCollider = mesh.GetComponent<BoxCollider>();
-    }
 
-    public void Init(Vector2Int size, Direction dir)
-    {
         this.size = size;
         this.dir = dir;
         PlaceableItem = new PlaceableItem(size);

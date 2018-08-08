@@ -7,18 +7,14 @@ public class Ground : MonoBehaviour
 
     private GameObject grid;
 
-
     private Vector2Int size;
     private Direction dir;
     public PlaceableItem PlaceableItem;
 
-    void Start()
-    {
-        grid = transform.Find("grid").gameObject;
-    }
-
     public void Init(Vector2Int size)
     {
+        grid = transform.Find("grid").gameObject;
+
         this.size = size;
         PlaceableItem = new PlaceableItem(size);
     }

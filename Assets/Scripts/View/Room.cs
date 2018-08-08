@@ -55,6 +55,7 @@ public class Room : MonoBehaviour
             walls[i] = wall;
 
             Pillar pillar = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
+            pillar.Init();
             pillars[i] = pillar;
         }
 
