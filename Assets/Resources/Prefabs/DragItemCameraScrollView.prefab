@@ -71,7 +71,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4531811585357740}
   m_Layer: 0
-  m_Name: DragableItemScrollView
+  m_Name: DragItemCameraScrollView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

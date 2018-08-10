@@ -56,7 +56,7 @@ public class DragItemCellView : MonoBehaviour {
     }
 
 	public void OnItemBeginDrag(PointerEventData eventData) {
-		curItem = Instantiate(Resources.Load("Prefabs/Item")) as GameObject;
+		curItem = Instantiate(Resources.Load("Prefabs/HItem")) as GameObject;
 		SetItemPos(eventData.position);
 	}
 
