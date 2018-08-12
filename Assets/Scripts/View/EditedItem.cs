@@ -17,6 +17,8 @@ public class EditedItem : MonoBehaviour {
 	 */
 	public Vector2 DragOffset;
 
+	public bool CanOutside = true;
+
 	public bool CanPlaced = false;
 
 	void Start() {
@@ -36,7 +38,7 @@ public class EditedItem : MonoBehaviour {
 
 	public void SetDragOffset(Vector3 position) {
 		// Debug.Log("relative pos: " + position + transform.position);
-		position = position - transform.position;
+		position = position - Item.Position;
 		// Debug.Log("relative pos: " + position);
 		DragOffset = Item.GetDragOffset(position);
 		// Debug.Log("dragOffset: " + DragOffset);

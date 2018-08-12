@@ -8,14 +8,14 @@ public class ItemObject : MonoBehaviour
     public ItemType Type;
     public Item Item;
 
-	public PlaceableItem PlaceableItem {
-		get {
-			return Item.PlaceableItem;
-		}
-		set {
-			Item.PlaceableItem = value;
-		}
-	}
+	// public PlaceableItem PlaceableItem {
+	// 	get {
+	// 		return Item.PlaceableItem;
+	// 	}
+	// 	set {
+	// 		Item.PlaceableItem = value;
+	// 	}
+	// }
 
     // Use this for initialization
     public void Init(ItemType type, Vector3Int size)
@@ -49,5 +49,9 @@ public class ItemObject : MonoBehaviour
         transform.eulerAngles = eulerAngles;
     }
 
-	
+	public void SetPosition(Vector3 position)
+    {
+        Item.Position = position;
+        transform.position = position - Item.CenterPositionOffset();
+    }
 }

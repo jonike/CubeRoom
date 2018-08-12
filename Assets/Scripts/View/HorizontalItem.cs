@@ -9,15 +9,19 @@ public class HorizontalItem : Item
 
     }
 
+    public override bool CanPlaceOfType()
+    {
+        return PlaceType == PlaceType.Ground;
+    }
     public override Vector2 GetDragOffset(Vector3 position)
     {
         return new Vector2(0, position.y);
     }
 
-    public override Plane GetOffsetPlane(Vector3 position)
+    public override Plane GetOffsetPlane()
     {
         // x 和 z 任意即可
-        float distance = position.z;
+        float distance = Position.z;
         return new Plane(Vector3.back, distance);
     }
 

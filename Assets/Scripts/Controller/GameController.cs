@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sorumi.Util;
 
+
+
 public class GameController : MonoBehaviour
 {
 
@@ -99,13 +101,13 @@ public class GameController : MonoBehaviour
             itemGO = Instantiate(Resources.Load("Prefabs/VItem")) as GameObject;
         }
 
-        itemGO.transform.position = new Vector3(0, 0, 0);
+
         ItemObject item = itemGO.GetComponent<ItemObject>();
         item.Init(type, size);
 
         SetEdited(itemGO);
 
-        SetItemPosition(room, item, Vector3.zero);
+        SetCurrentItemPosition(room, item, new Vector3(0, 3, 0));
 
     }
 
@@ -164,13 +166,13 @@ public class GameController : MonoBehaviour
     {
         currentItem.SetDir(currentItem.Item.Dir.Next());
         // gridGroup.SetTransform(currentItem);
-        SetItemPosition(room, currentItem, currentItem.transform.position);
+        SetCurrentItemPosition(room, currentItem, currentItem.transform.position);
 
     }
 
     private void OnBeginDragItem()
     {
-        Plane plane = currentItem.Item.GetOffsetPlane(currentItem.transform.position);
+        Plane plane = currentItem.Item.GetOffsetPlane();
 
         Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
 
@@ -180,8 +182,14 @@ public class GameController : MonoBehaviour
     private void OnDragItem()
     {
 
-        Vector3 realPosition = ItemPositionOfScreen(room, currentItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
-        SetItemPosition(room, currentItem, realPosition);
+        Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
+        if (currentItem.Item.PlaceType != PlaceType.None) {
+            editedItem.CanOutside = false;
+        }
+
+        SetCurrentItemPosition(room, currentItem, itemPosition);
+
+        // Debug.Log(currentItem.Item.PlaceType);
     }
 
     private void OnEndDragItem()
@@ -190,134 +198,124 @@ public class GameController : MonoBehaviour
     }
 
 
-    public void SetItemPosition(Room room, ItemObject item, Vector3 realPosition)
+    public void SetCurrentItemPosition(Room room, ItemObject item, Vector3 itemPosition)
     {
 
-        item.transform.position = realPosition;
-        item.Item.RoomPosition = roomPosition(item.Item, room.Size, realPosition);
+        item.SetPosition(itemPosition);
+        item.Item.RoomPosition = roomPosition(item.Item, room.Size, itemPosition);
 
         bool[,] bottomGrids, sideGrids;
-        bool canPlaced = gridTypes(item, out bottomGrids, out sideGrids);
+        bool canPlaced = gridTypes(item.Item, out bottomGrids, out sideGrids);
+          editedItem.CanPlaced = canPlaced;
+
         gridGroup.SetBottomGridsType(bottomGrids);
         if (item.Type == ItemType.Vertical)
             gridGroup.SetSideGridsType(sideGrids);
 
-        editedItem.CanPlaced = canPlaced;
-        gridGroup.SetTransform(item, canPlaced);
+        gridGroup.SetTransform(item.Item);
     }
     /***** Pure Function *****/
 
     /*** position ***/
     public Vector3 ItemPositionOfScreen(
         Room room,
-        ItemObject item,
+        ItemObject itemObject,
+        EditedItem editedItem,
         Vector3 screenPosition,
         Vector2 offset,
         bool isRestricted)
     {
-
+        Item item = itemObject.Item;
         Vector3 itemPostion = Vector3.zero;
-        PlaceableItem placeableItem = null;
+        PlaceType placeType = PlaceType.None;
         if (currentItem.Type == ItemType.Horizontal)
         {
             float distance;
-            PlaceableItem placeableItemG;
-            itemPostion = ItemPositionOfGround(room, item, screenPosition, offset, item.Item.Dir, isRestricted, out distance, out placeableItemG);
-            // Debug.Log(distance);
-            if (distance < 0)
+            Vector3 worldPosition = ScreenToWorldOfGround(room, item, screenPosition, offset);
+            itemPostion = WorldToItemOfGround(room, item, worldPosition, isRestricted, out distance);
+            placeType = PlaceType.Ground;
+
+            if (editedItem.CanOutside && distance < 0)
             {
-                itemPostion = ItemPositionOfOutside(room, item, screenPosition, offset, item.Item.Dir, isRestricted);
-            }
-            else
-            {
-                placeableItem = placeableItemG;
+                worldPosition = ScreenToWorldOfOutside(room, item, screenPosition, offset);
+                itemPostion = WorldToItemOfOutside(room, item, worldPosition, isRestricted);
+                placeType = PlaceType.None;
             }
         }
         else if (currentItem.Type == ItemType.Vertical)
         {
-            Direction itemDir = item.Item.Dir;
+            Direction itemDir = item.Dir;
             Direction[] showWallsDirection = room.ShowWallsDirection();
             Direction dirL = showWallsDirection[0];
             Direction dirR = showWallsDirection[1];
 
             Vector3 distance, distanceL, distanceR;
-            PlaceableItem placeableItemL, placeableItemR;
-            Vector3 itemPostionL = ItemPositionOfWall(room, item, screenPosition, offset, showWallsDirection[0], isRestricted, out distanceL, out placeableItemL);
-            Vector3 itemPostionR = ItemPositionOfWall(room, item, screenPosition, offset, showWallsDirection[1], isRestricted, out distanceR, out placeableItemR);
+            Vector3 itemPostionL = WorldToItemOfWall(room, item, ScreenToWorldOfWall(room, item, screenPosition, offset, showWallsDirection[0]), showWallsDirection[0], isRestricted, out distanceL);
+            Vector3 itemPostionR = WorldToItemOfWall(room, item, ScreenToWorldOfWall(room, item, screenPosition, offset, showWallsDirection[1]), showWallsDirection[1], isRestricted, out distanceR);
 
             float distanceG;
-            PlaceableItem placeableItemG;
-            Vector3 itemPostionG = ItemPositionOfGround(room, item, screenPosition, offset, item.Item.Dir, isRestricted, out distanceG, out placeableItemG);
-
-            Vector3 itemPostionO = ItemPositionOfOutside(room, item, screenPosition, offset, item.Item.Dir, isRestricted);
+            Vector3 itemPostionG = WorldToItemOfGround(room, item, ScreenToWorldOfGround(room, item, screenPosition, offset), isRestricted, out distanceG);
+            Vector3 itemPostionO = WorldToItemOfOutside(room, item, ScreenToWorldOfOutside(room, item, screenPosition, offset), isRestricted);
+            
             // Debug.Log(distanceG + " " + distanceL + " " + distanceR);
 
             if (distanceL.y >= -0.5f || distanceR.y >= -0.5f)
             {
+                placeType = PlaceType.Wall;
                 if (itemDir == dirL && distanceL.x >= 0)
                 {
                     distance = distanceL;
                     itemPostion = itemPostionL;
-                    placeableItem = placeableItemL;
                 }
                 else if (itemDir == dirR && distanceR.x >= 0)
                 {
                     distance = distanceR;
                     itemPostion = itemPostionR;
-                    placeableItem = placeableItemR;
                 }
                 else if (distanceL.x >= distanceR.x)
                 {
                     distance = distanceL;
                     itemPostion = itemPostionL;
-                    placeableItem = placeableItemL;
-                    item.SetDir(dirL);
+                    itemObject.SetDir(dirL);
                 }
-                else 
+                else
                 {
                     distance = distanceR;
                     itemPostion = itemPostionR;
-                    placeableItem = placeableItemR;
-                    item.SetDir(dirR);
+                    itemObject.SetDir(dirR);
                 }
 
-                if (distance.y < 0 || distance.z < 0) {
+                if (editedItem.CanOutside && (distance.y < -0.5f || distance.z < 0))
+                {
                     itemPostion = itemPostionO;
-                    placeableItem = null;
+                    placeType = PlaceType.None;
                 }
             }
             else
             {
                 itemPostion = itemPostionG;
-                if (distanceG < 0)
-                    itemPostion = ItemPositionOfOutside(room, item, screenPosition, offset, item.Item.Dir, isRestricted);
+                placeType = PlaceType.Ground;
+                if (editedItem.CanOutside && distanceG < 0) {
+                    itemPostion = itemPostionO;
+                    placeType = PlaceType.None;
+                }
             }
 
         }
-        item.PlaceableItem = placeableItem;
+        item.PlaceType = placeType;
         return itemPostion;
     }
 
     // distance 边缘距离
-    public Vector3 ItemPositionOfGround(
+    public Vector3 WorldToItemOfGround(
         Room room,
-        ItemObject item,
-        Vector3 screenPosition,
-        Vector2 offset,
-        Direction dir,
+        Item item,
+        Vector3 worldPosition,
         bool isRestricted,
-        out float distance,
-        out PlaceableItem placeableItem)
+        out float distance)
     {
-        Vector3Int itemSize = item.Item.RotateSize;
+        Vector3Int itemSize = item.RotateSize;
         Vector3Int roomSize = room.Size;
-
-        if (item.Type == ItemType.Vertical)
-        {
-            offset.y += itemSize.y / 2.0f;
-        }
-
-        Vector3 worldPosition = ScreenToWorldOfGround(room, screenPosition, offset);
 
         float maxX = (roomSize.x - itemSize.x) / 2.0f;
         float minX = -maxX;
@@ -332,12 +330,7 @@ public class GameController : MonoBehaviour
             z = Mathf.Round(z * 2) / 2.0f;
         }
 
-        Vector3 itemPoition = new Vector3(x, worldPosition.y, z); ;
-        if (item.Type == ItemType.Vertical)
-        {
-            itemPoition.y += itemSize.y / 2.0f;
-            itemPoition -= item.Item.CenterPositionOffset();
-        }
+        Vector3 itemPoition = new Vector3(x, itemSize.y / 2.0f, z); ;
 
         // if worldPosition on the ground
         Direction[] showWallsDirection = room.ShowWallsDirection();
@@ -363,29 +356,19 @@ public class GameController : MonoBehaviour
 
         distance = Mathf.Min(distanceL, distanceR);
 
-        placeableItem = room.Ground().PlaceableItem;
-
         return itemPoition;
     }
 
-    public Vector3 ItemPositionOfOutside(
+    public Vector3 WorldToItemOfOutside(
        Room room,
-       ItemObject item,
-       Vector3 screenPosition,
-       Vector2 offset,
-       Direction dir,
+       Item item,
+       Vector3 worldPosition,
        bool isRestricted)
     {
 
-        Vector3Int itemSize = item.Item.RotateSize;
+        Vector3Int itemSize = item.RotateSize;
         Vector3Int roomSize = room.Size;
 
-        if (item.Type == ItemType.Vertical)
-        {
-            offset.y += itemSize.y / 2.0f;
-        }
-
-        Vector3 worldPosition = ScreenToWorldOfOutside(room, screenPosition, offset);
         // return worldPosition;
         float x = worldPosition.x;
         float z = worldPosition.z;
@@ -396,29 +379,22 @@ public class GameController : MonoBehaviour
             z = Mathf.Round(z * 2) / 2.0f;
         }
 
-        Vector3 itemPoition = new Vector3(x, worldPosition.y, z); ;
-        if (item.Type == ItemType.Vertical)
-        {
-            itemPoition.y += itemSize.y / 2.0f;
-            itemPoition -= item.Item.CenterPositionOffset();
-        }
+        Vector3 itemPoition = new Vector3(x, itemSize.y / 2.0f + roomSize.y, z); ;
 
         return itemPoition;
     }
 
-    public Vector3 ItemPositionOfWall(
+    public Vector3 WorldToItemOfWall(
         Room room,
-        ItemObject item,
-        Vector3 screenPosition,
-        Vector2 offset,
+        Item item,
+        Vector3 worldPosition,
         Direction dir,
         bool isRestricted,
-        out Vector3 distance,
-        out PlaceableItem placeableItem)
+        out Vector3 distance)
     {
-        Vector3Int itemSize = item.Item.RotateSize;
+        Vector3Int itemSize = item.RotateSize;
         Vector3Int roomSize = room.Size;
-        Vector3 worldPosition = ScreenToWorldOfWall(room, screenPosition, offset, dir);
+
         float maxY = roomSize.y - itemSize.y / 2.0f;
         float minY = itemSize.y / 2.0f;
         float y = Mathf.Clamp(worldPosition.y, minY, maxY);
@@ -477,28 +453,27 @@ public class GameController : MonoBehaviour
             distance.y = worldPosition.y - itemSize.y / 2.0f;
         }
 
-        placeableItem = room.WallOfDirection(dir).PlaceableItem;
         return itemPoition;
     }
-    public Vector3 ScreenToWorldOfGround(Room room, Vector3 screenPosition, Vector2 offset)
-    {
 
-        Plane plane = new Plane(Vector3.down, offset.y);
+    public Vector3 ScreenToWorldOfGround(Room room, Item item, Vector3 screenPosition, Vector2 offset)
+    {
+        Plane plane = new Plane(Vector3.down, offset.y + item.Size.y / 2.0f);
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
-        position.y = 0;
+        position.y -= offset.y;
         return Util.roundPosition(position);
     }
 
-    public Vector3 ScreenToWorldOfOutside(Room room, Vector3 screenPosition, Vector2 offset)
+    public Vector3 ScreenToWorldOfOutside(Room room, Item item, Vector3 screenPosition, Vector2 offset)
     {
 
-        Plane plane = new Plane(Vector3.down, offset.y + room.Size.y);
+        Plane plane = new Plane(Vector3.down, offset.y + item.Size.y / 2.0f + room.Size.y);
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
-        position.y = room.Size.y;
+        position.y -= offset.y;
         return Util.roundPosition(position);
     }
 
-    public Vector3 ScreenToWorldOfWall(Room room, Vector3 screenPosition, Vector2 offset, Direction dir)
+    public Vector3 ScreenToWorldOfWall(Room room, Item item, Vector3 screenPosition, Vector2 offset, Direction dir)
     {
         // TODO
         if (dir.Value % 2 != 0) return Vector3.zero;
@@ -511,26 +486,26 @@ public class GameController : MonoBehaviour
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
 
         position -= offset.x * dirVec;
+        position += item.Size.z / 2.0f * dirVec;
         position.y -= offset.y;
-
         return Util.roundPosition(position);
     }
 
     /*** grids ***/
-    public bool gridTypes(ItemObject item, out bool[,] bottomGrids, out bool[,] sideGrids)
+    public bool gridTypes(Item item, out bool[,] bottomGrids, out bool[,] sideGrids)
     {
-        Vector3Int itemSize = item.Item.Size;
-        Vector3Int rotateSize = item.Item.RotateSize;
+        Vector3Int itemSize = item.Size;
+        Vector3Int rotateSize = item.RotateSize;
         Vector2Int bottomSize = new Vector2Int(itemSize.x, itemSize.z);
         Vector2Int sideSize = new Vector2Int(itemSize.x, itemSize.y);
-        Direction itemDir = item.Item.Dir;
+        Direction itemDir = item.Dir;
         int sizeX = itemSize.x;
         int sizeY = itemSize.y;
         int sizeZ = itemSize.z;
         bottomGrids = new bool[sizeX, sizeZ];
         sideGrids = new bool[sizeX, sizeY];
 
-        if (item.PlaceableItem == null)
+        if (!item.CanPlaceOfType())
         {
             for (int i = 0; i < rotateSize.x; i++)
             {
@@ -585,7 +560,7 @@ public class GameController : MonoBehaviour
             bottomGrids[vec.x, vec.y] = false;
         }
 
-        if (item.Item.Dir.Value % 4 == 0)
+        if (item.Dir.Value % 4 == 0)
         {
             foreach (Vector2Int grid in xyGrids)
             {
@@ -656,19 +631,19 @@ public class GameController : MonoBehaviour
 
     private Vector3Int roomPosition(Item item, Vector3Int roomSize, Vector3 itemPosition)
     {
-        itemPosition = (itemPosition + item.CenterPositionOffset()) * 2;
+        itemPosition = itemPosition * 2;
         return new Vector3Int(
          (int)Mathf.Round(itemPosition.x + roomSize.x),
          (int)Mathf.Round(itemPosition.y),
          (int)Mathf.Round(itemPosition.z + roomSize.z));
     }
-    private void conflictSpaceToGrids(ItemObject item, List<Vector3Int> spaces, out HashSet<Vector2Int> xzGrids, out HashSet<Vector2Int> xyGrids, out HashSet<Vector2Int> zyGrids)
+    private void conflictSpaceToGrids(Item item, List<Vector3Int> spaces, out HashSet<Vector2Int> xzGrids, out HashSet<Vector2Int> xyGrids, out HashSet<Vector2Int> zyGrids)
     {
         xzGrids = new HashSet<Vector2Int>();
         xyGrids = new HashSet<Vector2Int>();
         zyGrids = new HashSet<Vector2Int>();
-        Vector3Int roomPosition = item.Item.RoomPosition;
-        Vector3Int rotateSize = item.Item.RotateSize;
+        Vector3Int roomPosition = item.RoomPosition;
+        Vector3Int rotateSize = item.RotateSize;
 
         foreach (Vector3Int space in spaces)
         {

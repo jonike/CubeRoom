@@ -74,7 +74,7 @@ public class GridGroup : MonoBehaviour
         sideSize = new Vector2Int(size.x, size.y);
 
         float offsetX = 0.5f - size.x / 2.0f;
-        float offsetZ = item.Type == ItemType.Vertical ? 0.5f : 0.5f - size.z / 2.0f;
+        float offsetZ = 0.5f - size.z / 2.0f;
         float offsetY = 0.5f - size.y / 2.0f;
 
         // float bottomY = item.Type == ItemType.Vertical ? GRID_OFFSET - size.y / 2.0f : GRID_OFFSET;
@@ -109,6 +109,7 @@ public class GridGroup : MonoBehaviour
 
         if (item.Type == ItemType.Vertical)
         {
+            offsetZ = - size.z / 2.0f;
             for (int i = 0; i < size.x; i++)
             {
                 for (int j = 0; j < size.y; j++)
@@ -123,7 +124,7 @@ public class GridGroup : MonoBehaviour
                     }
                     float x = i + offsetX;
                     float y = j + offsetY;
-                    grid.transform.position = new Vector3(x, y, GRID_OFFSET);
+                    grid.transform.position = new Vector3(x, y, offsetZ + GRID_OFFSET);
                     grid.transform.eulerAngles = new Vector3(90, 0, 0);
 
                 }
@@ -145,19 +146,19 @@ public class GridGroup : MonoBehaviour
 
     }
 
-    public void SetTransform(ItemObject item, bool canPlaced)
+    public void SetTransform(Item item)
     {
-        Vector3 position = item.transform.position;
-        Vector3 size = item.Item.RotateSize;
-        Vector3 eulerAngles = item.transform.eulerAngles;
-        if (canPlaced)
+        Vector3 position = item.Position;
+        Vector3 size = item.RotateSize;
+        float rotateAngles = item.Dir.Rotation();
+        if (item.PlaceType != PlaceType.None)
             bottomGridsGroup.position = new Vector3(position.x, 0, position.z);
         else
-            bottomGridsGroup.position = item.Type == ItemType.Vertical ? new Vector3(position.x, position.y - size.y / 2.0f, position.z) : position;
-        bottomGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0);
+            bottomGridsGroup.position = new Vector3(position.x, position.y - size.y / 2.0f, position.z);
+        bottomGridsGroup.eulerAngles = new Vector3(0, rotateAngles, 0);
 
         sideGridsGroup.position = position;
-        sideGridsGroup.eulerAngles = new Vector3(0, eulerAngles.y, 0);
+        sideGridsGroup.eulerAngles = new Vector3(0, rotateAngles, 0);
     }
 
     public void SetBottomGridsType(bool[,] gridTypes)

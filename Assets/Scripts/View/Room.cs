@@ -145,9 +145,11 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
+                        string coordinate = x + ", " + y + ", " + z;
+                        Debug.Log(coordinate);
                         if (space[x, y, z] != null)
                         {
-                            string coordinate = x + ", " + y + ", " + z;
+                            // string coordinate = x + ", " + y + ", " + z;
                             Debug.LogWarning(coordinate + " has already been occupied");
                         }
                         space[x, y, z] = item;
@@ -157,12 +159,12 @@ public class Room : MonoBehaviour
         }
     }
 
-    public List<Vector3Int> ConflictSpace(ItemObject item)
+    public List<Vector3Int> ConflictSpace(Item item)
     {
         List<Vector3Int> conflictSpace = new List<Vector3Int>();
 
-        Vector3Int rotateSize = item.Item.RotateSize;
-        Vector3Int roomPosition = item.Item.RoomPosition;
+        Vector3Int rotateSize = item.RotateSize;
+        Vector3Int roomPosition = item.RoomPosition;
         int minX = roomPosition.x - rotateSize.x;
         int maxX = roomPosition.x + rotateSize.x;
         int minY = roomPosition.y - rotateSize.y;
@@ -176,7 +178,7 @@ public class Room : MonoBehaviour
             return conflictSpace;
         }
 
-        if (item.Item.IsOccupid)
+        if (item.IsOccupid)
         {
             for (int x = minX; x < maxX; x++)
             {
@@ -188,6 +190,7 @@ public class Room : MonoBehaviour
                         if (space[x, y, z] != null)
                         {
                             string coordinate = x + ", " + y + ", " + z;
+                            Debug.Log("conflict: " + coordinate);
                             conflictSpace.Add(new Vector3Int(x, y, z));
                         }
                     }
