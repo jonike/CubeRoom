@@ -166,7 +166,8 @@ public class GameController : MonoBehaviour
     {
         currentItem.SetDir(currentItem.Item.Dir.Next());
         // gridGroup.SetTransform(currentItem);
-        SetCurrentItemPosition(room, currentItem, currentItem.transform.position);
+        Vector3 itemPoition = ItemPositionOfCurrent(room, currentItem, editedItem, isRestricted);
+        SetCurrentItemPosition(room, currentItem, itemPoition);
 
     }
 
@@ -183,7 +184,8 @@ public class GameController : MonoBehaviour
     {
 
         Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
-        if (currentItem.Item.PlaceType != PlaceType.None) {
+        if (currentItem.Item.PlaceType != PlaceType.None)
+        {
             editedItem.CanOutside = false;
         }
 
@@ -206,7 +208,7 @@ public class GameController : MonoBehaviour
 
         bool[,] bottomGrids, sideGrids;
         bool canPlaced = gridTypes(item.Item, out bottomGrids, out sideGrids);
-          editedItem.CanPlaced = canPlaced;
+        editedItem.CanPlaced = canPlaced;
 
         gridGroup.SetBottomGridsType(bottomGrids);
         if (item.Type == ItemType.Vertical)
@@ -256,7 +258,7 @@ public class GameController : MonoBehaviour
             float distanceG;
             Vector3 itemPostionG = WorldToItemOfGround(room, item, ScreenToWorldOfGround(room, item, screenPosition, offset), isRestricted, out distanceG);
             Vector3 itemPostionO = WorldToItemOfOutside(room, item, ScreenToWorldOfOutside(room, item, screenPosition, offset), isRestricted);
-            
+
             // Debug.Log(distanceG + " " + distanceL + " " + distanceR);
 
             if (distanceL.y >= -0.5f || distanceR.y >= -0.5f)
@@ -295,7 +297,8 @@ public class GameController : MonoBehaviour
             {
                 itemPostion = itemPostionG;
                 placeType = PlaceType.Ground;
-                if (editedItem.CanOutside && distanceG < 0) {
+                if (editedItem.CanOutside && distanceG < 0)
+                {
                     itemPostion = itemPostionO;
                     placeType = PlaceType.None;
                 }
@@ -306,6 +309,26 @@ public class GameController : MonoBehaviour
         return itemPostion;
     }
 
+
+    // 根据 Item 当前位置，进行适当调整
+    public Vector3 ItemPositionOfCurrent(
+        Room room,
+        ItemObject itemObject,
+        EditedItem editedItem,
+        bool isRestricted)
+    {
+        Item item = itemObject.Item;
+        Vector3 itemPostion = item.Position;
+
+        if (item.PlaceType == PlaceType.Ground || item.PlaceType == PlaceType.Wall)
+        {
+            float distance;
+            itemPostion = WorldToItemOfGround(room, item, itemPostion, isRestricted, out distance);
+            item.PlaceType = PlaceType.Ground;
+        }
+
+        return itemPostion;
+    }
     // distance 边缘距离
     public Vector3 WorldToItemOfGround(
         Room room,
