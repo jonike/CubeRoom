@@ -22,6 +22,8 @@ public class DragItemCellView : MonoBehaviour {
         cellView = GetComponent<CellView>();
         cellView.CountOfCell = CountOfCell;
         cellView.CellAtIndex = CellAtIndex;
+
+        cellView.Init();
     }
 
     // Update is called once per frame

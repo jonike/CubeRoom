@@ -13,7 +13,7 @@ public class RotateButton : MonoBehaviour, IDragHandler
     {
         rectTransform = transform.GetComponent<RectTransform>();
         dot = transform.Find("dot").GetComponent<RectTransform>();
-        Debug.Log(dot.localEulerAngles);
+        // Debug.Log(dot.localEulerAngles);
     }
     public void OnDrag(PointerEventData eventData)
     {

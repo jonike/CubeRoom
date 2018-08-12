@@ -125,6 +125,7 @@ GameObject:
   - component: {fileID: 267923410}
   - component: {fileID: 267923409}
   - component: {fileID: 267923412}
+  - component: {fileID: 267923414}
   - component: {fileID: 267923413}
   m_Layer: 5
   m_Name: Scroll View
@@ -216,7 +217,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 267923412}
+      - m_Target: {fileID: 267923414}
         m_MethodName: OnValueChanged
         m_Mode: 0
         m_Arguments:
@@ -240,14 +241,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de9b7d941dbbd423bb59a0fea25608c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  direction: 1
-  cellObject: {fileID: 1942282725429572, guid: 6ccf3fef4a33c420583a13e3deb96ebd, type: 2}
-  cellWidth: 80
-  cellHeight: 80
-  minHorizontalSpace: 10
-  minVerticalSpace: 10
-  maxHorizontalPadding: 10
-  maxVerticalPadding: 10
 --- !u!114 &267923413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,6 +253,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   count: 200
+--- !u!114 &267923414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 267923407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a2a83b8a625c47d587781dd23ce52c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  direction: 1
+  cellObject: {fileID: 1942282725429572, guid: 6ccf3fef4a33c420583a13e3deb96ebd, type: 2}
+  cellWidth: 80
+  cellHeight: 80
+  minHorizontalSpace: 10
+  minVerticalSpace: 10
+  maxHorizontalPadding: 10
+  maxVerticalPadding: 10
 --- !u!1 &293038255
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,14 +437,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de9b7d941dbbd423bb59a0fea25608c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  direction: 0
-  cellObject: {fileID: 1942282725429572, guid: 6ccf3fef4a33c420583a13e3deb96ebd, type: 2}
-  cellWidth: 80
-  cellHeight: 80
-  minHorizontalSpace: 10
-  minVerticalSpace: 10
-  maxHorizontalPadding: 100
-  maxVerticalPadding: 100
 --- !u!114 &505501887
 MonoBehaviour:
   m_ObjectHideFlags: 0

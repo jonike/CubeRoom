@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 114414031294777850}
   - component: {fileID: 222504072032478058}
   - component: {fileID: 114701489971527668}
-  - component: {fileID: 114598339633952306}
+  - component: {fileID: 114750396761595244}
   - component: {fileID: 114212855766849144}
   m_Layer: 5
   m_Name: DragItemScrollView
@@ -259,7 +259,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114598339633952306}
+      - m_Target: {fileID: 114750396761595244}
         m_MethodName: OnValueChanged
         m_Mode: 0
         m_Arguments:
@@ -311,25 +311,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114598339633952306
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1481356397712964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de9b7d941dbbd423bb59a0fea25608c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  direction: 1
-  cellObject: {fileID: 1558243603590256, guid: 9e0d05d42b55d4c229889bd6117fa254, type: 2}
-  cellWidth: 160
-  cellHeight: 160
-  minHorizontalSpace: 10
-  minVerticalSpace: 10
-  maxHorizontalPadding: 10
-  maxVerticalPadding: 10
 --- !u!114 &114657155515380276
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -384,6 +365,25 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114750396761595244
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1481356397712964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a2a83b8a625c47d587781dd23ce52c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  direction: 1
+  cellObject: {fileID: 1558243603590256, guid: 9e0d05d42b55d4c229889bd6117fa254, type: 2}
+  cellWidth: 160
+  cellHeight: 160
+  minHorizontalSpace: 10
+  minVerticalSpace: 10
+  maxHorizontalPadding: 10
+  maxVerticalPadding: 10
 --- !u!114 &114766157622325870
 MonoBehaviour:
   m_ObjectHideFlags: 1

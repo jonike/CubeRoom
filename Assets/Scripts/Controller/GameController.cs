@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sorumi.Util;
 
-
-
 public class GameController : MonoBehaviour
 {
 
