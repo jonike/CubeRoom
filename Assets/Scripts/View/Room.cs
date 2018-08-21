@@ -145,11 +145,11 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
-                        string coordinate = x + ", " + y + ", " + z;
-                        Debug.Log(coordinate);
+                        // string coordinate = x + ", " + y + ", " + z;
+                        // Debug.Log(coordinate);
                         if (space[x, y, z] != null)
                         {
-                            // string coordinate = x + ", " + y + ", " + z;
+                            string coordinate = x + ", " + y + ", " + z;
                             Debug.LogWarning(coordinate + " has already been occupied");
                         }
                         space[x, y, z] = item;
@@ -189,8 +189,8 @@ public class Room : MonoBehaviour
 
                         if (space[x, y, z] != null)
                         {
-                            string coordinate = x + ", " + y + ", " + z;
-                            Debug.Log("conflict: " + coordinate);
+                            // string coordinate = x + ", " + y + ", " + z;
+                            // Debug.Log("conflict: " + coordinate);
                             conflictSpace.Add(new Vector3Int(x, y, z));
                         }
                     }

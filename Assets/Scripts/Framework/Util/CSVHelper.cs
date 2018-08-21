@@ -7,16 +7,6 @@ namespace Sorumi.Util
 {
     public class CSVHelper
     {
-        public TextAsset csvFile;
-        public void Start()
-        {
-            string[,] csvArray = SplitCsv(csvFile.text);
-            Debug.Log("size = " + csvArray.GetLength(0) + "," + csvArray.GetLength(1));
-
-            Debug.Log(ArrayToString(csvArray));
-        }
-
-        // outputs the content of a 2D array, useful for checking the importer
         public static string ArrayToString(string[,] array)
         {
             StringBuilder str = new StringBuilder("");
@@ -44,14 +34,12 @@ namespace Sorumi.Util
                 for (int y = 0; y < countOfCol; y++)
                 {
                     result[x, y] = row[y];
-                    // result[x, y] = result[x, y];
                 }
             }
 
             return result;
         }
 
-        // splits a CSV row 
         public static string[] SplitLine(string line)
         {
             string[] arrays = line.Split(';');

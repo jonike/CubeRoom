@@ -21,7 +21,7 @@ public class EditedItem : MonoBehaviour {
 
 	public bool CanPlaced = false;
 
-	void Start() {
+	public void Init() {
 		Item = GetComponent<ItemObject>().Item;
 	}
 	void OnMouseDown() {

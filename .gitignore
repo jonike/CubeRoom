@@ -35,5 +35,4 @@ sysinfo.txt
 *.unitypackage
 
 # Custom
-PostProcessing/
-SabreCSG/
+Plugins/

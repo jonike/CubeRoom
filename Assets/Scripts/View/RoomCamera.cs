@@ -28,6 +28,10 @@ public class RoomCamera : MonoBehaviour
     private float moveHorizontal = 0;
 
 #if UNITY_EDITOR
+    private Vector3 lastPosition;
+#endif
+
+#if UNITY_EDITOR
     void OnGUI()
     {
         if (GUI.RepeatButton(new Rect(0, 0, 50, 20), "放大"))
@@ -78,37 +82,32 @@ public class RoomCamera : MonoBehaviour
         camera = GetComponent<Camera>();
     }
 
-    void Update()
-    {
-        // If there are two touches on the device...
-        if (Input.touchCount == 2)
-        {
-            // Store both touches.
-            Touch touchZero = Input.GetTouch(0);
-            Touch touchOne = Input.GetTouch(1);
+    //     void Update()
+    //     {
 
-            // Find the position in the previous frame of each touch.
-            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+    //  if (Input.touchCount == 2)
+    // {
+    //     // Store both touches.
+    //     Touch touchZero = Input.GetTouch(0);
+    //     Touch touchOne = Input.GetTouch(1);
 
-            // Find the magnitude of the vector (the distance) between the touches in each frame.
-            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+    //     // Find the position in the previous frame of each touch.
+    //     Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+    //     Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
-            // Find the difference in the distances between each frame.
-            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+    //     // Find the magnitude of the vector (the distance) between the touches in each frame.
+    //     float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+    //     float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-            // If the camera is orthographic...
+    //     // Find the difference in the distances between each frame.
+    //     float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
-            Zoom(deltaMagnitudeDiff);
-        }
-    }
-    public void OnMouseDown()
-    {
-        Debug.Log("camera");
-    }
+    //     // If the camera is orthographic...
 
-    private void Zoom(float deltaMagnitudeDiff)
+    //     Zoom(deltaMagnitudeDiff);
+    // }
+    // }
+    public void Zoom(float deltaMagnitudeDiff)
     {
         if (camera.orthographic)
         {
@@ -122,7 +121,7 @@ public class RoomCamera : MonoBehaviour
         }
     }
 
-    private void Rotate(float deltaDegree)
+    public void Rotate(float deltaDegree)
     {
 
         rotateDegree += deltaDegree * RotateSpeed;
@@ -130,7 +129,7 @@ public class RoomCamera : MonoBehaviour
         SetCameraTransform();
     }
 
-    private void Move(Vector2 deltaVec)
+    public void Move(Vector2 deltaVec)
     {
         moveHorizontal += deltaVec.x * MoveSpeed;
         moveVertical += deltaVec.y * MoveSpeed;

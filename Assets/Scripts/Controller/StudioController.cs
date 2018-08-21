@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Sorumi.Util;
 
-public class GameController : MonoBehaviour
+public class StudioController : MonoBehaviour
 {
 
     // temp
@@ -16,17 +18,35 @@ public class GameController : MonoBehaviour
 
     // end temp
 
+    // View
     private RoomCamera camera;
     private Room room;
-
     private bool isRestricted;
     private bool isItemEdited;
     private ItemObject currentItem;
     private EditedItem editedItem;
-    // private GridObject gridObject;
     private GridGroup gridGroup;
 
+    // UI
+    private EventSystem eventSystem;
+    private StudioPanel studioPanel;
+
+    // Touch
+
+    private Vector3 lastPosition;
+
+    private bool isOverUI;
+    private bool isUIHandleDrag;
+    private bool isEditItemHandleDrag;
+
     private void Start()
+    {
+        InitView();
+        InitUI();
+        InitTouch();
+    }
+
+    private void InitView()
     {
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
         room = roomGO.GetComponent<Room>();
@@ -42,9 +62,75 @@ public class GameController : MonoBehaviour
         gridGroup.Init();
 
         // TODO
-        isRestricted = true;
-
+        isRestricted = false;
     }
+
+    private void InitUI()
+    {
+        eventSystem = GameObject.Find("/EventSystem").GetComponent<EventSystem>();
+        studioPanel = GameObject.Find("/Canvas/StudioPanel").GetComponent<StudioPanel>();
+        studioPanel.Init();
+        studioPanel.OnItemBeginDrag = HandleUIItemBeginDrag;
+        studioPanel.OnPlaceClick = PlaceItem;
+        studioPanel.OnDeletelick = DeleteItem;
+    }
+
+    private void InitTouch()
+    {
+        TKPanRecognizer recognizer = new TKPanRecognizer();
+        recognizer.gestureRecognizedEvent += (r) =>
+        {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                isOverUI = true;
+            }
+            if (isOverUI) return;
+
+            Vector2 position = r.touchLocation();
+
+            if (isEditItemHandleDrag)
+            {
+
+            }
+            else if (isUIHandleDrag)
+            {
+                DragItem(position);
+            }
+            else
+            {
+                float delta = -recognizer.deltaTranslation.x * 0.5f;
+                camera.Rotate(delta);
+            }
+
+        };
+
+        recognizer.gestureCompleteEvent += r =>
+      {
+          isUIHandleDrag = false;
+          isOverUI = false;
+      };
+
+        TouchKit.addGestureRecognizer(recognizer);
+    }
+
+    // private bool isHitCurrentItem(Vector2 position)
+    // {
+    //     if (!isItemEdited) return false;
+
+    //     Ray ray = Camera.main.ScreenPointToRay(position);
+    //     RaycastHit hit;
+
+    //     if (Physics.Raycast(ray, out hit))
+    //     {
+    //         Debug.Log(hit.transform.name);
+    //         if (hit.transform.gameObject == currentItem.gameObject)
+    //         {
+    //             return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
 
 #if UNITY_EDITOR
     void OnGUI()
@@ -67,16 +153,16 @@ public class GameController : MonoBehaviour
             RotateItem();
         }
 
-        if (GUI.Button(new Rect(0, 210, 60, 20), "Ok Item"))
-        {
-            if (!isItemEdited) return;
-            PlaceItem();
-        }
-        if (GUI.Button(new Rect(80, 210, 60, 20), "X Item"))
-        {
-            if (!isItemEdited) return;
-            DeleteItem();
-        }
+        // if (GUI.Button(new Rect(0, 210, 60, 20), "Ok Item"))
+        // {
+        //     if (!isItemEdited) return;
+        //     PlaceItem(null);
+        // }
+        // if (GUI.Button(new Rect(80, 210, 60, 20), "X Item"))
+        // {
+        //     if (!isItemEdited) return;
+        //     DeleteItem();
+        // }
     }
 #endif
 
@@ -85,8 +171,11 @@ public class GameController : MonoBehaviour
         room.RefreshByAngle(Math.mod(angle, 360));
     }
 
+
     private void AddItem(ItemType type)
     {
+        if (isItemEdited) return;
+
         Vector3Int size = new Vector3Int(2, 3, 1); // TODO
 
         GameObject itemGO = null;
@@ -99,37 +188,36 @@ public class GameController : MonoBehaviour
             itemGO = Instantiate(Resources.Load("Prefabs/VItem")) as GameObject;
         }
 
-
         ItemObject item = itemGO.GetComponent<ItemObject>();
         item.Init(type, size);
 
         SetEdited(itemGO);
-
-        SetCurrentItemPosition(room, item, new Vector3(0, 3, 0));
-
     }
 
     private void SetEdited(GameObject itemGO)
     {
         isItemEdited = true;
 
+        studioPanel.SetItemCellViewActive(false);
+
         currentItem = itemGO.GetComponent<ItemObject>();
         editedItem = itemGO.AddComponent<EditedItem>();
+        editedItem.Init();
 
         room.RefreshGrids(true, currentItem.Type);
 
-        editedItem.OnDrag = OnDragItem;
-        editedItem.OnDragBefore = OnBeginDragItem;
-        editedItem.OnDragAfter = OnEndDragItem;
+        editedItem.OnDragBefore = HandleItemBeginDrag;
+        editedItem.OnDrag = HandleItemDrag;
+        editedItem.OnDragAfter = HandleItemEndDrag;
 
         gridGroup.SetActive(true);
         gridGroup.SetGrids(currentItem);
+
     }
 
-    private void PlaceItem()
+    private void PlaceItem(PointerEventData eventData)
     {
-        if (editedItem == null)
-            return;
+        if (!isItemEdited) return;
         if (!editedItem.CanPlaced)
         {
             Debug.LogWarning("Current item can not be placed!");
@@ -141,14 +229,21 @@ public class GameController : MonoBehaviour
         // after
         Destroy(editedItem);
         Reset();
+
+        isItemEdited = false;
+
+        studioPanel.SetItemCellViewActive(true);
     }
 
-    private void DeleteItem()
+    private void DeleteItem(PointerEventData eventData)
     {
-        if (editedItem == null)
-            return;
+        if (!isItemEdited) return;
         Destroy(currentItem.gameObject);
         Reset();
+
+        isItemEdited = false;
+
+        studioPanel.SetItemCellViewActive(true);
     }
 
     private void Reset()
@@ -169,36 +264,54 @@ public class GameController : MonoBehaviour
 
     }
 
-    private void OnBeginDragItem()
+    private void HandleItemBeginDrag()
     {
+        isEditItemHandleDrag = true;
+
         Plane plane = currentItem.Item.GetOffsetPlane();
-
         Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
-
         editedItem.SetDragOffset(mousePosition);
     }
 
-    private void OnDragItem()
+    private void HandleItemDrag()
     {
+        DragItem(Input.mousePosition);
+    }
 
-        Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, Input.mousePosition, editedItem.DragOffset, isRestricted);
+    private void HandleItemEndDrag()
+    {
+        isEditItemHandleDrag = false;
+    }
+
+
+    private void HandleUIItemBeginDrag(Vector2 screenPosition)
+    {
+        isUIHandleDrag = true;
+
+        AddItem(ItemType.Vertical);
+        Vector3 worldPosition = ScreenToWorldOfOutside(room, currentItem.Item, screenPosition, Vector2.zero);
+        SetCurrentItemPosition(room, currentItem, worldPosition);
+        editedItem.SetDragOffset(worldPosition);
+    }
+
+    private void DragItem(Vector2 screenPosition)
+    {
+        if (!isItemEdited) return;
+        Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, screenPosition, editedItem.DragOffset, isRestricted);
         if (currentItem.Item.PlaceType != PlaceType.None)
         {
             editedItem.CanOutside = false;
         }
 
         SetCurrentItemPosition(room, currentItem, itemPosition);
-
-        // Debug.Log(currentItem.Item.PlaceType);
     }
 
-    private void OnEndDragItem()
+    private void EndDragItem(Vector2 screenPosition)
     {
-        // currentItem.dragY = 0.0f;
     }
 
 
-    public void SetCurrentItemPosition(Room room, ItemObject item, Vector3 itemPosition)
+    private void SetCurrentItemPosition(Room room, ItemObject item, Vector3 itemPosition)
     {
 
         item.SetPosition(itemPosition);
@@ -217,7 +330,7 @@ public class GameController : MonoBehaviour
     /***** Pure Function *****/
 
     /*** position ***/
-    public Vector3 ItemPositionOfScreen(
+    private Vector3 ItemPositionOfScreen(
         Room room,
         ItemObject itemObject,
         EditedItem editedItem,
@@ -309,7 +422,7 @@ public class GameController : MonoBehaviour
 
 
     // 根据 Item 当前位置，进行适当调整
-    public Vector3 ItemPositionOfCurrent(
+    private Vector3 ItemPositionOfCurrent(
         Room room,
         ItemObject itemObject,
         EditedItem editedItem,
@@ -328,7 +441,7 @@ public class GameController : MonoBehaviour
         return itemPostion;
     }
     // distance 边缘距离
-    public Vector3 WorldToItemOfGround(
+    private Vector3 WorldToItemOfGround(
         Room room,
         Item item,
         Vector3 worldPosition,
@@ -380,7 +493,7 @@ public class GameController : MonoBehaviour
         return itemPoition;
     }
 
-    public Vector3 WorldToItemOfOutside(
+    private Vector3 WorldToItemOfOutside(
        Room room,
        Item item,
        Vector3 worldPosition,
@@ -405,7 +518,7 @@ public class GameController : MonoBehaviour
         return itemPoition;
     }
 
-    public Vector3 WorldToItemOfWall(
+    private Vector3 WorldToItemOfWall(
         Room room,
         Item item,
         Vector3 worldPosition,
@@ -477,7 +590,7 @@ public class GameController : MonoBehaviour
         return itemPoition;
     }
 
-    public Vector3 ScreenToWorldOfGround(Room room, Item item, Vector3 screenPosition, Vector2 offset)
+    private Vector3 ScreenToWorldOfGround(Room room, Item item, Vector3 screenPosition, Vector2 offset)
     {
         Plane plane = new Plane(Vector3.down, offset.y + item.Size.y / 2.0f);
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);
@@ -485,7 +598,7 @@ public class GameController : MonoBehaviour
         return Util.roundPosition(position);
     }
 
-    public Vector3 ScreenToWorldOfOutside(Room room, Item item, Vector3 screenPosition, Vector2 offset)
+    private Vector3 ScreenToWorldOfOutside(Room room, Item item, Vector3 screenPosition, Vector2 offset)
     {
 
         Plane plane = new Plane(Vector3.down, offset.y + item.Size.y / 2.0f + room.Size.y);
@@ -494,7 +607,7 @@ public class GameController : MonoBehaviour
         return Util.roundPosition(position);
     }
 
-    public Vector3 ScreenToWorldOfWall(Room room, Item item, Vector3 screenPosition, Vector2 offset, Direction dir)
+    private Vector3 ScreenToWorldOfWall(Room room, Item item, Vector3 screenPosition, Vector2 offset, Direction dir)
     {
         // TODO
         if (dir.Value % 2 != 0) return Vector3.zero;
@@ -513,7 +626,7 @@ public class GameController : MonoBehaviour
     }
 
     /*** grids ***/
-    public bool gridTypes(Item item, out bool[,] bottomGrids, out bool[,] sideGrids)
+    private bool gridTypes(Item item, out bool[,] bottomGrids, out bool[,] sideGrids)
     {
         Vector3Int itemSize = item.Size;
         Vector3Int rotateSize = item.RotateSize;

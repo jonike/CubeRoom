@@ -48,7 +48,7 @@ public class RotateButton : MonoBehaviour, IDragHandler
     {
         if (degree >= 0 && degree < 90)
         {
-			dot.localEulerAngles = new Vector3(0, 0, 0);
+            dot.localEulerAngles = new Vector3(0, 0, 0);
         }
         else if (degree >= 90 && degree < 180)
         {
