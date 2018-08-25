@@ -46,6 +46,8 @@ public class StudioController : MonoBehaviour
         InitTouch();
     }
 
+    #region Init
+
     private void InitView()
     {
         GameObject roomGO = Instantiate(Resources.Load("Prefabs/Room")) as GameObject;
@@ -77,77 +79,84 @@ public class StudioController : MonoBehaviour
 
     private void InitTouch()
     {
-        TKPanRecognizer recognizer = new TKPanRecognizer();
-        recognizer.gestureRecognizedEvent += (r) =>
+        // Pan
+        PanRecognizer panRecognizer = new PanRecognizer();
+        panRecognizer.zIndex = 2;
+
+        panRecognizer.gestureBeginEvent += (r) =>
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            // Debug.Log("Pan Begin : " + r);
+        };
+
+        panRecognizer.gestureRecognizedEvent += (r) =>
+        {
+            if (isUIHandleDrag)
+            {
+                DragItem(r.position);
+                return;
+            }
+
+            if (IsPointerOverUIObject())
             {
                 isOverUI = true;
             }
             if (isOverUI) return;
 
-            Vector2 position = r.touchLocation();
-
             if (isEditItemHandleDrag)
             {
 
             }
-            else if (isUIHandleDrag)
-            {
-                DragItem(position);
-            }
             else
             {
-                float delta = -recognizer.deltaTranslation.x * 0.5f;
+                Vector2 delta = -(r.deltaPosition) * 0.1f;
                 camera.Rotate(delta);
             }
-
         };
 
-        recognizer.gestureCompleteEvent += r =>
-      {
-          isUIHandleDrag = false;
-          isOverUI = false;
-      };
+        panRecognizer.gestureEndEvent += r =>
+        {
+            isUIHandleDrag = false;
+            isOverUI = false;
+        };
 
-        TouchKit.addGestureRecognizer(recognizer);
+        PanRecognizer panTwoRecognizer = new PanRecognizer(2);
+        panTwoRecognizer.zIndex = 3;
+        panTwoRecognizer.gestureRecognizedEvent += (r) =>
+        {
+            camera.Move(r.deltaPosition * 0.05f);
+        };
+
+        PinchRecognizer pinchRecognizer = new PinchRecognizer();
+        pinchRecognizer.zIndex = 4;
+
+        pinchRecognizer.gestureRecognizedEvent += (r) =>
+        {
+            camera.Zoom(r.deltaDistance * 0.05f);
+        };
+
+        TouchSystem.addRecognizer(panRecognizer);
+        TouchSystem.addRecognizer(panTwoRecognizer);
+        TouchSystem.addRecognizer(pinchRecognizer);
+
     }
-
-    // private bool isHitCurrentItem(Vector2 position)
-    // {
-    //     if (!isItemEdited) return false;
-
-    //     Ray ray = Camera.main.ScreenPointToRay(position);
-    //     RaycastHit hit;
-
-    //     if (Physics.Raycast(ray, out hit))
-    //     {
-    //         Debug.Log(hit.transform.name);
-    //         if (hit.transform.gameObject == currentItem.gameObject)
-    //         {
-    //             return true;
-    //         }
-    //     }
-
-    //     return false;
-    // }
+    #endregion
 
 #if UNITY_EDITOR
     void OnGUI()
     {
-        if (GUI.Button(new Rect(0, 150, 60, 20), "+ H Item"))
+        if (GUI.Button(new Rect(0, 210, 60, 20), "+ H Item"))
         {
             if (isItemEdited) return;
             AddItem(ItemType.Horizontal);
         }
 
-        if (GUI.Button(new Rect(80, 150, 60, 20), "+ V Item"))
+        if (GUI.Button(new Rect(80, 210, 60, 20), "+ V Item"))
         {
             if (isItemEdited) return;
             AddItem(ItemType.Vertical);
         }
 
-        if (GUI.Button(new Rect(0, 180, 60, 20), "Rotate Item"))
+        if (GUI.Button(new Rect(0, 240, 60, 20), "Rotate Item"))
         {
             if (!isItemEdited) return;
             RotateItem();
@@ -327,9 +336,8 @@ public class StudioController : MonoBehaviour
 
         gridGroup.SetTransform(item.Item);
     }
-    /***** Pure Function *****/
 
-    /*** position ***/
+    #region Position
     private Vector3 ItemPositionOfScreen(
         Room room,
         ItemObject itemObject,
@@ -625,7 +633,9 @@ public class StudioController : MonoBehaviour
         return Util.roundPosition(position);
     }
 
-    /*** grids ***/
+    #endregion
+
+    #region Grids
     private bool gridTypes(Item item, out bool[,] bottomGrids, out bool[,] sideGrids)
     {
         Vector3Int itemSize = item.Size;
@@ -789,6 +799,17 @@ public class StudioController : MonoBehaviour
             xyGrids.Add(new Vector2Int(grid.x, grid.y));
             zyGrids.Add(new Vector2Int(grid.z, grid.y));
         }
+    }
+
+    #endregion
+
+    private bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 
 }

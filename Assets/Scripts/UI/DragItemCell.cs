@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class DragItemCell : MonoBehaviour, IPointerDownHandler {
+public class DragItemCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
 
     private ScrollRect parentScroll;
     private DragItemCellView cellView;
@@ -12,49 +13,43 @@ public class DragItemCell : MonoBehaviour, IPointerDownHandler {
     private bool scroll;
 
 
-    void Start () 
+    void Start()
     {
         parentScroll = GetComponentInParent<ScrollRect>();
         cellView = GetComponentInParent<DragItemCellView>();
     }
-    
-    public void OnPointerDown (PointerEventData eventData) 
-	{
-        cellView.OnItemBeginDrag(eventData.position);
-	}
 
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        float diffX = Mathf.Abs(eventData.position.x - eventData.pressPosition.x);
+        float diffY = Mathf.Abs(eventData.position.y - eventData.pressPosition.y);
+        if (diffX < diffY)
+        {
+            scroll = true;
+            parentScroll.OnBeginDrag(eventData);
+        }
+        else
+        {
+            scroll = false;
+            cellView.OnItemBeginDrag(eventData.position);
+        }
+    }
 
- 	// public void OnBeginDrag(PointerEventData eventData)
-    //  {
-	// // 	Debug.Log("Press position + " + eventData.pressPosition);
-	// // 	Debug.Log("End position + " + eventData.position);
+     public void OnDrag(PointerEventData eventData)
+     {
+        if (scroll) {
+            parentScroll.OnDrag(eventData);
+        } else {
+            // cellView.OnItemDrag(eventData);
+        }
+     }
 
-	// 	float diffX = Mathf.Abs(eventData.position.x - eventData.pressPosition.x);
-	// 	float diffY = Mathf.Abs(eventData.position.y - eventData.pressPosition.y);
-	// 	if (diffX < diffY){
-	// 		scroll = true;
-    //         parentScroll.OnBeginDrag(eventData);
-	// 	} else {
-    //         scroll = false;
-    //         cellView.OnItemBeginDrag(eventData);
-    //     }
-    //  }
- 
-    //  public void OnDrag(PointerEventData eventData)
-    //  {
-    //     if (scroll) {
-    //         parentScroll.OnDrag(eventData);
-    //     } else {
-    //         cellView.OnItemDrag(eventData);
-    //     }
-    //  }
- 
-    //  public void OnEndDrag(PointerEventData eventData)
-    //  {
-	// 	if (scroll) {
-    //         parentScroll.OnEndDrag(eventData);
-    //     } else {
-    //         cellView.OnItemEndDrag(eventData);
-    //     }
-    //  }
+     public void OnEndDrag(PointerEventData eventData)
+     {
+    	if (scroll) {
+            parentScroll.OnEndDrag(eventData);
+        } else {
+            // cellView.OnItemEndDrag(eventData);
+        }
+     }
 }
