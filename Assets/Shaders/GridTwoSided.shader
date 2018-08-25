@@ -1,4 +1,4 @@
-﻿Shader "Custom/GridShader" {
+﻿Shader "Custom/GridTwoSided" {
 	Properties {
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_LineColor ("LineColor", Color) = (1,1,1,1)
@@ -23,6 +23,7 @@
 			}
 
 			ZWrite Off
+			Cull Off
 			Blend SrcAlpha OneMinusSrcAlpha
 
 			CGPROGRAM
