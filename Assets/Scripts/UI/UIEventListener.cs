@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,9 +8,9 @@ using UnityEngine.EventSystems;
 public class UIEventListener : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 
-    public event UIActions.PointerEventAction OnClick;
-    public event UIActions.PointerEventAction OnMouseEnter;
-    public event UIActions.PointerEventAction OnMouseExit;
+    public event Action<PointerEventData> OnClick;
+    public event Action<PointerEventData>  OnMouseEnter;
+    public event Action<PointerEventData>  OnMouseExit;
 
     public void OnPointerClick(PointerEventData eventData)
     {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,17 +7,18 @@ using UnityEngine.EventSystems;
 using Sorumi.UI;
 
 [RequireComponent(typeof(CellView))]
-public class DragItemCellView : MonoBehaviour {
+public class DragItemCellView : MonoBehaviour
+{
 
     // Use this for initialization
     public int count;
     private CellView cellView;
-	private GameObject curItem;
+    private GameObject curItem;
 
 
-    public UIActions.Vector2Action OnItemBeginDrag;
-	// public UIActions.PointerEventAction OnItemDrag;
-	// public UIActions.PointerEventAction OnItemEndDrag;
+    public event Action<Vector2> OnItemBeginDrag;
+    // public Action<Vector2> OnItemDrag;
+    // public Action<Vector2> OnItemEndDrag;
     void Start()
     {
         cellView = GetComponent<CellView>();
@@ -33,5 +35,11 @@ public class DragItemCellView : MonoBehaviour {
     public int CountOfCell()
     {
         return count;
+    }
+
+    public void OnBeginDrag(Vector2 position)
+    {
+        if (OnItemBeginDrag != null)
+            OnItemBeginDrag(position);
     }
 }

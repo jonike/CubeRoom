@@ -31,7 +31,7 @@ public class DragItemCell : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         else
         {
             scroll = false;
-            cellView.OnItemBeginDrag(eventData.position);
+            cellView.OnBeginDrag(eventData.position);
         }
     }
 

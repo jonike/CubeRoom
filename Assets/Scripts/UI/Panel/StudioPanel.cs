@@ -1,22 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Sorumi.Util;
 
 public class StudioPanel : MonoBehaviour
 {
     private DragItemCellView itemCellView;
+    private Transform editView;
 
     private Button placeButton;
     private Button deleteButton;
     private RotateButton rotateButton;
 
-    public UIActions.Vector2Action OnItemBeginDrag
+    public Action<Vector2> OnItemBeginDrag
     {
         set
         {
-            itemCellView.OnItemBeginDrag = value;
+            itemCellView.OnItemBeginDrag += value;
         }
     }
     // public UIActions.PointerEventAction OnItemDrag
@@ -34,7 +37,7 @@ public class StudioPanel : MonoBehaviour
     //     }
     // }
 
-    public UIActions.PointerEventAction OnPlaceClick
+    public Action<PointerEventData> OnPlaceClick
     {
         set
         {
@@ -44,7 +47,7 @@ public class StudioPanel : MonoBehaviour
         }
     }
 
-    public UIActions.PointerEventAction OnDeletelick
+    public Action<PointerEventData> OnDeleteClick
     {
         set
         {
@@ -54,16 +57,38 @@ public class StudioPanel : MonoBehaviour
         }
     }
 
+    public Action<float> OnRotateChange
+    {
+        set
+        {
+            rotateButton.OnChange += value;
+        }
+    }
+
     public void Init()
     {
         itemCellView = transform.Find("DragItemScrollView").GetComponent<DragItemCellView>();
-        placeButton = transform.Find("PlaceButton").GetComponent<Button>();
-        deleteButton = transform.Find("DeleteButton").GetComponent<Button>();
-        rotateButton = transform.Find("RotateButton").GetComponent<RotateButton>();
+        editView = transform.Find("EditView");
+        placeButton = editView.Find("PlaceButton").GetComponent<Button>();
+        deleteButton = editView.Find("DeleteButton").GetComponent<Button>();
+        rotateButton = editView.Find("RotateButton").GetComponent<RotateButton>();
     }
 
     public void SetItemCellViewActive(bool isActive)
     {
         itemCellView.gameObject.SetActive(isActive);
+    }
+
+    public void SetEditViewActive(bool isActive)
+    {
+        editView.gameObject.SetActive(isActive);
+    }
+    public void SetRotateButtonValue(float degree)
+    {
+        rotateButton.SetValue(degree);
+    }
+    public void SetRotateButtonRotation(float degree)
+    {
+        rotateButton.SetRotation(degree);
     }
 }

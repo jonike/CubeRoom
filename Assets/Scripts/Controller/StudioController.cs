@@ -41,9 +41,12 @@ public class StudioController : MonoBehaviour
 
     private void Start()
     {
-        InitView();
+
         InitUI();
         InitTouch();
+        InitView();
+
+        Reset();
     }
 
     #region Init
@@ -74,7 +77,8 @@ public class StudioController : MonoBehaviour
         studioPanel.Init();
         studioPanel.OnItemBeginDrag = HandleUIItemBeginDrag;
         studioPanel.OnPlaceClick = PlaceItem;
-        studioPanel.OnDeletelick = DeleteItem;
+        studioPanel.OnDeleteClick = DeleteItem;
+        studioPanel.OnRotateChange = RotateItem;
     }
 
     private void InitTouch()
@@ -156,11 +160,11 @@ public class StudioController : MonoBehaviour
             AddItem(ItemType.Vertical);
         }
 
-        if (GUI.Button(new Rect(0, 240, 60, 20), "Rotate Item"))
-        {
-            if (!isItemEdited) return;
-            RotateItem();
-        }
+        // if (GUI.Button(new Rect(0, 240, 60, 20), "Rotate Item"))
+        // {
+        //     if (!isItemEdited) return;
+        //     RotateItem();
+        // }
 
         // if (GUI.Button(new Rect(0, 210, 60, 20), "Ok Item"))
         // {
@@ -178,8 +182,20 @@ public class StudioController : MonoBehaviour
     private void onCameraRotate(float angle)
     {
         room.RefreshByAngle(Math.mod(angle, 360));
+        studioPanel.SetRotateButtonRotation(angle);
     }
 
+    private void Reset()
+    {
+        isItemEdited = false;
+        studioPanel.SetItemCellViewActive(true);
+        studioPanel.SetEditViewActive(false);
+
+        room.RefreshGrids(false);
+        currentItem = null;
+        editedItem = null;
+        gridGroup.SetActive(false);
+    }
 
     private void AddItem(ItemType type)
     {
@@ -208,6 +224,7 @@ public class StudioController : MonoBehaviour
         isItemEdited = true;
 
         studioPanel.SetItemCellViewActive(false);
+        studioPanel.SetEditViewActive(true);
 
         currentItem = itemGO.GetComponent<ItemObject>();
         editedItem = itemGO.AddComponent<EditedItem>();
@@ -238,10 +255,6 @@ public class StudioController : MonoBehaviour
         // after
         Destroy(editedItem);
         Reset();
-
-        isItemEdited = false;
-
-        studioPanel.SetItemCellViewActive(true);
     }
 
     private void DeleteItem(PointerEventData eventData)
@@ -249,24 +262,10 @@ public class StudioController : MonoBehaviour
         if (!isItemEdited) return;
         Destroy(currentItem.gameObject);
         Reset();
-
-        isItemEdited = false;
-
-        studioPanel.SetItemCellViewActive(true);
     }
-
-    private void Reset()
+    private void RotateItem(float degree)
     {
-        isItemEdited = false;
-        room.RefreshGrids(false, currentItem.Type);
-        currentItem = null;
-        editedItem = null;
-        gridGroup.SetActive(false);
-    }
-
-    private void RotateItem()
-    {
-        currentItem.SetDir(currentItem.Item.Dir.Next());
+        currentItem.SetDir(Direction.Degree(degree));
         // gridGroup.SetTransform(currentItem);
         Vector3 itemPoition = ItemPositionOfCurrent(room, currentItem, editedItem, isRestricted);
         SetCurrentItemPosition(room, currentItem, itemPoition);
@@ -319,7 +318,6 @@ public class StudioController : MonoBehaviour
     {
     }
 
-
     private void SetCurrentItemPosition(Room room, ItemObject item, Vector3 itemPosition)
     {
 
@@ -335,6 +333,12 @@ public class StudioController : MonoBehaviour
             gridGroup.SetSideGridsType(sideGrids);
 
         gridGroup.SetTransform(item.Item);
+    }
+
+    private void SetCurrentItemDirection(ItemObject item, Direction dir)
+    {
+        item.SetDir(dir);
+        studioPanel.SetRotateButtonValue(dir.Rotation());
     }
 
     #region Position
@@ -397,13 +401,13 @@ public class StudioController : MonoBehaviour
                 {
                     distance = distanceL;
                     itemPostion = itemPostionL;
-                    itemObject.SetDir(dirL);
+                    SetCurrentItemDirection(itemObject, dirL);
                 }
                 else
                 {
                     distance = distanceR;
                     itemPostion = itemPostionR;
-                    itemObject.SetDir(dirR);
+                    SetCurrentItemDirection(itemObject, dirR);
                 }
 
                 if (editedItem.CanOutside && (distance.y < -0.5f || distance.z < 0))

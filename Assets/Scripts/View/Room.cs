@@ -87,14 +87,25 @@ public class Room : MonoBehaviour
         showWalls[1] = Math.mod((angle / 90) + 2, 4);
     }
 
-    public void RefreshGrids(bool isEdited, ItemType itemType)
+    public void RefreshGrids(bool isEdited, ItemType itemType = 0)
     {
-        if (itemType == ItemType.Horizontal)
+        if (isEdited)
+        {
+            if (itemType == ItemType.Horizontal)
+            {
+                ground.ShowGrid(true);
+            }
+            else if (itemType == ItemType.Vertical)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    walls[i].ShowGrid(true);
+                }
+            }
+        }
+        else
         {
             ground.ShowGrid(isEdited);
-        }
-        else if (itemType == ItemType.Vertical)
-        {
             for (int i = 0; i < 4; i++)
             {
                 walls[i].ShowGrid(isEdited);

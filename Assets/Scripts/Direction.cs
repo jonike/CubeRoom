@@ -1,4 +1,5 @@
 using UnityEngine;
+using Sorumi.Util;
 public class Direction
 {
 
@@ -24,6 +25,12 @@ public class Direction
     private static Direction[] directions = { A, B, C, D, E, F, G, H };
     public int Value;
     public Vector3 Vector;
+
+    public static Direction Degree(float degree)
+    {
+        int index = ((int)degree / 90) * 2;
+        return directions[index];
+    }
 
     private Direction(int v, Vector3 vec)
     {

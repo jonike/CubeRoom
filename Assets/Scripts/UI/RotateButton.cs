@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,10 @@ public class RotateButton : MonoBehaviour, IDragHandler
 
     private RectTransform rectTransform;
     private RectTransform dot;
+
+    private float value;
+
+    public event Action<float> OnChange;
     public void Start()
     {
         rectTransform = transform.GetComponent<RectTransform>();
@@ -17,11 +22,12 @@ public class RotateButton : MonoBehaviour, IDragHandler
     }
     public void OnDrag(PointerEventData eventData)
     {
-        // Debug.Log(transform.position);
+
         Vector2 position = new Vector2(
-            rectTransform.position.x + rectTransform.rect.width / 2,
-            rectTransform.position.y + rectTransform.rect.height / 2);
+            rectTransform.position.x,
+            rectTransform.position.y);
         position = eventData.position - position;
+        // Debug.Log(position);
         float x = position.x;
         float y = position.y;
         float degree = Mathf.Atan(Mathf.Abs(y / x)) * Mathf.Rad2Deg;
@@ -41,11 +47,24 @@ public class RotateButton : MonoBehaviour, IDragHandler
             degree = 360 - degree;
         }
 
-        setValue(degree);
+        degree += rectTransform.localEulerAngles.z;        
+        SetValue(degree);
     }
 
-    private void setValue(float degree)
+    public void SetRotation(float degree)
     {
+        degree = -(int)(degree / 90) * 90.0f;
+        rectTransform.localEulerAngles = new Vector3(0, 0, degree);
+    }
+    public void SetValue(float degree)
+    {
+        degree = degree % 360;
+        if (degree < 0)
+            degree += 360;
+        // Debug.Log("drag: " + degree);
+
+        value = degree;
+
         if (degree >= 0 && degree < 90)
         {
             dot.localEulerAngles = new Vector3(0, 0, 0);
@@ -62,5 +81,8 @@ public class RotateButton : MonoBehaviour, IDragHandler
         {
             dot.localEulerAngles = new Vector3(0, 0, 90);
         }
+
+        if (OnChange != null)
+            OnChange(value);
     }
 }
