@@ -141,14 +141,16 @@ public class RoomCamera : MonoBehaviour
         float moveDegree = (defaultRotationY + rotateHorizontal + 180);
         float moveRad = moveDegree * Mathf.Deg2Rad;
 
-        cameraPosition.x = defaultPositionX * Mathf.Cos(rotateHorizontalRad) - defaultPositionZ * Mathf.Sin(rotateHorizontalRad);
-        cameraPosition.z = defaultPositionX * Mathf.Sin(rotateHorizontalRad) + defaultPositionZ * Mathf.Cos(rotateHorizontalRad);
+        float d = defaultPositionXZ * (1 - Mathf.Cos(rotateVerticalRad));  //rotate vertical
+        float dRad = (defaultRotationY + 180 - rotateHorizontal) * Mathf.Deg2Rad;
+
+        cameraPosition.x = defaultPositionX * Mathf.Cos(rotateHorizontalRad) - defaultPositionZ * Mathf.Sin(rotateHorizontalRad) - d * Mathf.Sin(dRad);
+        cameraPosition.z = defaultPositionX * Mathf.Sin(rotateHorizontalRad) + defaultPositionZ * Mathf.Cos(rotateHorizontalRad) - d * Mathf.Cos(dRad);
         cameraPosition.x += Mathf.Sin(moveRad) * moveHorizontal;
         cameraPosition.z += -Mathf.Cos(moveRad) * moveHorizontal;
 
-        cameraPosition.y = defaultPositionXZ * Mathf.Tan(rotateVerticalRad) + defaultPositionY;
+        cameraPosition.y = defaultPositionXZ * Mathf.Sin(rotateVerticalRad) + defaultPositionY;
         cameraPosition.y -= moveVertical;
-
 
         camera.transform.position = cameraPosition;
         camera.transform.eulerAngles = cameraRotation;

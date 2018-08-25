@@ -28,7 +28,6 @@ public class StudioController : MonoBehaviour
     private GridGroup gridGroup;
 
     // UI
-    private EventSystem eventSystem;
     private StudioPanel studioPanel;
 
     // Touch
@@ -72,7 +71,6 @@ public class StudioController : MonoBehaviour
 
     private void InitUI()
     {
-        eventSystem = GameObject.Find("/EventSystem").GetComponent<EventSystem>();
         studioPanel = GameObject.Find("/Canvas/StudioPanel").GetComponent<StudioPanel>();
         studioPanel.Init();
         studioPanel.OnItemBeginDrag = HandleUIItemBeginDrag;
@@ -148,17 +146,17 @@ public class StudioController : MonoBehaviour
 #if UNITY_EDITOR
     void OnGUI()
     {
-        if (GUI.Button(new Rect(0, 210, 60, 20), "+ H Item"))
-        {
-            if (isItemEdited) return;
-            AddItem(ItemType.Horizontal);
-        }
+        // if (GUI.Button(new Rect(0, 210, 60, 20), "+ H Item"))
+        // {
+        //     if (isItemEdited) return;
+        //     AddItem(ItemType.Horizontal);
+        // }
 
-        if (GUI.Button(new Rect(80, 210, 60, 20), "+ V Item"))
-        {
-            if (isItemEdited) return;
-            AddItem(ItemType.Vertical);
-        }
+        // if (GUI.Button(new Rect(80, 210, 60, 20), "+ V Item"))
+        // {
+        //     if (isItemEdited) return;
+        //     AddItem(ItemType.Vertical);
+        // }
 
         // if (GUI.Button(new Rect(0, 240, 60, 20), "Rotate Item"))
         // {
