@@ -10,9 +10,6 @@ namespace Sorumi.UI
     [RequireComponent(typeof(ScrollRect))]
     public class CellView : MonoBehaviour
     {
-
-        // Use this for initialization
-
         public enum Direction
         {
             Horizontal,

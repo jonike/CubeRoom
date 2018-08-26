@@ -78,72 +78,74 @@ public class GridGroup : MonoBehaviour
         float offsetY = 0.5f - size.y / 2.0f;
 
         // float bottomY = item.Type == ItemType.Vertical ? GRID_OFFSET - size.y / 2.0f : GRID_OFFSET;
-        for (int i = 0; i < size.x; i++)
+        for (int i = 0; i < MAX_SIZE; i++)
         {
-            for (int j = 0; j < size.z; j++)
+            for (int j = 0; j < MAX_SIZE; j++)
             {
-                Grid grid;
-                if ((grid = bottomGrids[i, j]) == null)
+                if (i < size.x && j < size.z)
                 {
-                    grid = gridPool.GetObject().GetComponent<Grid>();
-                    grid.transform.SetParent(bottomGridsGroup);
-                    bottomGrids[i, j] = grid;
-                    grid.name = "(" + i + ", " + j + ")";
+                    Grid grid = bottomGrids[i, j];
+                    if (grid == null)
+                    {
+                        grid = gridPool.GetObject().GetComponent<Grid>();
+                        grid.transform.SetParent(bottomGridsGroup);
+                        bottomGrids[i, j] = grid;
+                        grid.name = "(" + i + ", " + j + ")";
+                    }
+                    float x = i + offsetX;
+                    float z = j + offsetZ;
+                    grid.transform.position = new Vector3(x, GRID_OFFSET, z);
                 }
-                float x = i + offsetX;
-                float z = j + offsetZ;
-                grid.transform.position = new Vector3(x, GRID_OFFSET, z);
-            }
-        }
+                else // remove others
+                {
+                    Grid grid = bottomGrids[i, j];
+                    if (grid != null)
+                    {
+                        gridPool.PutObject(grid.gameObject);
+                        bottomGrids[i, j] = null;
+                    }
 
-        // remove others
-        for (int i = size.x; i < MAX_SIZE; i++)
-        {
-            for (int j = size.z; j < MAX_SIZE; j++)
-            {
-                Grid grid;
-                if ((grid = bottomGrids[i, j]) != null)
-                    gridPool.PutObject(grid.gameObject);
+                }
             }
         }
 
         if (item.Type == ItemType.Vertical)
         {
-            offsetZ = - size.z / 2.0f;
-            for (int i = 0; i < size.x; i++)
+            offsetZ = -size.z / 2.0f;
+            for (int i = 0; i < MAX_SIZE; i++)
             {
-                for (int j = 0; j < size.y; j++)
+                for (int j = 0; j < MAX_SIZE; j++)
                 {
-                    Grid grid;
-                    if ((grid = sideGrids[i, j]) == null)
+                    if (i < size.x && j < size.y)
                     {
-                        grid = gridPool.GetObject().GetComponent<Grid>();
-                        grid.transform.SetParent(sideGridsGroup);
-                        sideGrids[i, j] = grid;
-                        grid.name = "(" + i + ", " + j + ")";
+                        Grid grid = sideGrids[i, j];
+                        if (grid == null)
+                        {
+                            grid = gridPool.GetObject().GetComponent<Grid>();
+                            grid.transform.SetParent(sideGridsGroup);
+                            sideGrids[i, j] = grid;
+                            grid.name = "(" + i + ", " + j + ")";
+                        }
+                        float x = i + offsetX;
+                        float y = j + offsetY;
+                        grid.transform.position = new Vector3(x, y, offsetZ + GRID_OFFSET);
+                        grid.transform.eulerAngles = new Vector3(90, 0, 0);
+
                     }
-                    float x = i + offsetX;
-                    float y = j + offsetY;
-                    grid.transform.position = new Vector3(x, y, offsetZ + GRID_OFFSET);
-                    grid.transform.eulerAngles = new Vector3(90, 0, 0);
-
-                }
-            }
-
-            // remove others
-            for (int i = size.x; i < MAX_SIZE; i++)
-            {
-                for (int j = size.y; j < MAX_SIZE; j++)
-                {
-                    Grid grid;
-                    if ((grid = sideGrids[i, j]) != null)
-                        gridPool.PutObject(grid.gameObject);
+                    else // remove others
+                    {
+                        Grid grid = sideGrids[i, j];
+                        if (grid != null)
+                        {
+                            gridPool.PutObject(grid.gameObject);
+                            sideGrids[i, j] = null;
+                        }
+                    }
                 }
             }
         }
 
         Vector3 position = item.gameObject.transform.position;
-
     }
 
     public void SetTransform(Item item)
