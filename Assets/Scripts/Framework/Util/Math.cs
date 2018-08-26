@@ -10,9 +10,9 @@ namespace Sorumi.Util
             return (x % m + m) % m;
         }
 
-        public static int mod(float x, int m)
+        public static float mod(float x, int m)
         {
-            return (int)(x % m + m) % m;
+            return (x % m + m) % m;
         }
 
 

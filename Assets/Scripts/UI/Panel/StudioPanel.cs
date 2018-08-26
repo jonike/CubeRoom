@@ -9,7 +9,10 @@ using Sorumi.Util;
 public class StudioPanel : MonoBehaviour
 {
     private DragItemCellView itemCellView;
+    private Transform setView;
     private Transform editView;
+
+    private Button resetButton;
 
     private Button placeButton;
     private Button deleteButton;
@@ -37,6 +40,15 @@ public class StudioPanel : MonoBehaviour
     //     }
     // }
 
+    public Action<PointerEventData> OnResetClick
+    {
+        set
+        {
+            UIEventListener btnListener = resetButton.gameObject.AddComponent<UIEventListener>();
+
+            btnListener.OnClick += value;
+        }
+    }
     public Action<PointerEventData> OnPlaceClick
     {
         set
@@ -68,6 +80,10 @@ public class StudioPanel : MonoBehaviour
     public void Init()
     {
         itemCellView = transform.Find("DragItemScrollView").GetComponent<DragItemCellView>();
+        itemCellView.Init();
+
+        setView = transform.Find("SetView");
+        resetButton = setView.Find("ResetButton").GetComponent<Button>();
         editView = transform.Find("EditView");
         placeButton = editView.Find("PlaceButton").GetComponent<Button>();
         deleteButton = editView.Find("DeleteButton").GetComponent<Button>();

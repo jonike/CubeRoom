@@ -83,8 +83,8 @@ public class Room : MonoBehaviour
         pillars[2].Hide(angle >= 90 && angle < 360);
         pillars[3].Hide(angle >= 180 || angle < 90);
 
-        showWalls[0] = Math.mod((angle / 90) + 3, 4);
-        showWalls[1] = Math.mod((angle / 90) + 2, 4);
+        showWalls[0] = (int)Math.mod((angle / 90) + 3, 4);
+        showWalls[1] = (int)Math.mod((angle / 90) + 2, 4);
     }
 
     public void RefreshGrids(bool isEdited, ItemType itemType = 0)

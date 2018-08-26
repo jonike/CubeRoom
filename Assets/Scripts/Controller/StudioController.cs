@@ -41,6 +41,8 @@ public class StudioController : MonoBehaviour
     private void Start()
     {
 
+        ItemData.Init();
+
         InitUI();
         InitTouch();
         InitView();
@@ -77,6 +79,9 @@ public class StudioController : MonoBehaviour
         studioPanel.OnPlaceClick = PlaceItem;
         studioPanel.OnDeleteClick = DeleteItem;
         studioPanel.OnRotateChange = RotateItem;
+        studioPanel.OnResetClick = (a) => {
+            camera.TriggerAnimation();
+        };
     }
 
     private void InitTouch()
