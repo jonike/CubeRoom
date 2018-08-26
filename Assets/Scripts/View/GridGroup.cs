@@ -95,6 +95,7 @@ public class GridGroup : MonoBehaviour
                     float x = i + offsetX;
                     float z = j + offsetZ;
                     grid.transform.position = new Vector3(x, GRID_OFFSET, z);
+                    grid.transform.eulerAngles = new Vector3(0, 0, 0);
                 }
                 else // remove others
                 {
