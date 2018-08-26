@@ -44,61 +44,60 @@ public class RoomCamera : MonoBehaviour
 
     private float iOrthographic = 0;
 
+#if UNITY_EDITOR && CR_DEBUG_CAMERA
+        void OnGUI()
+        {
+            if (GUI.RepeatButton(new Rect(0, 0, 50, 20), "放大"))
+            {
+                Zoom(1f);
+            }
 
-    // #if UNITY_EDITOR
-    //     void OnGUI()
-    //     {
-    //         if (GUI.RepeatButton(new Rect(0, 0, 50, 20), "放大"))
-    //         {
-    //             Zoom(1f);
-    //         }
+            if (GUI.RepeatButton(new Rect(60, 0, 50, 20), "缩小"))
+            {
+                Zoom(-1f);
+            }
+            if (GUI.RepeatButton(new Rect(30, 30, 50, 20), "上转"))
+            {
+                Rotate(new Vector2(0, 1));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(60, 0, 50, 20), "缩小"))
-    //         {
-    //             Zoom(-1f);
-    //         }
-    //         if (GUI.RepeatButton(new Rect(30, 30, 50, 20), "上转"))
-    //         {
-    //             Rotate(new Vector2(0, 1));
-    //         }
+            if (GUI.RepeatButton(new Rect(30, 90, 50, 20), "下转"))
+            {
+                Rotate(new Vector2(0, -1));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(30, 90, 50, 20), "下转"))
-    //         {
-    //             Rotate(new Vector2(0, -1));
-    //         }
+            if (GUI.RepeatButton(new Rect(0, 60, 50, 20), "左转"))
+            {
+                Rotate(new Vector2(-1, 0));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(0, 60, 50, 20), "左转"))
-    //         {
-    //             Rotate(new Vector2(-1, 0));
-    //         }
+            if (GUI.RepeatButton(new Rect(60, 60, 50, 20), "右转"))
+            {
+                Rotate(new Vector2(1, 0));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(60, 60, 50, 20), "右转"))
-    //         {
-    //             Rotate(new Vector2(1, 0));
-    //         }
+            if (GUI.RepeatButton(new Rect(30, 120, 50, 20), "↑"))
+            {
+                Move(new Vector2(0, 1));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(30, 120, 50, 20), "↑"))
-    //         {
-    //             Move(new Vector2(0, 1));
-    //         }
+            if (GUI.RepeatButton(new Rect(30, 180, 50, 20), "↓"))
+            {
+                Move(new Vector2(0, -1));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(30, 180, 50, 20), "↓"))
-    //         {
-    //             Move(new Vector2(0, -1));
-    //         }
+            if (GUI.RepeatButton(new Rect(0, 150, 50, 20), "←"))
+            {
+                Move(new Vector2(-1, 0));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(0, 150, 50, 20), "←"))
-    //         {
-    //             Move(new Vector2(-1, 0));
-    //         }
+            if (GUI.RepeatButton(new Rect(60, 150, 50, 20), "→"))
+            {
+                Move(new Vector2(1, 0));
+            }
 
-    //         if (GUI.RepeatButton(new Rect(60, 150, 50, 20), "→"))
-    //         {
-    //             Move(new Vector2(1, 0));
-    //         }
-
-    //     }
-    // #endif
+        }
+#endif
 
     void Update()
     {
@@ -161,6 +160,8 @@ public class RoomCamera : MonoBehaviour
         rotateVertical += deltaDegree.y * rotateSpeed;
 
         rotateHorizontal = Math.mod(rotateHorizontal, 360);
+        if (rotateHorizontal > 180)
+            rotateHorizontal -= 360;
 
         rotateVertical = Mathf.Clamp(rotateVertical, -30f, 50f);
 
