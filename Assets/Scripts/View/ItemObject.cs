@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,16 +9,15 @@ public class ItemObject : MonoBehaviour
     public ItemType Type;
     public Item Item;
 
-	// public PlaceableItem PlaceableItem {
-	// 	get {
-	// 		return Item.PlaceableItem;
-	// 	}
-	// 	set {
-	// 		Item.PlaceableItem = value;
-	// 	}
-	// }
+    // public PlaceableItem PlaceableItem {
+    // 	get {
+    // 		return Item.PlaceableItem;
+    // 	}
+    // 	set {
+    // 		Item.PlaceableItem = value;
+    // 	}
+    // }
 
-    // Use this for initialization
     public void Init(ItemType type, Vector3Int size)
     {
         if (type == ItemType.Horizontal)
@@ -51,7 +51,7 @@ public class ItemObject : MonoBehaviour
         transform.eulerAngles = eulerAngles;
     }
 
-	public void SetPosition(Vector3 position)
+    public void SetPosition(Vector3 position)
     {
         Item.Position = position;
         transform.position = position - Item.CenterPositionOffset();

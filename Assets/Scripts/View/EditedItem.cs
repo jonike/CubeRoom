@@ -1,15 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EditedItem : MonoBehaviour {
 
 	public Item Item;
-
-	public delegate void VoidAction();
-	public VoidAction OnDrag;
-	public VoidAction OnDragBefore;
-	public VoidAction OnDragAfter;
+	public Action OnDrag;
+	public Action OnDragBefore;
+	public Action OnDragAfter;
 	
 	/* 
 	 * VerticalItem 计算 y 和 x

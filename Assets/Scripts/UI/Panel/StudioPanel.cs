@@ -92,7 +92,6 @@ public class StudioPanel : MonoBehaviour
 
         // TODO
         itemCellViewData = ItemData.GetAll();
-        Debug.Log("length: " + itemCellViewData[0].name);
         itemCellView.Refresh();
 
     }

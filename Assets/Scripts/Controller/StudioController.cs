@@ -200,39 +200,52 @@ public class StudioController : MonoBehaviour
         gridGroup.SetActive(false);
     }
 
-    private void AddItem(ItemPO item_s)
+    private void AddItem(ItemPO itemPO)
     {
         if (isItemEdited) return;
 
-        // Vector3Int size = new Vector3Int(2, 3, 1); // TODO
-
         GameObject itemGO = null;
 
-        itemGO = Instantiate(Resources.Load("Prefabs/" + item_s.name)) as GameObject;
+        itemGO = Instantiate(Resources.Load("Prefabs/" + itemPO.name)) as GameObject;
 
         ItemObject item = itemGO.GetComponent<ItemObject>();
-        item.Init(item_s.type, item_s.size);
+        item.Init(itemPO.type, itemPO.size);
 
-        SetEdited(itemGO);
+        SuspendItem suspendItem = itemGO.GetComponent<SuspendItem>();
+        suspendItem.Init();
+        suspendItem.OnClick = ClickItem;
+
+        SetEdited(item);
     }
 
-    private void SetEdited(GameObject itemGO)
+    private void ClickItem(ItemObject item)
+    {
+        room.DeleteItem(item);
+        SetEdited(item);
+    }
+
+    private void SetEdited(ItemObject item)
     {
         isItemEdited = true;
         studioPanel.SetMode(StudioMode.EditItem);
 
-        currentItem = itemGO.GetComponent<ItemObject>();
-        editedItem = itemGO.AddComponent<EditedItem>();
+        currentItem = item;
+
+        editedItem = item.gameObject.AddComponent<EditedItem>();
         editedItem.Init();
 
-        room.RefreshGrids(true, currentItem.Type);
+        room.RefreshGrids(true, item.Type);
 
         editedItem.OnDragBefore = HandleItemBeginDrag;
         editedItem.OnDrag = HandleItemDrag;
         editedItem.OnDragAfter = HandleItemEndDrag;
 
+        SuspendItem suspendItem = item.gameObject.GetComponent<SuspendItem>();
+        suspendItem.enabled = false;
+
         gridGroup.SetActive(true);
-        gridGroup.SetGrids(currentItem);
+        gridGroup.SetGrids(item);
+        gridGroup.SetTransform(item.Item);
 
     }
 
@@ -249,6 +262,9 @@ public class StudioController : MonoBehaviour
 
         // after
         Destroy(editedItem);
+        SuspendItem suspendItem = currentItem.gameObject.GetComponent<SuspendItem>();
+        suspendItem.enabled = true;
+
         Reset();
     }
 

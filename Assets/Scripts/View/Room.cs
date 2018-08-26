@@ -26,7 +26,7 @@ public class Room : MonoBehaviour
 
     private List<ItemObject> items;
 
-    private ItemObject[,,] space;
+    private Dictionary<int, List<ItemObject>> space;
     // private ItemBehaviour[,,] occupiedSpace;
     // private ItemBehaviour[,] groundSpace;
     // private ItemBehaviour[,] wallASpace;
@@ -38,7 +38,7 @@ public class Room : MonoBehaviour
     {
         this.Size = size;
         items = new List<ItemObject>();
-        space = new ItemObject[size.x * 2, size.y * 2, size.z * 2];
+        space = new Dictionary<int, List<ItemObject>>();
 
         ground = transform.Find("ground").GetComponent<Ground>();
         ground.Init(new Vector2Int(size.x * 2, size.z * 2));
@@ -133,23 +133,13 @@ public class Room : MonoBehaviour
     {
         items.Add(item);
 
-        Vector3Int rotateSize = item.Item.RotateSize;
-        Vector3Int roomPosition = item.Item.RoomPosition;
-        int minX = roomPosition.x - rotateSize.x;
-        int maxX = roomPosition.x + rotateSize.x;
-        int minY = roomPosition.y - rotateSize.y;
-        int maxY = roomPosition.y + rotateSize.y;
-        int minZ = roomPosition.z - rotateSize.z;
-        int maxZ = roomPosition.z + rotateSize.z;
-
-        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
-        {
-            Debug.LogWarning("The item position or size is wrong");
-            return;
-        }
-
         if (item.Item.IsOccupid)
         {
+            int minX, maxX, minY, maxY, minZ, maxZ;
+            bool success = ItemXYZ(item.Item, out minX, out maxX, out minY, out maxY, out minZ, out maxZ);
+            if (!success)
+                return;
+
             for (int x = minX; x < maxX; x++)
             {
                 for (int y = minY; y < maxY; y++)
@@ -158,56 +148,94 @@ public class Room : MonoBehaviour
                     {
                         // string coordinate = x + ", " + y + ", " + z;
                         // Debug.Log(coordinate);
-                        if (space[x, y, z] != null)
+                        int key = x * 12 * 12 + y * 12 + z;
+                        if (!space.ContainsKey(key))
+                            space.Add(key, new List<ItemObject>());
+
+                        if (space[key].Count > 0)
                         {
                             string coordinate = x + ", " + y + ", " + z;
                             Debug.LogWarning(coordinate + " has already been occupied");
                         }
-                        space[x, y, z] = item;
+
+                        space[key].Add(item);
                     }
                 }
             }
         }
     }
 
-    public List<Vector3Int> ConflictSpace(Item item)
+    public void DeleteItem(ItemObject item)
     {
-        List<Vector3Int> conflictSpace = new List<Vector3Int>();
+        items.Remove(item);
 
-        Vector3Int rotateSize = item.RotateSize;
-        Vector3Int roomPosition = item.RoomPosition;
-        int minX = roomPosition.x - rotateSize.x;
-        int maxX = roomPosition.x + rotateSize.x;
-        int minY = roomPosition.y - rotateSize.y;
-        int maxY = roomPosition.y + rotateSize.y;
-        int minZ = roomPosition.z - rotateSize.z;
-        int maxZ = roomPosition.z + rotateSize.z;
-
-        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
+        if (item.Item.IsOccupid)
         {
-            Debug.LogWarning("The item position or size is wrong");
-            return conflictSpace;
-        }
+            int minX, maxX, minY, maxY, minZ, maxZ;
+            bool success = ItemXYZ(item.Item, out minX, out maxX, out minY, out maxY, out minZ, out maxZ);
+            if (!success)
+                return;
 
-        if (item.IsOccupid)
-        {
             for (int x = minX; x < maxX; x++)
             {
                 for (int y = minY; y < maxY; y++)
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
+                        int key = x * 12 * 12 + y * 12 + z;
+                        if (space.ContainsKey(key))
+                            space[key].Remove(item);
+                    }
+                }
+            }
+        }
+    }
 
-                        if (space[x, y, z] != null)
-                        {
-                            // string coordinate = x + ", " + y + ", " + z;
-                            // Debug.Log("conflict: " + coordinate);
+
+    public List<Vector3Int> ConflictSpace(Item item)
+    {
+        List<Vector3Int> conflictSpace = new List<Vector3Int>();
+
+        if (item.IsOccupid)
+        {
+            int minX, maxX, minY, maxY, minZ, maxZ;
+            bool success = ItemXYZ(item, out minX, out maxX, out minY, out maxY, out minZ, out maxZ);
+            if (!success)
+                return conflictSpace;
+
+
+            for (int x = minX; x < maxX; x++)
+            {
+                for (int y = minY; y < maxY; y++)
+                {
+                    for (int z = minZ; z < maxZ; z++)
+                    {
+                        int key = x * 12 * 12 + y * 12 + z;
+                        if (space.ContainsKey(key) && space[key].Count > 0)
                             conflictSpace.Add(new Vector3Int(x, y, z));
-                        }
                     }
                 }
             }
         }
         return conflictSpace;
+    }
+
+    private bool ItemXYZ(Item item, out int minX, out int maxX, out int minY, out int maxY, out int minZ, out int maxZ)
+    {
+        Vector3Int rotateSize = item.RotateSize;
+        Vector3Int roomPosition = item.RoomPosition;
+        minX = roomPosition.x - rotateSize.x;
+        maxX = roomPosition.x + rotateSize.x;
+        minY = roomPosition.y - rotateSize.y;
+        maxY = roomPosition.y + rotateSize.y;
+        minZ = roomPosition.z - rotateSize.z;
+        maxZ = roomPosition.z + rotateSize.z;
+
+        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
+        {
+            Debug.LogWarning("The item position or size is wrong");
+            return false;
+        }
+        return true;
     }
 }
