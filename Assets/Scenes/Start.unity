@@ -749,7 +749,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxTouches: 2
   canContinuousRecognize: 0
-  isGetMouse: 0
+  isGetMouse: 1
 --- !u!1 &1607910190
 GameObject:
   m_ObjectHideFlags: 0

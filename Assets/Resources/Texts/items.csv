@@ -1,2 +1,3 @@
 name;type(h/v);size;is occupied
-;;;
+VItem;v;2,3,1;1
+HItem;h;1,1,1;1

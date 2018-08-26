@@ -41,7 +41,7 @@ public class StudioController : MonoBehaviour
     private void Start()
     {
 
-        ItemData.Init();
+        // ItemData.Init();
 
         InitUI();
         InitTouch();
