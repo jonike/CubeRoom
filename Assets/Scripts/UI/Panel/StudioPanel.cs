@@ -101,6 +101,17 @@ public class StudioPanel : MonoBehaviour
         return itemCellViewData;
     }
 
+
+    private void SetEditViewActive(bool isActive)
+    {
+        editView.gameObject.SetActive(isActive);
+    }
+
+    private void SetItemCellViewActive(bool isActive)
+    {
+        itemCellView.gameObject.SetActive(isActive);
+    }
+
     #region Controller API
 
     public void SetMode(StudioMode mode)
@@ -118,14 +129,11 @@ public class StudioPanel : MonoBehaviour
         rotateButton.SetRotation(degree);
     }
 
-    private void SetItemCellViewActive(bool isActive)
+    public void SetPlaceButtonAbled(bool isAbled)
     {
-        itemCellView.gameObject.SetActive(isActive);
+        placeButton.interactable = isAbled;
     }
 
-    private void SetEditViewActive(bool isActive)
-    {
-        editView.gameObject.SetActive(isActive);
-    }
+
     #endregion
 }

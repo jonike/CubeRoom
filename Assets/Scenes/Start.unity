@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.745283, g: 0.745283, b: 0.745283, a: 1}
+  m_AmbientSkyColor: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -316,6 +316,52 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 124af382b7bbb45fb9924f8015753b67, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1001 &459668206
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035988755437082, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1847039530922408, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45f600adf1b01488d80b1f58e610e9ab, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1 &571944018
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,14 +504,6 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1545441144524246, guid: f28c373c87cc7463cbddbd65e64887a3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1625100048386416, guid: f28c373c87cc7463cbddbd65e64887a3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f28c373c87cc7463cbddbd65e64887a3, type: 2}
   m_IsPrefabAsset: 0
@@ -557,7 +595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b084e1c48d21e46cfb055eef4aaad4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &1206847119
+--- !u!1001 &1096820624
 Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -566,15 +604,15 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4154809072753670, guid: 5aa3fa3505a7446cd9f3bc9491a079b9, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -2.55
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4154809072753670, guid: 5aa3fa3505a7446cd9f3bc9491a079b9, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 4.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4154809072753670, guid: 5aa3fa3505a7446cd9f3bc9491a079b9, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -0.63
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4154809072753670, guid: 5aa3fa3505a7446cd9f3bc9491a079b9, type: 2}
       propertyPath: m_LocalRotation.x
@@ -1247,7 +1285,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.8666667, g: 0.8666667, b: 0.8666667, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -1325,7 +1363,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 1, g: 0.981469, b: 0.9481132, a: 1}
+  m_Color: {r: 0.8773585, g: 0.8773585, b: 0.8773585, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30

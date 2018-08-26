@@ -68,7 +68,7 @@ public class StudioController : MonoBehaviour
         gridGroup.Init();
 
         // TODO
-        isRestricted = false;
+        isRestricted = true;
     }
 
     private void InitUI()
@@ -222,6 +222,7 @@ public class StudioController : MonoBehaviour
     {
         room.DeleteItem(item);
         SetEdited(item);
+        SetCurrentItemPosition(room, currentItem, item.Item.Position);
     }
 
     private void SetEdited(ItemObject item)
@@ -280,7 +281,6 @@ public class StudioController : MonoBehaviour
         // gridGroup.SetTransform(currentItem);
         Vector3 itemPoition = ItemPositionOfCurrent(room, currentItem, editedItem, isRestricted);
         SetCurrentItemPosition(room, currentItem, itemPoition);
-
     }
 
     private void HandleItemBeginDrag()
@@ -301,7 +301,6 @@ public class StudioController : MonoBehaviour
     {
         isEditItemHandleDrag = false;
     }
-
 
     private void HandleUIItemBeginDrag(ItemPO item, Vector2 screenPosition)
     {
@@ -338,6 +337,7 @@ public class StudioController : MonoBehaviour
         bool[,] bottomGrids, sideGrids;
         bool canPlaced = gridTypes(item.Item, out bottomGrids, out sideGrids);
         editedItem.CanPlaced = canPlaced;
+        studioPanel.SetPlaceButtonAbled(canPlaced);
 
         gridGroup.SetBottomGridsType(bottomGrids);
         if (item.Type == ItemType.Vertical)
@@ -686,10 +686,8 @@ public class StudioController : MonoBehaviour
             return false;
         }
 
-        // 
-        HashSet<Vector2Int> xzGrids, xyGrids, zyGrids;
-        List<Vector3Int> conflictSpaces = room.ConflictSpace(item);
-        conflictSpaceToGrids(item, conflictSpaces, out xzGrids, out xyGrids, out zyGrids);
+
+        // initialize all true
         for (int i = 0; i < rotateSize.x; i++)
         {
             for (int j = 0; j < rotateSize.z; j++)
@@ -707,6 +705,13 @@ public class StudioController : MonoBehaviour
                 sideGrids[vec.x, vec.y] = true;
             }
         }
+
+        if (!isRestricted || !item.IsOccupid)
+            return true;
+
+        HashSet<Vector2Int> xzGrids, xyGrids, zyGrids;
+        List<Vector3Int> conflictSpaces = room.ConflictSpace(item);
+        conflictSpaceToGrids(item, conflictSpaces, out xzGrids, out xyGrids, out zyGrids);
 
         if ((xzGrids.Count + xyGrids.Count + zyGrids.Count) == 0)
         {
@@ -817,7 +822,6 @@ public class StudioController : MonoBehaviour
     }
 
     #endregion
-
     private bool IsPointerOverUIObject()
     {
         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
@@ -826,6 +830,5 @@ public class StudioController : MonoBehaviour
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
         return results.Count > 0;
     }
-
 }
 
