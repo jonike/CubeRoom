@@ -20,7 +20,7 @@ namespace Sorumi.UI
         }
 
         public Direction direction;
-        public GameObject cellObject;
+        public Cell cell;
         public float cellWidth;
         public float cellHeight;
         public float minHorizontalSpace = 0.0f;
@@ -45,17 +45,17 @@ namespace Sorumi.UI
         private int countOfLine;
 
         private GameObject poolGO;
-        private ObjectPool<GameObject> cellPool;
-        private Dictionary<int, GameObject> dictionary;
+        private ObjectPool<Cell> cellPool;
+        private Dictionary<int, Cell> dictionary;
 
         private int startIndex = -1;
         private int endIndex = -1;
 
 
         public delegate int IntDelegate();
-        public delegate void GameObjectIntAction(GameObject gameObject, int i);
+        public delegate void CellIntAction(Cell cell, int i);
         public IntDelegate CountOfCell;
-        public GameObjectIntAction CellAtIndex;
+        public CellIntAction CellAtIndex;
 
         public void Init()
         {
@@ -105,8 +105,22 @@ namespace Sorumi.UI
                 countPreLine = (int)Mathf.Floor((scrollSize.x - cellWidth - itemPadding * 2) / (cellWidth + minHorizontalSpace));
             }
 
-            countOfCell = CountOfCell != null ? CountOfCell() : 0;
+            
             countPreLine = countPreLine + 1;
+            
+
+            cellPool = new ObjectPool<Cell>(CreateCell, ResetCell);
+            poolGO = new GameObject("PoolGameObject");
+            poolGO.transform.position = Vector3.zero;
+            poolGO.SetActive(false);
+            poolGO.transform.SetParent(scrollRect.transform);
+
+            dictionary = new Dictionary<int, Cell>();
+        }
+
+        private void RefreshLayout()
+        {
+            countOfCell = CountOfCell != null ? CountOfCell() : 0;
             countOfLine = countOfCell / countPreLine + (countOfCell % countPreLine == 0 ? 0 : 1);
 
             // item space
@@ -150,29 +164,27 @@ namespace Sorumi.UI
                 scrollRect.content.sizeDelta = contentSize;
                 scrollRect.content.anchoredPosition = Vector3.zero;
             }
+        }
 
-            cellPool = new ObjectPool<GameObject>(CreateCell, ResetCell);
-            poolGO = new GameObject("PoolGameObject");
-            poolGO.transform.position = Vector3.zero;
-            poolGO.SetActive(false);
-            poolGO.transform.SetParent(scrollRect.transform);
+        private Cell CreateCell()
+        {
+            GameObject cellObject = GameObject.Instantiate(cell.gameObject, Vector3.zero, Quaternion.identity);
+            cellObject.transform.SetParent(poolGO.transform);
+            Cell objectCell = cellObject.GetComponent<Cell>();
+            objectCell.Init();
+            return objectCell;
+        }
 
-            dictionary = new Dictionary<int, GameObject>();
+        private void ResetCell(Cell cell)
+        {
+            cell.transform.SetParent(poolGO.transform);
+        }
 
+        public void Refresh()
+        {
+            RefreshLayout();
             Rect rect = new Rect(0, 0, scrollSize.x, scrollSize.y);
             UpdateInRect(rect);
-        }
-
-        private GameObject CreateCell()
-        {
-            GameObject cell = GameObject.Instantiate(cellObject, Vector3.zero, Quaternion.identity);
-            cell.transform.SetParent(poolGO.transform);
-            return cell;
-        }
-
-        private void ResetCell(GameObject cell)
-        {
-            cell.transform.SetParent(poolGO.transform);
         }
 
         public void OnValueChanged(Vector2 value)
@@ -196,7 +208,7 @@ namespace Sorumi.UI
             IndexInRect(rect, out startIndex, out endIndex);
 
             List<int> deleteList = new List<int>();
-            foreach (KeyValuePair<int, GameObject> pair in dictionary)
+            foreach (KeyValuePair<int, Cell> pair in dictionary)
             {
                 if (pair.Key < startIndex || pair.Key > endIndex)
                 {
@@ -216,8 +228,9 @@ namespace Sorumi.UI
                 {
                     if (!dictionary.ContainsKey(i))
                     {
-                        GameObject cell = cellPool.GetObject();
+                        Cell cell = cellPool.GetObject();
                         cell.name = i.ToString();
+                        cell.index = i;
                         SetCellPositionHorizontal(cell, i);
                         dictionary.Add(i, cell);
                         if (CellAtIndex != null)
@@ -231,8 +244,9 @@ namespace Sorumi.UI
                 {
                     if (!dictionary.ContainsKey(i))
                     {
-                        GameObject cell = cellPool.GetObject();
+                        Cell cell = cellPool.GetObject();
                         cell.name = i.ToString();
+                        cell.index = i;
                         SetCellPositionVertical(cell, i);
                         dictionary.Add(i, cell);
                         if (CellAtIndex != null)
@@ -278,7 +292,7 @@ namespace Sorumi.UI
 
         }
 
-        private void SetCellPositionHorizontal(GameObject cell, int index)
+        private void SetCellPositionHorizontal(Cell cell, int index)
         {
             cell.transform.SetParent(scrollRect.content);
             RectTransform rt = cell.GetComponent<RectTransform>();
@@ -287,7 +301,7 @@ namespace Sorumi.UI
             rt.anchoredPosition = new Vector2(x, y);
         }
 
-        private void SetCellPositionVertical(GameObject cell, int index)
+        private void SetCellPositionVertical(Cell cell, int index)
         {
             cell.transform.SetParent(scrollRect.content);
             RectTransform rt = cell.GetComponent<RectTransform>();

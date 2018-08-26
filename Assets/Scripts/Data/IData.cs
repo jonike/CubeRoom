@@ -35,7 +35,7 @@ public abstract class IData<T> where T : IData<T>, new()
 
     public virtual void DebugLog()
     {
-        Debug.Log(name + ": size = " + csvArray.GetLength(0) + "," + csvArray.GetLength(1) + CSVHelper.ArrayToString(csvArray));
+        Debug.Log(name + ": size = " + csvArray.GetLength(0) + "," + csvArray.GetLength(1) + "\n" + CSVHelper.ArrayToString(csvArray));
     }
 
 }

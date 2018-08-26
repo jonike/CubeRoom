@@ -6,8 +6,15 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Sorumi.Util;
 
+public enum StudioMode
+{
+    SelectItem,
+    EditItem,
+}
 public class StudioPanel : MonoBehaviour
 {
+
+    private StudioMode mode;
     private DragItemCellView itemCellView;
     private Transform setView;
     private Transform editView;
@@ -18,27 +25,19 @@ public class StudioPanel : MonoBehaviour
     private Button deleteButton;
     private RotateButton rotateButton;
 
-    public Action<Vector2> OnItemBeginDrag
+    private ItemPO[] itemCellViewData;
+
+    #region delegate
+    public Action<ItemPO, Vector2> OnItemBeginDrag
     {
         set
         {
-            itemCellView.OnItemBeginDrag += value;
+            itemCellView.OnItemBeginDrag += (index, position) =>
+            {
+                value(itemCellViewData[index], position);
+            };
         }
     }
-    // public UIActions.PointerEventAction OnItemDrag
-    // {
-    //     set
-    //     {
-    //         itemCellView.OnItemDrag = value;
-    //     }
-    // }
-    // public UIActions.PointerEventAction OnItemEndDrag
-    // {
-    //     set
-    //     {
-    //         itemCellView.OnItemEndDrag = value;
-    //     }
-    // }
 
     public Action<PointerEventData> OnResetClick
     {
@@ -77,9 +76,11 @@ public class StudioPanel : MonoBehaviour
         }
     }
 
+    #endregion
     public void Init()
     {
         itemCellView = transform.Find("DragItemScrollView").GetComponent<DragItemCellView>();
+        itemCellView.DataSource = ItemCellViewDataSource;
         itemCellView.Init();
 
         setView = transform.Find("SetView");
@@ -88,16 +89,26 @@ public class StudioPanel : MonoBehaviour
         placeButton = editView.Find("PlaceButton").GetComponent<Button>();
         deleteButton = editView.Find("DeleteButton").GetComponent<Button>();
         rotateButton = editView.Find("RotateButton").GetComponent<RotateButton>();
+
+        // TODO
+        itemCellViewData = ItemData.GetAll();
+        Debug.Log("length: " + itemCellViewData[0].name);
+        itemCellView.Refresh();
+
     }
 
-    public void SetItemCellViewActive(bool isActive)
+    public ItemPO[] ItemCellViewDataSource()
     {
-        itemCellView.gameObject.SetActive(isActive);
+        return itemCellViewData;
     }
 
-    public void SetEditViewActive(bool isActive)
+    #region Controller API
+
+    public void SetMode(StudioMode mode)
     {
-        editView.gameObject.SetActive(isActive);
+        this.mode = mode;
+        SetItemCellViewActive(mode == StudioMode.SelectItem);
+        SetEditViewActive(mode == StudioMode.EditItem);
     }
     public void SetRotateButtonValue(float degree)
     {
@@ -107,4 +118,15 @@ public class StudioPanel : MonoBehaviour
     {
         rotateButton.SetRotation(degree);
     }
+
+    private void SetItemCellViewActive(bool isActive)
+    {
+        itemCellView.gameObject.SetActive(isActive);
+    }
+
+    private void SetEditViewActive(bool isActive)
+    {
+        editView.gameObject.SetActive(isActive);
+    }
+    #endregion
 }

@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sorumi.Util;
 
-public struct Item_S
+public class ItemPO
 {
     public string name;
-    public string type;
+    public ItemType type;
     public Vector3Int size;
     public bool isOccupied;
 }
 
 public class ItemData : IData<ItemData>
 {
-    protected override string name {get; set;}
+    protected override string name { get; set; }
 
     public ItemData()
     {
@@ -26,12 +26,17 @@ public class ItemData : IData<ItemData>
         return instance.csvArray.GetLength(0) - 1;
     }
 
-    public static Item_S GetByRow(int i)
+    public static ItemPO GetByRow(int i) // 1 ~ Count
     {
-
-        Item_S item = new Item_S();
+        i = i + 1;
+        ItemPO item = new ItemPO();
         item.name = instance.csvArray[i, 0];
-        item.type = instance.csvArray[i, 1];
+
+        string type = instance.csvArray[i, 1];
+        if (type == "h")
+            item.type = ItemType.Horizontal;
+        else if (type == "v")
+            item.type = ItemType.Vertical;
 
         string[] sizeArray = instance.csvArray[i, 2].Split(',');
         int x = Int32.Parse(sizeArray[0]);
@@ -46,7 +51,17 @@ public class ItemData : IData<ItemData>
 
     public static string GetNameByRow(int i)
     {
-        return instance.csvArray[i, 0];
+        return instance.csvArray[i + 1, 0];
+    }
+
+    public static ItemPO[] GetAll()
+    {
+        ItemPO[] items = new ItemPO[Count()];
+        for (int i = 0; i < Count(); i++)
+        {
+            items[i] = GetByRow(i);
+        }
+        return items;
     }
 
 }

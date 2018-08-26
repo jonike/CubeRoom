@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Sorumi.UI;
 
-public class ItemCell : MonoBehaviour {
+public class ItemCell : Cell {
 
-    private ScrollRect parentScroll;
+    // private ScrollRect parentScroll;
 
     void Start () 
     {
-        parentScroll = GetComponentInParent<ScrollRect>();
+        // parentScroll = GetComponentInParent<ScrollRect>();
     }
  
 }

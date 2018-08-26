@@ -79,7 +79,8 @@ public class StudioController : MonoBehaviour
         studioPanel.OnPlaceClick = PlaceItem;
         studioPanel.OnDeleteClick = DeleteItem;
         studioPanel.OnRotateChange = RotateItem;
-        studioPanel.OnResetClick = (a) => {
+        studioPanel.OnResetClick = (a) =>
+        {
             camera.TriggerAnimation();
         };
     }
@@ -191,8 +192,7 @@ public class StudioController : MonoBehaviour
     private void Reset()
     {
         isItemEdited = false;
-        studioPanel.SetItemCellViewActive(true);
-        studioPanel.SetEditViewActive(false);
+        studioPanel.SetMode(StudioMode.SelectItem);
 
         room.RefreshGrids(false);
         currentItem = null;
@@ -200,24 +200,18 @@ public class StudioController : MonoBehaviour
         gridGroup.SetActive(false);
     }
 
-    private void AddItem(ItemType type)
+    private void AddItem(ItemPO item_s)
     {
         if (isItemEdited) return;
 
-        Vector3Int size = new Vector3Int(2, 3, 1); // TODO
+        // Vector3Int size = new Vector3Int(2, 3, 1); // TODO
 
         GameObject itemGO = null;
-        if (type == ItemType.Horizontal)
-        {
-            itemGO = Instantiate(Resources.Load("Prefabs/HItem")) as GameObject;
-        }
-        else if (type == ItemType.Vertical)
-        {
-            itemGO = Instantiate(Resources.Load("Prefabs/VItem")) as GameObject;
-        }
+
+        itemGO = Instantiate(Resources.Load("Prefabs/" + item_s.name)) as GameObject;
 
         ItemObject item = itemGO.GetComponent<ItemObject>();
-        item.Init(type, size);
+        item.Init(item_s.type, item_s.size);
 
         SetEdited(itemGO);
     }
@@ -225,9 +219,7 @@ public class StudioController : MonoBehaviour
     private void SetEdited(GameObject itemGO)
     {
         isItemEdited = true;
-
-        studioPanel.SetItemCellViewActive(false);
-        studioPanel.SetEditViewActive(true);
+        studioPanel.SetMode(StudioMode.EditItem);
 
         currentItem = itemGO.GetComponent<ItemObject>();
         editedItem = itemGO.AddComponent<EditedItem>();
@@ -295,11 +287,11 @@ public class StudioController : MonoBehaviour
     }
 
 
-    private void HandleUIItemBeginDrag(Vector2 screenPosition)
+    private void HandleUIItemBeginDrag(ItemPO item, Vector2 screenPosition)
     {
         isUIHandleDrag = true;
 
-        AddItem(ItemType.Vertical);
+        AddItem(item);
         Vector3 worldPosition = ScreenToWorldOfOutside(room, currentItem.Item, screenPosition, Vector2.zero);
         SetCurrentItemPosition(room, currentItem, worldPosition);
         editedItem.SetDragOffset(worldPosition);

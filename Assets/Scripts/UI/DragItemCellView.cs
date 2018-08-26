@@ -11,7 +11,11 @@ public class DragItemCellView : MonoBehaviour
 {
     private CellView cellView;
     private GameObject curItem;
-    public event Action<Vector2> OnItemBeginDrag;
+    public event Action<int, Vector2> OnItemBeginDrag;
+
+    public delegate ItemPO[] DataSourceDelegate();
+    public DataSourceDelegate DataSource;
+
     // public Action<Vector2> OnItemDrag;
     // public Action<Vector2> OnItemEndDrag;
     public void Init()
@@ -23,18 +27,28 @@ public class DragItemCellView : MonoBehaviour
         cellView.Init();
     }
 
-    public void CellAtIndex(GameObject gameObject, int index)
+    public void Refresh()
     {
-        gameObject.transform.Find("Text").GetComponent<Text>().text = ItemData.GetNameByRow(index + 1);
+        cellView.Refresh();
+    }
+
+    public void CellAtIndex(Cell cell, int index)
+    {
+        if (DataSource != null) {
+            DragItemCell dragItemCell = cell.GetComponent<DragItemCell>();
+            dragItemCell.SetItem(DataSource()[index]);
+        }
     }
     public int CountOfCell()
     {
-        return ItemData.Count();
+        if (DataSource != null)
+            return DataSource().Length;
+        return 0;
     }
 
-    public void OnBeginDrag(Vector2 position)
+    public void OnBeginDrag(int index, Vector2 position)
     {
         if (OnItemBeginDrag != null)
-            OnItemBeginDrag(position);
+            OnItemBeginDrag(index, position);
     }
 }
