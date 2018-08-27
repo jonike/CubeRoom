@@ -33,7 +33,7 @@ public class Room : MonoBehaviour
         space = new Dictionary<int, List<ItemObject>>();
 
         ground = transform.Find("ground").GetComponent<Ground>();
-        ground.Init(new Vector2Int(size.x * 2, size.z * 2));
+        ground.Init(new Vector2Int(size.x, size.z));
 
         walls = new Wall[4];
         pillarsV = new Pillar[4];
@@ -42,8 +42,8 @@ public class Room : MonoBehaviour
         {
             Wall wall = transform.Find("wall_" + wallNames[i]).GetComponent<Wall>();
             Direction dir = wallDirections[i];
-            int x = (int)Mathf.Abs(Vector3.Dot(dir.Vector, size)) * 2;
-            Vector2Int wallSize = new Vector2Int(x, size.y * 2);
+            int x = (int)Mathf.Abs(Vector3.Dot(dir.Vector, size));
+            Vector2Int wallSize = new Vector2Int(x, size.y);
             wall.Init(wallSize, dir);
             walls[i] = wall;
 
@@ -150,7 +150,7 @@ public class Room : MonoBehaviour
                     {
                         // string coordinate = x + ", " + y + ", " + z;
                         // Debug.Log(coordinate);
-                        int key = x * 12 * 12 + y * 12 + z;
+                        int key = x * Size.y * Size.z + y * Size.z + z;
                         if (!space.ContainsKey(key))
                             space.Add(key, new List<ItemObject>());
 
@@ -184,7 +184,7 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
-                        int key = x * 12 * 12 + y * 12 + z;
+                        int key = x * Size.y * Size.z + y * Size.z + z;
                         if (space.ContainsKey(key))
                             space[key].Remove(item);
                     }
@@ -212,7 +212,7 @@ public class Room : MonoBehaviour
                 {
                     for (int z = minZ; z < maxZ; z++)
                     {
-                        int key = x * 12 * 12 + y * 12 + z;
+                        int key = x * Size.y * Size.z + y * Size.z + z;
                         if (space.ContainsKey(key) && space[key].Count > 0)
                             conflictSpace.Add(new Vector3Int(x, y, z));
                     }
@@ -226,14 +226,14 @@ public class Room : MonoBehaviour
     {
         Vector3Int rotateSize = item.RotateSize;
         Vector3Int roomPosition = item.RoomPosition;
-        minX = roomPosition.x - rotateSize.x;
+        minX = roomPosition.x;
         maxX = roomPosition.x + rotateSize.x;
-        minY = roomPosition.y - rotateSize.y;
+        minY = roomPosition.y;
         maxY = roomPosition.y + rotateSize.y;
-        minZ = roomPosition.z - rotateSize.z;
+        minZ = roomPosition.z;
         maxZ = roomPosition.z + rotateSize.z;
 
-        if (minX < 0 || maxX > Size.x * 2 || minY < 0 || maxY > Size.y * 2 || minZ < 0 || maxZ > Size.z * 2)
+        if (minX < 0 || maxX > Size.x || minY < 0 || maxY > Size.y || minZ < 0 || maxZ > Size.z)
         {
             Debug.LogWarning("The item position or size is wrong");
             return false;

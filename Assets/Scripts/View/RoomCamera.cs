@@ -7,20 +7,20 @@ public class RoomCamera : MonoBehaviour
     private float defaultRotationY = -135f;
 
     private float defaultRotationX = 30f;
-    private float defaultPositionX = 16f;
-    private float defaultPositionZ = 16f;
+    private float defaultPositionX = 32f;
+    private float defaultPositionZ = 32f;
 
-    private float defaultPositionXZ = Mathf.Sqrt(2) * 16f;
-    private float defaultPositionY = 3f;
+    private float defaultPositionXZ = Mathf.Sqrt(2) * 32f;
+    private float defaultPositionY = 6f;
 
-    private float defaultOrthographic = 5.0f;
+    private float defaultOrthographic = 10.0f;
     private float perspectiveZoomSpeed = 0.5f;        // The rate of change of the field of view in perspective mode.
     private float orthoZoomSpeed = 0.1f;        // The rate of change of the orthographic size in orthographic mode.
 
     private float moveSpeed = 0.1f;
     private float rotateSpeed = 1f;
-    private float orthographicMin = 2.0f;
-    private float orthographicMax = 8.0f;
+    private float orthographicMin = 4.0f;
+    private float orthographicMax = 12.0f;
 
     private Camera camera;
 

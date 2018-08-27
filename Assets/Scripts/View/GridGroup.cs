@@ -5,7 +5,7 @@ using Sorumi.Util;
 
 public class GridGroup : MonoBehaviour
 {
-    private const int MAX_SIZE = 5;
+    private const int MAX_SIZE = 6;
     private const float GRID_OFFSET = 0.002f;
 
     private bool active;

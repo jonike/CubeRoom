@@ -9,12 +9,7 @@ public class StudioController : MonoBehaviour
 {
 
     // temp
-    private Vector3Int roomSize = new Vector3Int(6, 6, 6);
-
-    private float minX = -3f;
-    private float maxX = 3f;
-    private float minZ = -3f;
-    private float maxZ = 3f;
+    private Vector3Int roomSize = new Vector3Int(12, 12, 12);
 
     // end temp
 
@@ -483,8 +478,8 @@ public class StudioController : MonoBehaviour
 
         if (isRestricted)
         {
-            x = Mathf.Round(x * 2) / 2.0f;
-            z = Mathf.Round(z * 2) / 2.0f;
+            x = itemSize.x % 2 == 1 ? Mathf.Floor(x) + 0.5f : Mathf.Floor(x + 0.5f);
+            z = itemSize.z % 2 == 1 ? Mathf.Floor(z) + 0.5f : Mathf.Floor(z + 0.5f);
         }
 
         Vector3 itemPoition = new Vector3(x, itemSize.y / 2.0f, z); ;
@@ -532,8 +527,8 @@ public class StudioController : MonoBehaviour
 
         if (isRestricted)
         {
-            x = Mathf.Round(x * 2) / 2.0f;
-            z = Mathf.Round(z * 2) / 2.0f;
+            x = itemSize.x % 2 == 1 ? Mathf.Floor(x) + 0.5f : Mathf.Floor(x + 0.5f);
+            z = itemSize.z % 2 == 1 ? Mathf.Floor(z) + 0.5f : Mathf.Floor(z + 0.5f);
         }
 
         Vector3 itemPoition = new Vector3(x, itemSize.y / 2.0f + roomSize.y, z); ;
@@ -557,7 +552,7 @@ public class StudioController : MonoBehaviour
         float y = Mathf.Clamp(worldPosition.y, minY, maxY);
 
         if (isRestricted)
-            y = Mathf.Round(y * 2) / 2.0f;
+            y = itemSize.y % 2 == 1 ? Mathf.Floor(y) + 0.5f : Mathf.Floor(y + 0.5f);
 
         Vector3 itemPoition;
         if (!dir.IsFlipped())
@@ -567,7 +562,7 @@ public class StudioController : MonoBehaviour
             float x = Mathf.Clamp(worldPosition.x, minX, maxX);
 
             if (isRestricted)
-                x = Mathf.Round(x * 2) / 2.0f;
+                x = itemSize.x % 2 == 1 ? Mathf.Floor(x) + 0.5f : Mathf.Floor(x + 0.5f);
 
             itemPoition = new Vector3(x, y, worldPosition.z);
         }
@@ -578,7 +573,7 @@ public class StudioController : MonoBehaviour
             float z = Mathf.Clamp(worldPosition.z, minZ, maxZ);
 
             if (isRestricted)
-                z = Mathf.Round(z * 2) / 2.0f;
+                z = itemSize.z % 2 == 1 ? Mathf.Floor(z) + 0.5f : Mathf.Floor(z + 0.5f);
 
             itemPoition = new Vector3(worldPosition.x, y, z);
         }
@@ -711,6 +706,7 @@ public class StudioController : MonoBehaviour
 
         HashSet<Vector2Int> xzGrids, xyGrids, zyGrids;
         List<Vector3Int> conflictSpaces = room.ConflictSpace(item);
+
         conflictSpaceToGrids(item, conflictSpaces, out xzGrids, out xyGrids, out zyGrids);
 
         if ((xzGrids.Count + xyGrids.Count + zyGrids.Count) == 0)
@@ -795,11 +791,12 @@ public class StudioController : MonoBehaviour
 
     private Vector3Int roomPosition(Item item, Vector3Int roomSize, Vector3 itemPosition)
     {
-        itemPosition = itemPosition * 2;
+        Vector3 itemSize = item.RotateSize;
+        itemPosition = itemPosition - 0.5f * itemSize;
         return new Vector3Int(
-         (int)Mathf.Round(itemPosition.x + roomSize.x),
+         (int)Mathf.Round(itemPosition.x + 0.5f * roomSize.x),
          (int)Mathf.Round(itemPosition.y),
-         (int)Mathf.Round(itemPosition.z + roomSize.z));
+         (int)Mathf.Round(itemPosition.z + 0.5f * roomSize.z));
     }
     private void conflictSpaceToGrids(Item item, List<Vector3Int> spaces, out HashSet<Vector2Int> xzGrids, out HashSet<Vector2Int> xyGrids, out HashSet<Vector2Int> zyGrids)
     {
@@ -811,10 +808,7 @@ public class StudioController : MonoBehaviour
 
         foreach (Vector3Int space in spaces)
         {
-            Vector3Int grid = space + rotateSize - roomPosition;
-            grid.x /= 2;
-            grid.y /= 2;
-            grid.z /= 2;
+            Vector3Int grid = space - roomPosition;
             xzGrids.Add(new Vector2Int(grid.x, grid.z));
             xyGrids.Add(new Vector2Int(grid.x, grid.y));
             zyGrids.Add(new Vector2Int(grid.z, grid.y));
