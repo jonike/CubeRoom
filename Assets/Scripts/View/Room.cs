@@ -11,7 +11,8 @@ public class Room : MonoBehaviour
 
     private Wall[] walls;
 
-    private Pillar[] pillars;
+    private Pillar[] pillarsH;
+    private Pillar[] pillarsV;
 
     private string[] wallNames = { "a", "b", "c", "d" };
 
@@ -21,18 +22,9 @@ public class Room : MonoBehaviour
 
     private Dictionary<Direction, Wall> dirWallMap;
     private int[] showWalls;
-
-    // private List<ItemBehaviour> items;
-
     private List<ItemObject> items;
 
     private Dictionary<int, List<ItemObject>> space;
-    // private ItemBehaviour[,,] occupiedSpace;
-    // private ItemBehaviour[,] groundSpace;
-    // private ItemBehaviour[,] wallASpace;
-    // private ItemBehaviour[,] wallBSpace;
-    // private ItemBehaviour[,] wallCSpace;
-    // private ItemBehaviour[,] wallDSpace;
 
     public void Init(Vector3Int size)
     {
@@ -44,7 +36,8 @@ public class Room : MonoBehaviour
         ground.Init(new Vector2Int(size.x * 2, size.z * 2));
 
         walls = new Wall[4];
-        pillars = new Pillar[4];
+        pillarsV = new Pillar[4];
+        pillarsH = new Pillar[4];
         for (int i = 0; i < 4; i++)
         {
             Wall wall = transform.Find("wall_" + wallNames[i]).GetComponent<Wall>();
@@ -54,9 +47,13 @@ public class Room : MonoBehaviour
             wall.Init(wallSize, dir);
             walls[i] = wall;
 
-            Pillar pillar = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
-            pillar.Init();
-            pillars[i] = pillar;
+            Pillar pillarV = transform.Find("v_" + wallNames[i]).GetComponent<Pillar>();
+            pillarV.Init();
+            pillarsV[i] = pillarV;
+
+            Pillar pillarH = transform.Find("h_" + wallNames[i]).GetComponent<Pillar>();
+            pillarH.Init();
+            pillarsH[i] = pillarH;
         }
 
         // showWalls
@@ -78,10 +75,15 @@ public class Room : MonoBehaviour
         walls[2].Hide(angle >= 90 && angle < 270);
         walls[3].Hide(angle >= 180 && angle < 360);
 
-        pillars[0].Hide(angle >= 270 || angle < 180);
-        pillars[1].Hide(angle >= 0 && angle < 270);
-        pillars[2].Hide(angle >= 90 && angle < 360);
-        pillars[3].Hide(angle >= 180 || angle < 90);
+        pillarsV[0].Hide(angle >= 270 || angle < 180);
+        pillarsV[1].Hide(angle >= 0 && angle < 270);
+        pillarsV[2].Hide(angle >= 90 && angle < 360);
+        pillarsV[3].Hide(angle >= 180 || angle < 90);
+
+        pillarsH[0].Hide(angle >= 270 || angle < 90);
+        pillarsH[1].Hide(angle >= 0 && angle < 180);
+        pillarsH[2].Hide(angle >= 90 && angle < 270);
+        pillarsH[3].Hide(angle >= 180 && angle < 360);
 
         showWalls[0] = (int)Math.mod((angle / 90) + 3, 4);
         showWalls[1] = (int)Math.mod((angle / 90) + 2, 4);

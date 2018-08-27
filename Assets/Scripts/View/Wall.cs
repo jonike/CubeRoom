@@ -6,10 +6,11 @@ using UnityEngine.Rendering;
 public class Wall : MonoBehaviour
 {
 
-    private GameObject mesh;
+    // private GameObject mesh;
     private GameObject grid;
-    private MeshRenderer meshRenderer;
-    private BoxCollider boxCollider;
+    private MeshRenderer innerMeshRenderer;
+    private MeshRenderer outterMeshRenderer;
+    // private BoxCollider boxCollider;
 
     private Vector2Int size;
     private Direction dir;
@@ -18,10 +19,11 @@ public class Wall : MonoBehaviour
 
     public void Init(Vector2Int size, Direction dir)
     {
-        mesh = transform.Find("mesh").gameObject;
+        // mesh = transform.Find("mesh/inner").gameObject;
         grid = transform.Find("grid").gameObject;
-        meshRenderer = mesh.GetComponent<MeshRenderer>();
-        boxCollider = mesh.GetComponent<BoxCollider>();
+        innerMeshRenderer = transform.Find("mesh/inner").GetComponent<MeshRenderer>();
+        outterMeshRenderer = transform.Find("mesh/outter").GetComponent<MeshRenderer>();
+        // boxCollider = mesh.GetComponent<BoxCollider>();
 
         this.size = size;
         this.dir = dir;
@@ -31,8 +33,9 @@ public class Wall : MonoBehaviour
 
     public void Hide(bool hide)
     {
-        meshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
-        boxCollider.enabled = !hide;
+        innerMeshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
+        outterMeshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
+        // boxCollider.enabled = !hide;
     }
 
     public void ShowGrid(bool show)

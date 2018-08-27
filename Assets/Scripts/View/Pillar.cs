@@ -7,17 +7,17 @@ public class Pillar : MonoBehaviour
 {
 
     private MeshRenderer meshRenderer;
-    private BoxCollider boxCollider;
+    // private BoxCollider boxCollider;
 
     public void Init()
     {
         meshRenderer = GetComponent<MeshRenderer>();
-        boxCollider = GetComponent<BoxCollider>();
+        // boxCollider = GetComponent<BoxCollider>();
     }
 
     public void Hide(bool hide)
     {
         meshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
-        boxCollider.enabled = !hide;
+        // boxCollider.enabled = !hide;
     }
 }
