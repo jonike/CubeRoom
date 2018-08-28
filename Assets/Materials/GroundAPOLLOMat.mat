@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: GroundMat
-  m_Shader: {fileID: 4800000, guid: 7f0f02a28cd9347898cc2782dcf37c8c, type: 3}
+  m_Name: GroundAPOLLOMat
+  m_Shader: {fileID: 4800000, guid: cc2b87cec69eb4b6b81c53f1e1f65c75, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -117,7 +117,7 @@ Material:
     m_Colors:
     - _AOColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorShadow: {r: 0.8392157, g: 0.8392157, b: 0.8392157, a: 1}
+    - _ColorShadow: {r: 0.8113208, g: 0.8113208, b: 0.8113208, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainTint: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

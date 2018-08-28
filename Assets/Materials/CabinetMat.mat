@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: GroundMat
-  m_Shader: {fileID: 4800000, guid: 7f0f02a28cd9347898cc2782dcf37c8c, type: 3}
+  m_Name: CabinetMat
+  m_Shader: {fileID: 4800000, guid: 7627aafbd90434568acbdba4f34496f4, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,19 +19,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AOTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: d4bf75617f7534bff92809613aa6db60, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 6f2bde3a08f494de9bd3967d3c140f12, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Cube:
-        m_Texture: {fileID: 8900000, guid: aef48668e52ef45cbba4faa44aa0fa34, type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Cubemap:
-        m_Texture: {fileID: 8900000, guid: 95b648dcf16874d8aaeae55adf004862, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -46,23 +38,11 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _DetailTex:
-        m_Texture: {fileID: 2800000, guid: b9ff019522c144ed582766b54b52314a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: b9ff019522c144ed582766b54b52314a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MetTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -78,46 +58,28 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _SpeTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Ao: 0
-    - Em: 0
-    - Metal: 0
-    - PM: 0
-    - Prometheus: 0
-    - Sp: 0
-    - _Blur: 0.01
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EmissionPower: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NormP: 0.59
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PrPower: 1
-    - _ReflAmount: 0.793
-    - _ReflectPower: 0
-    - _RimPower: 0
-    - _Shininess: 0.078125
+    - _Slider: 2.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpecularPower: 0.051
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _AOColor: {r: 1, g: 1, b: 1, a: 1}
+    - _AOColor: {r: 0.4433962, g: 0.4413047, b: 0.4413047, a: 1}
+    - _AmbientColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorShadow: {r: 0.8392157, g: 0.8392157, b: 0.8392157, a: 1}
+    - _ColorShadow: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MainTint: {r: 1, g: 1, b: 1, a: 1}
-    - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}

@@ -1,4 +1,4 @@
-﻿Shader "Custom/GridTwoSided"
+﻿Shader "CubeRoom/GridTwoSided"
 {
     Properties
     {

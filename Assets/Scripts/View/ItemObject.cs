@@ -6,6 +6,8 @@ using UnityEngine;
 public class ItemObject : MonoBehaviour
 {
 
+    private const float ITEM_OFFSET = 0.003f;
+
     public ItemType Type;
     public Item Item;
 
@@ -17,6 +19,27 @@ public class ItemObject : MonoBehaviour
     // 		Item.PlaceableItem = value;
     // 	}
     // }
+    public void Init(ItemPO itemPO)
+    {
+        ItemType type = itemPO.type;
+        Vector3Int size = itemPO.size;
+        if (type == ItemType.Horizontal)
+        {
+            Item = new HorizontalItem();
+        }
+        else if (type == ItemType.Vertical)
+        {
+            Item = new VerticalItem();
+        }
+        this.Type = type;
+        Item.Dir = Direction.A; // TODO
+        Item.Size = size;
+        Item.FlippedSize = new Vector3Int(size.z, size.y, size.x);
+        Item.RotateSize = Item.Dir.IsFlipped() ? Item.FlippedSize : Item.Size;
+        Item.IsOccupid = itemPO.isOccupied;
+
+        gameObject.name = itemPO.name;
+    }
 
     public void Init(ItemType type, Vector3Int size)
     {
@@ -34,8 +57,6 @@ public class ItemObject : MonoBehaviour
         Item.FlippedSize = new Vector3Int(size.z, size.y, size.x);
         Item.RotateSize = Item.Dir.IsFlipped() ? Item.FlippedSize : Item.Size;
         Item.IsOccupid = true; // TODO
-
-        gameObject.name = "Item";
     }
     public void Init(Vector3Int size)
     {
@@ -53,6 +74,7 @@ public class ItemObject : MonoBehaviour
 
     public void SetPosition(Vector3 position)
     {
+        position.y += ITEM_OFFSET;
         Item.Position = position;
         transform.position = position - Item.CenterPositionOffset();
     }

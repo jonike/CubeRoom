@@ -203,10 +203,11 @@ public class StudioController : MonoBehaviour
 
         itemGO = Instantiate(Resources.Load("Prefabs/" + itemPO.name)) as GameObject;
 
-        ItemObject item = itemGO.GetComponent<ItemObject>();
-        item.Init(itemPO.type, itemPO.size);
 
-        SuspendItem suspendItem = itemGO.GetComponent<SuspendItem>();
+        ItemObject item = itemGO.AddComponent<ItemObject>();
+        item.Init(itemPO);
+
+        SuspendItem suspendItem = itemGO.AddComponent<SuspendItem>();
         suspendItem.Init();
         suspendItem.OnClick = ClickItem;
 

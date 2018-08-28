@@ -1,4 +1,4 @@
-﻿Shader "Custom/Grid"
+﻿Shader "CubeRoom/Grid"
 {
     Properties
     {
