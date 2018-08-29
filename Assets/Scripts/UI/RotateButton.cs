@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Sorumi.Util;
 
 public class RotateButton : MonoBehaviour, IDragHandler
 {
@@ -47,8 +48,8 @@ public class RotateButton : MonoBehaviour, IDragHandler
             degree = 360 - degree;
         }
 
-        degree += rectTransform.localEulerAngles.z;        
-        SetValue(degree);
+        degree += rectTransform.localEulerAngles.z;
+        SetValue(degree, true);
     }
 
     public void SetRotation(float degree)
@@ -56,7 +57,7 @@ public class RotateButton : MonoBehaviour, IDragHandler
         degree = -(int)(degree / 90) * 90.0f;
         rectTransform.localEulerAngles = new Vector3(0, 0, degree);
     }
-    public void SetValue(float degree)
+    public void SetValue(float degree, bool isTriggerChange = false)
     {
         degree = degree % 360;
         if (degree < 0)
@@ -82,7 +83,7 @@ public class RotateButton : MonoBehaviour, IDragHandler
             dot.localEulerAngles = new Vector3(0, 0, 90);
         }
 
-        if (OnChange != null)
+        if (isTriggerChange && OnChange != null)
             OnChange(value);
     }
 }

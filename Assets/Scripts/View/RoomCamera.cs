@@ -159,7 +159,7 @@ public class RoomCamera : MonoBehaviour
         rotateHorizontal += deltaDegree.x * rotateSpeed;
         rotateVertical += deltaDegree.y * rotateSpeed;
 
-        rotateHorizontal = Math.mod(rotateHorizontal, 360);
+        rotateHorizontal = Maths.mod(rotateHorizontal, 360);
         if (rotateHorizontal > 180)
             rotateHorizontal -= 360;
 

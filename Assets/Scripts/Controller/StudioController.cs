@@ -74,7 +74,7 @@ public class StudioController : MonoBehaviour
         studioPanel.OnPlaceClick = PlaceItem;
         studioPanel.OnDeleteClick = DeleteItem;
         studioPanel.OnRotateChange = RotateItem;
-        studioPanel.OnResetClick = (a) =>
+        studioPanel.OnResetClick = () =>
         {
             camera.TriggerAnimation();
         };
@@ -180,7 +180,8 @@ public class StudioController : MonoBehaviour
 
     private void onCameraRotate(float angle)
     {
-        room.RefreshByAngle(Math.mod(angle, 360));
+        angle = Maths.mod(angle, 360);
+        room.RefreshByAngle(angle);
         studioPanel.SetRotateButtonRotation(angle);
     }
 
@@ -203,7 +204,6 @@ public class StudioController : MonoBehaviour
 
         itemGO = Instantiate(Resources.Load("Prefabs/Items/" + itemPO.name)) as GameObject;
 
-
         ItemObject item = itemGO.AddComponent<ItemObject>();
         item.Init(itemPO);
 
@@ -212,13 +212,21 @@ public class StudioController : MonoBehaviour
         suspendItem.OnClick = ClickItem;
 
         SetEdited(item);
+        
+        Direction dir = room.ShowWallsDirection()[0];
+        SetCurrentItemDirection(item, dir);
     }
 
     private void ClickItem(ItemObject item)
     {
+        if (editedItem.CanPlaced) {
+            PlaceItem();
+        }
+        if (isItemEdited) return;
         room.DeleteItem(item);
         SetEdited(item);
         SetCurrentItemPosition(room, currentItem, item.Item.Position);
+        SetCurrentItemDirection(item, item.Item.Dir);
     }
 
     private void SetEdited(ItemObject item)
@@ -243,10 +251,9 @@ public class StudioController : MonoBehaviour
         gridGroup.SetActive(true);
         gridGroup.SetGrids(item);
         gridGroup.SetTransform(item.Item);
-
     }
 
-    private void PlaceItem(PointerEventData eventData)
+    private void PlaceItem()
     {
         if (!isItemEdited) return;
         if (!editedItem.CanPlaced)
@@ -265,7 +272,7 @@ public class StudioController : MonoBehaviour
         Reset();
     }
 
-    private void DeleteItem(PointerEventData eventData)
+    private void DeleteItem()
     {
         if (!isItemEdited) return;
         Destroy(currentItem.gameObject);
@@ -274,7 +281,6 @@ public class StudioController : MonoBehaviour
     private void RotateItem(float degree)
     {
         currentItem.SetDir(Direction.Degree(degree));
-        // gridGroup.SetTransform(currentItem);
         Vector3 itemPoition = ItemPositionOfCurrent(room, currentItem, editedItem, isRestricted);
         SetCurrentItemPosition(room, currentItem, itemPoition);
     }

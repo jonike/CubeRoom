@@ -20,7 +20,6 @@ public class Room : MonoBehaviour
         Direction.G, Direction.E, Direction.C, Direction.A
     };
 
-    private Dictionary<Direction, Wall> dirWallMap;
     private int[] showWalls;
     private List<ItemObject> items;
 
@@ -58,14 +57,6 @@ public class Room : MonoBehaviour
 
         // showWalls
         showWalls = new int[2];
-
-        // direction int map
-        dirWallMap = new Dictionary<Direction, Wall>();
-        for (int i = 0; i < 4; i++)
-        {
-            dirWallMap.Add(wallDirections[i], walls[i]);
-        }
-
     }
 
     public void RefreshByAngle(float angle)
@@ -85,8 +76,8 @@ public class Room : MonoBehaviour
         pillarsH[2].Hide(angle >= 90 && angle < 270);
         pillarsH[3].Hide(angle >= 180 && angle < 360);
 
-        showWalls[0] = (int)Math.mod((angle / 90) + 3, 4);
-        showWalls[1] = (int)Math.mod((angle / 90) + 2, 4);
+        showWalls[0] = (int)Maths.mod((angle / 90) + 3, 4);
+        showWalls[1] = (int)Maths.mod((angle / 90) + 2, 4);
     }
 
     public void RefreshGrids(bool isEdited, ItemType itemType = 0)
@@ -118,11 +109,6 @@ public class Room : MonoBehaviour
     public Direction[] ShowWallsDirection()
     {
         return new Direction[2] { wallDirections[showWalls[0]], wallDirections[showWalls[1]] };
-    }
-
-    public Wall WallOfDirection(Direction dir)
-    {
-        return dirWallMap[dir];
     }
 
     public Ground Ground()

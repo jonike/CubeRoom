@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Sorumi.Util
 {
-    public static class Math
+    public static class Maths
     {
         public static int mod(int x, int m)
         {

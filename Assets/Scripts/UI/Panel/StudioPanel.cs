@@ -39,32 +39,35 @@ public class StudioPanel : MonoBehaviour
         }
     }
 
-    public Action<PointerEventData> OnResetClick
+    public Action OnResetClick
     {
         set
         {
-            UIEventListener btnListener = resetButton.gameObject.AddComponent<UIEventListener>();
-
-            btnListener.OnClick += value;
+            resetButton.onClick.AddListener(() =>
+            {
+                value();
+            });
         }
     }
-    public Action<PointerEventData> OnPlaceClick
+    public Action OnPlaceClick
     {
         set
         {
-            UIEventListener btnListener = placeButton.gameObject.AddComponent<UIEventListener>();
-
-            btnListener.OnClick += value;
+            placeButton.onClick.AddListener(() =>
+            {
+                value();
+            });
         }
     }
 
-    public Action<PointerEventData> OnDeleteClick
+    public Action OnDeleteClick
     {
         set
         {
-            UIEventListener btnListener = deleteButton.gameObject.AddComponent<UIEventListener>();
-
-            btnListener.OnClick += value;
+            deleteButton.onClick.AddListener(() =>
+            {
+                value();
+            });
         }
     }
 
