@@ -201,7 +201,7 @@ public class StudioController : MonoBehaviour
 
         GameObject itemGO = null;
 
-        itemGO = Instantiate(Resources.Load("Prefabs/" + itemPO.name)) as GameObject;
+        itemGO = Instantiate(Resources.Load("Prefabs/Items/" + itemPO.name)) as GameObject;
 
 
         ItemObject item = itemGO.AddComponent<ItemObject>();

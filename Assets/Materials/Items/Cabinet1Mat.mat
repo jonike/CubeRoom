@@ -6,9 +6,9 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: StandardMat
+  m_Name: Cabinet1Mat
   m_Shader: {fileID: 4800000, guid: 9be8fb2ffd2204e87a1c868d6530c9d2, type: 3}
-  m_ShaderKeywords: METAL_ON RF_ON
+  m_ShaderKeywords: AO_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -19,7 +19,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AOTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a889d4c3686284fd6874a7b55e49c86d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -27,7 +27,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cube:
-        m_Texture: {fileID: 8900000, guid: aef48668e52ef45cbba4faa44aa0fa34, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -79,38 +79,39 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Ao: 0
+    - Ao: 1
     - Em: 0
-    - Metal: 1
     - Mt: 0
-    - Rf: 1
+    - Rf: 0
     - Sp: 0
-    - _Blur: 0.01
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EmissionPower: 0
-    - _Fresnel: 0.83
-    - _FresnelScale: 0
-    - _GlossMapScale: 0.53
-    - _Glossiness: 0.768
+    - _Fresnel: 1
+    - _FresnelScale: 1
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Metallic: 0.677
+    - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ReflectPower: 0.37
-    - _Shininess: 3.16
-    - _Smoothness: 0.264
+    - _ReflectPower: 0
+    - _Shininess: 0.2
+    - _Slider: 2.5
+    - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _AOColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Color: {r: 0.9245283, g: 0.91205, b: 0.87655747, a: 1}
-    - _ColorShadow: {r: 0.5188679, g: 0.46151152, b: 0.3989409, a: 1}
-    - _EmissionColor: {r: 0.9150943, g: 0.15107687, b: 0.15107687, a: 1}
-    - _SpecColor: {r: 0.4245283, g: 0.39495766, b: 0.3464311, a: 0.1254902}
+    - _AOColor: {r: 0, g: 0, b: 0, a: 0.59607846}
+    - _AmbientColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorShadow: {r: 0.73333335, g: 0.73333335, b: 0.73333335, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

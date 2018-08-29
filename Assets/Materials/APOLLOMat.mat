@@ -23,8 +23,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 6f2bde3a08f494de9bd3967d3c140f12, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 988dfdb11965644b9b069b222a396abd, type: 3}
+        m_Scale: {x: 3, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cube:
         m_Texture: {fileID: 8900000, guid: aef48668e52ef45cbba4faa44aa0fa34, type: 2}
@@ -102,7 +102,7 @@ Material:
     - _Mode: 0
     - _NormP: 0.59
     - _OcclusionStrength: 1
-    - _Parallax: 0.02
+    - _Parallax: 0.01
     - _PrPower: 1
     - _ReflAmount: 0.793
     - _ReflectPower: 0

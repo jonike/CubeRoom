@@ -23,7 +23,7 @@
         [MaterialToggle] Rf ("Reflection", Float) = 0
         _Cube ("Reflection Cubemap", Cube) = "_Skybox" { }
         _ReflectPower ("Reflect Power", Range(0.0, 1)) = 0.0
-        _FresnelScale ("Fresnel Scale", Range(0, 1.0)) = 0.5
+        _FresnelScale ("Fresnel Scale", Range(0, 3.0)) = 0.5
 
         // Metal
         [MaterialToggle] Mt ("Metal", Float) = 0
@@ -33,7 +33,7 @@
         // Specular
         [MaterialToggle] Sp ("Specular", Float) = 0
         _SpecColor ("Specular Color", Color) = (0.5, 0.5, 0.5, 1)
-        _Shininess ("Shininess", Range(0.0, 10)) = 0.2
+        _Shininess ("Shininess", Range(0.01, 10)) = 0.2
         _SpecTex ("Specular Map", 2D) = "white" { }
         
         // Emission
@@ -123,17 +123,14 @@
 
             #if defined(RF_ON)
                 half rim = 1 - saturate(dot(normalize(IN.viewDir), o.Normal));
-                half fresnel = _FresnelScale + (1 - _FresnelScale) * pow(rim, 5);
-
                 fixed3 reflect = reflection.rgb * reflection.a * _ReflectPower;
-                // o.Albedo += lerp(0, reflect, saturate(fresnel));
                 o.Albedo += reflect * pow(rim, _FresnelScale);
             #endif
 
             #if defined(SP_ON)
                 fixed spec = tex2D(_SpecTex, IN.uv_DetailTex).r;
-                o.Gloss = spec * _Shininess;
-                o.Specular = alpha;
+                o.Gloss = _SpecColor.a;
+                o.Specular = spec * _Shininess;
             #endif
 
             #if defined(EM_ON)

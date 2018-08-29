@@ -1,34 +1,28 @@
 fileFormatVersion: 2
-guid: f8db4a4fe0cad4436a9ea8d8e86b4f0c
+guid: d3ce981b5c474410cb5088674eee60f0
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
-    100000: Board_Cabinet.005
-    100002: Cabinet
+    100000: Legs
+    100002: Sofa
     100004: //RootNode
-    100006: Cabinet_s_b_Plane
-    100008: Handle_Cabinet.001
-    400000: Board_Cabinet.005
-    400002: Cabinet
+    100006: Sofa_s_Plane.002
+    400000: Legs
+    400002: Sofa
     400004: //RootNode
-    400006: Cabinet_s_b_Plane
-    400008: Handle_Cabinet.001
-    2100000: Board_Cabinet.005Mat
-    2100002: CabinetMat
-    2100004: Cabinet_s_b_PlaneMat
-    2100006: Handle_Cabinet.001Mat
-    2300000: Board_Cabinet.005
-    2300002: Cabinet
-    2300004: Cabinet_s_b_Plane
-    2300006: Handle_Cabinet.001
-    3300000: Board_Cabinet.005
-    3300002: Cabinet
-    3300004: Cabinet_s_b_Plane
-    3300006: Handle_Cabinet.001
-    4300000: Board_Cabinet.005
-    4300002: Cabinet
-    4300004: Cabinet_s_b_Plane
-    4300006: Handle_Cabinet.001
+    400006: Sofa_s_Plane.002
+    2100000: LegsMat
+    2100002: SofaMat
+    2100004: Sofa_s_Plane.002Mat
+    2300000: Legs
+    2300002: Sofa
+    2300004: Sofa_s_Plane.002
+    3300000: Legs
+    3300002: Sofa
+    3300004: Sofa_s_Plane.002
+    4300000: Legs
+    4300002: Sofa
+    4300004: Sofa_s_Plane.002
   externalObjects: {}
   materials:
     importMaterials: 0
