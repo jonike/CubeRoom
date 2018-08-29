@@ -12,7 +12,8 @@ public class DragItemCell : Cell, IBeginDragHandler, IDragHandler, IEndDragHandl
     private DragItemCellView cellView;
 
     private bool scroll;
-    private Text text;
+    private Text nameText;
+    private Image image;
 
     void Start()
     {
@@ -23,7 +24,8 @@ public class DragItemCell : Cell, IBeginDragHandler, IDragHandler, IEndDragHandl
 
     public override void Init()
     {
-        text = transform.Find("Text").GetComponent<Text>();
+        nameText = transform.Find("name").GetComponent<Text>();
+        image = transform.Find("image").GetComponent<Image>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -68,6 +70,12 @@ public class DragItemCell : Cell, IBeginDragHandler, IDragHandler, IEndDragHandl
 
     public void SetItem(ItemPO item)
     {
-        text.text = item.name;
+        nameText.text = item.name;
+        string path = string.Format("Images/{0}_512", item.name);
+        Sprite sprite = Resources.Load<Sprite>(path) as Sprite;
+        if (sprite)
+            image.sprite = sprite;
+        else
+            image.color = Color.clear;
     }
 }
