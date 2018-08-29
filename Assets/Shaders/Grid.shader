@@ -71,11 +71,11 @@
 
                 fixed4 texColor = tex2D(_MainTex, i.uv);
 
-                fixed3 albedo = texColor.a * _LineColor.rgb + (1 - texColor.a) * _AlphaColor.rgb;
+                fixed3 albedo = texColor.r * _LineColor.rgb + (1 - texColor.r) * _AlphaColor.rgb;
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT * albedo;
                 fixed3 diffuse = _LightColor0.rgb * albedo * saturate(dot(worldNormal, worldLight));
                 fixed3 color = ambient + diffuse;
-                fixed alpha = saturate(texColor.a + _AlphaScale);
+                fixed alpha = texColor.a * saturate(texColor.r + _AlphaScale);
 
                 return fixed4(color, alpha);
             }

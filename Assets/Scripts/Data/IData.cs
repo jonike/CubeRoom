@@ -27,7 +27,7 @@ public abstract class IData<T> where T : IData<T>, new()
     }
     protected virtual void Init()
     {
-        csvFile = (TextAsset)Resources.Load<TextAsset>("Texts/" + name);
+        csvFile = Resources.Load<TextAsset>("Texts/" + name) as TextAsset;
         csvArray = CSVHelper.SplitCsv(csvFile.text);
 
         DebugLog();

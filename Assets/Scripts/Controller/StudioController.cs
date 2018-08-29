@@ -341,6 +341,7 @@ public class StudioController : MonoBehaviour
         editedItem.CanPlaced = canPlaced;
         studioPanel.SetPlaceButtonAbled(canPlaced);
 
+        gridGroup.SetTriangleType(canPlaced);
         gridGroup.SetBottomGridsType(bottomGrids);
         if (item.Type == ItemType.Vertical)
             gridGroup.SetSideGridsType(sideGrids);

@@ -7,6 +7,7 @@ public class GridGroup : MonoBehaviour
 {
     private const int MAX_SIZE = 6;
     private const float GRID_OFFSET = 0.002f;
+    private const float TRI_Z_OFFSET = 0.5f;
 
     private bool active;
 
@@ -15,6 +16,8 @@ public class GridGroup : MonoBehaviour
     private Vector2Int sideSize;
     private Grid[,] bottomGrids;
     private Grid[,] sideGrids;
+
+    private Grid triangle;
 
     private Transform bottomGridsGroup;
     private Transform sideGridsGroup;
@@ -36,6 +39,12 @@ public class GridGroup : MonoBehaviour
         poolGO = new GameObject("PoolGameObject");
         poolGO.transform.position = Vector3.zero;
         poolGO.SetActive(false);
+
+        // triangle
+        GameObject triangleGO = Instantiate(Resources.Load("Prefabs/Triangle")) as GameObject;
+        triangle = triangleGO.GetComponent<Grid>();
+        triangle.Init();
+        triangle.transform.SetParent(bottomGridsGroup);
 
         SetActive(false);
     }
@@ -77,7 +86,8 @@ public class GridGroup : MonoBehaviour
         float offsetZ = 0.5f - size.z / 2.0f;
         float offsetY = 0.5f - size.y / 2.0f;
 
-        // float bottomY = item.Type == ItemType.Vertical ? GRID_OFFSET - size.y / 2.0f : GRID_OFFSET;
+        triangle.transform.position = new Vector3(0, GRID_OFFSET, size.z / 2.0f + TRI_Z_OFFSET);
+
         for (int i = 0; i < MAX_SIZE; i++)
         {
             for (int j = 0; j < MAX_SIZE; j++)
@@ -172,6 +182,11 @@ public class GridGroup : MonoBehaviour
     public void SetSideGridsType(bool[,] gridTypes)
     {
         setGridsType(sideGrids, sideSize, gridTypes);
+    }
+
+    public void SetTriangleType(bool gridType)
+    {
+        triangle.SetType(gridType);
     }
 
     private void setGridsType(Grid[,] grids, Vector2Int size, bool[,] gridTypes)
