@@ -4,11 +4,11 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: GroundMat
-  m_Shader: {fileID: 4800000, guid: 7f0f02a28cd9347898cc2782dcf37c8c, type: 3}
-  m_ShaderKeywords: _NORMALMAP
+  m_Shader: {fileID: 4800000, guid: 9be8fb2ffd2204e87a1c868d6530c9d2, type: 3}
+  m_ShaderKeywords: RF_ON _NORMALMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -27,7 +27,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cube:
-        m_Texture: {fileID: 8900000, guid: aef48668e52ef45cbba4faa44aa0fa34, type: 2}
+        m_Texture: {fileID: 8900000, guid: 68a94625cd28140b484f624d479a6432, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cubemap:
@@ -105,7 +105,7 @@ Material:
     - Mt: 0
     - PM: 0
     - Prometheus: 0
-    - Rf: 0
+    - Rf: 1
     - Sp: 0
     - _Blur: 0.01
     - _BumpScale: 1
@@ -113,7 +113,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EmissionPower: 0
-    - _FresnelScale: 0.5
+    - _FresnelScale: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1

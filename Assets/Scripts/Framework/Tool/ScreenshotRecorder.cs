@@ -27,29 +27,44 @@ public class ScreenshotRecorder : MonoBehaviour
     public int frameRate = 24;
     [Tooltip("How many frames should be captured before quitting")]
     public int framesToCapture = 24;
-
+    public RenderTexture renderTexture;
+    
     #endregion
 
     #region private fields
 
     private string folderName = "";
+    private Camera mainCamera;
     private Camera renderCamera;
     private int renderFrame = 0; // how many frames we've rendered
     private float originalTimescaleTime;
     private bool done = false;
     private int width;
     private int height;
-    private RenderTexture renderTexture;
     private Texture2D outputTexture;
 
     #endregion
 
     void Awake()
     {
-        renderCamera = gameObject.GetComponent<Camera>();
-        renderTexture = renderCamera.targetTexture;
+        mainCamera = gameObject.GetComponent<Camera>();
+
+        GameObject cameraGO = transform.Find("/RenderCamera").gameObject;
+        if (!cameraGO)
+            cameraGO = new GameObject("RenderCamera");
+
+        renderCamera = cameraGO.GetComponent<Camera>();
+        if (!renderCamera)
+            renderCamera = cameraGO.AddComponent<Camera>();
+
+        renderCamera.clearFlags = CameraClearFlags.SolidColor;
+        renderCamera.backgroundColor = Color.clear;
+        renderCamera.transform.position = mainCamera.transform.position;
+        renderCamera.transform.rotation = mainCamera.transform.rotation;
+
         CacheAndInitialiseFields();
         CreateNewFolderForScreenshots();
+
         Time.captureFramerate = frameRate;
     }
 
@@ -61,6 +76,7 @@ public class ScreenshotRecorder : MonoBehaviour
         }
         else
         {
+            Complete();
             Debug.Log("Complete! " + renderFrame + " videoframes rendered. File names are 0 indexed)");
             Debug.Break();
         }
@@ -85,8 +101,12 @@ public class ScreenshotRecorder : MonoBehaviour
     void CacheAndInitialiseFields()
     {
         originalTimescaleTime = Time.timeScale;
-        width = renderTexture.width;
-        height = renderTexture.height;
+        width = Screen.width;
+        height = Screen.height;
+
+        renderTexture.width = width;
+        renderTexture.height = height;
+        renderCamera.targetTexture = renderTexture;
 
         outputTexture = new Texture2D(width, height);
     }
@@ -104,7 +124,12 @@ public class ScreenshotRecorder : MonoBehaviour
         System.IO.Directory.CreateDirectory(folderName); // Create the folder
     }
 
-    public void RenderTextureToPNG()
+    void Complete()
+    {
+        Destroy(renderCamera.gameObject);
+    }
+
+    void RenderTextureToPNG()
     {
         RenderTexture oldRT = RenderTexture.active; // Save old active render texture
 

@@ -6,13 +6,13 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: CabinetSMat
+  m_Name: LampSMat
   m_Shader: {fileID: 4800000, guid: 7d0ab178d4dd54abf9ac478fe6765609, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3200
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -55,7 +55,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShadowTex:
-        m_Texture: {fileID: 2800000, guid: e8f9807fa0b0a49e29614452cd417148, type: 3}
+        m_Texture: {fileID: 2800000, guid: cb3a57181cfeb46be9a361ce00e12d24, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -66,8 +66,8 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _InHigh: 0.692
-    - _InLow: 0.034
+    - _InHigh: 0.73
+    - _InLow: 0.028
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

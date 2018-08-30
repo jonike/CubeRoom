@@ -33,7 +33,7 @@ public class Wall : MonoBehaviour
 
     public void Hide(bool hide)
     {
-        innerMeshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
+        // innerMeshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
         outterMeshRenderer.shadowCastingMode = hide ? ShadowCastingMode.ShadowsOnly : ShadowCastingMode.On;
         // boxCollider.enabled = !hide;
     }

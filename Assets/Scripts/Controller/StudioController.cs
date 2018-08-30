@@ -219,7 +219,7 @@ public class StudioController : MonoBehaviour
 
     private void ClickItem(ItemObject item)
     {
-        if (editedItem.CanPlaced) {
+        if (isItemEdited && editedItem.CanPlaced) {
             PlaceItem();
         }
         if (isItemEdited) return;

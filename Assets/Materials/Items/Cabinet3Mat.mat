@@ -4,7 +4,7 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Cabinet3Mat
   m_Shader: {fileID: 4800000, guid: 9be8fb2ffd2204e87a1c868d6530c9d2, type: 3}
@@ -27,7 +27,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Cube:
-        m_Texture: {fileID: 8900000, guid: aef48668e52ef45cbba4faa44aa0fa34, type: 2}
+        m_Texture: {fileID: 8900000, guid: 68a94625cd28140b484f624d479a6432, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
