@@ -1,0 +1,20 @@
+html, body, h1, h2, h3, h4, h5, h6, hr, li, ul, p, a, img, button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: $base-font-family;
+  font-weight: $base-font-weight;
+  list-style: none;
+  //text-decoration: none;
+}
+
+
+* {
+  position: relative;
+  @include box-sizing(border-box);
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+}

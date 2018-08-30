@@ -1,0 +1,156 @@
+$prefix-for-webkit: true !default;
+$prefix-for-mozilla: true !default;
+$prefix-for-microsoft: true !default;
+$prefix-for-opera: true !default;
+$prefix-for-spec: true !default;
+
+$all: webkit moz ms o spec;
+
+@mixin prefixer ($property, $value, $prefixes) {
+  @each $prefix in $prefixes {
+    @if $prefix == webkit and $prefix-for-webkit == true {
+      -webkit-#{$property}: $value;
+    }
+    @else if $prefix == moz and $prefix-for-mozilla == true {
+      -moz-#{$property}: $value;
+    }
+    @else if $prefix == ms and $prefix-for-microsoft == true {
+      -ms-#{$property}: $value;
+    }
+    @else if $prefix == o and $prefix-for-opera == true {
+      -o-#{$property}: $value;
+    }
+    @else if $prefix == spec and $prefix-for-spec == true {
+      #{$property}: $value;
+    }
+    @else {
+      @warn "Unrecognized prefix: #{$prefix}";
+    }
+  }
+}
+
+@mixin border-radius($radius...) {
+  @include prefixer(border-radius, $radius, $all);
+}
+
+@mixin transition($property...) {
+  @include prefixer(transition, $property, $all);
+}
+
+@mixin box-shadow($shadow...) {
+  @include prefixer(box-shadow, $shadow, $all);
+}
+
+@mixin box-sizing($type:border-box) {
+  // border-box | padding-box | content-box
+  @include prefixer(box-sizing, $type, $all);
+}
+
+@mixin transform($property...) {
+  @include prefixer(transform, $property, $all);
+}
+
+@mixin filter($property...) {
+  @include prefixer(filter, $property, $all);
+}
+
+@mixin placeholder($color, $font-size, $font-weight) {
+  &::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: $color;
+    font-size: $font-size;
+    font-weight: $font-weight;
+  }
+  &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: $color;
+    font-size: $font-size;
+    font-weight: $font-weight;
+  }
+  &::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: $color;
+    font-size: $font-size;
+    font-weight: $font-weight;
+  }
+  &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: $color;
+    font-size: $font-size;
+    font-weight: $font-weight;
+  }
+}
+
+/*
+ * grid
+ */
+
+@mixin row() {
+  font-size: 0;
+}
+
+@mixin col($col, $sum, $gap: 15px, $align: top, $first: false, $last: false) {
+  width: percentage($col/$sum);
+  font-size: $base-font-size;
+  display: inline-block;
+  vertical-align: $align;
+  @include box-sizing();
+  padding-left: if($first, 0, $gap);
+  padding-right: if($last, 0, $gap);
+}
+
+@mixin cover-img {
+  width: 100%;
+  height: 100%;
+  background: {
+    repeat: no-repeat;
+    position: center center;
+    size: cover;
+  }
+}
+
+@mixin contain-img {
+  width: 100%;
+  height: 100%;
+  background: {
+    repeat: no-repeat;
+    position: center center;
+    size: contain;
+  }
+}
+
+@mixin hr-line {
+  &:after {
+    display: block;
+    content: "";
+    width: 100%;
+    height: 1px;
+    margin: 30px 0;
+    background-color: $gray-color-ultra-light;
+  }
+}
+
+@mixin line-wrap($line) {
+  overflow : hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+}
+@mixin vertical-align($align: middle) {
+  &:before {
+    content: "";
+    display: inline-block;
+    height: 100%;
+    vertical-align: $align;
+    font-size: 0;
+  }
+  & > * {
+    vertical-align: $align;
+    font-size: 14px;
+  }
+}
+
+@mixin clear-fix() {
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
