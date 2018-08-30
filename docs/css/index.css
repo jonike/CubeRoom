@@ -1,0 +1,195 @@
+/*
+ * grid
+ */
+/*
+ * Fonts
+ */
+/*
+ * Colors
+ */
+html, body, h1, h2, h3, h4, h5, h6, hr, li, ul, p, a, img, button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: "Montserrat", -apple-system, "Lantinghei SC", "Microsoft Yahei Light", "Microsoft Yahei", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 200;
+  list-style: none; }
+
+* {
+  position: relative;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box; }
+
+button {
+  background-color: transparent;
+  outline: none; }
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url("../fonts/Montserrat-ExtraLight.eot");
+  src: url("../fonts/Montserrat-ExtraLight.woff") format("woff"), url("../fonts/Montserrat-ExtraLight.ttf") format("truetype"), url("../fonts/Montserrat-ExtraLight.svg") format("svg");
+  font-weight: 200;
+  font-style: normal; }
+@font-face {
+  font-family: 'Montserrat';
+  src: url("../fonts/Montserrat-Light.eot");
+  src: url("../fonts/Montserrat-Light.woff") format("woff"), url("../fonts/Montserrat-Light.ttf") format("truetype"), url("../fonts/Montserrat-Light.svg") format("svg");
+  font-weight: 300;
+  font-style: normal; }
+@font-face {
+  font-family: 'Montserrat';
+  src: url("../fonts/Montserrat-Regular.eot");
+  src: url("../fonts/Montserrat-Regular.woff") format("woff"), url("../fonts/Montserrat-Regular.ttf") format("truetype"), url("../fonts/Montserrat-Regular.svg") format("svg");
+  font-weight: 400;
+  font-style: normal; }
+@font-face {
+  font-family: 'Montserrat';
+  src: url("../fonts/Montserrat-Medium.eot");
+  src: url("../fonts/Montserrat-Medium.woff") format("woff"), url("../fonts/Montserrat-Medium.ttf") format("truetype"), url("../fonts/Montserrat-Medium.svg") format("svg");
+  font-weight: 500;
+  font-style: normal; }
+.container {
+  max-width: 800px;
+  margin: 0 auto; }
+
+body {
+  background-color: #F9F9F9; }
+
+header {
+  width: 100%;
+  padding: 100px 20px;
+  background-color: #F4DADC; }
+  header h1 {
+    color: #FFF;
+    font-size: 1.8em; }
+  header .sub {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    padding: 3px 5px;
+    border-radius: 2px;
+    color: #F4DADC;
+    background-color: #FFF;
+    font-size: 0.01em;
+    font-weight: 200; }
+  header p {
+    text-align: center;
+    margin-top: 80px;
+    line-height: 1.4em;
+    color: #FFF;
+    opacity: 0.9;
+    font-size: 1em;
+    font-weight: 200; }
+
+main {
+  padding: 40px 20px; }
+  main .wrapper {
+    margin: 100px 0; }
+    main .wrapper h1 {
+      margin-bottom: 50px;
+      color: #B3B3B3; }
+    main .wrapper h2 {
+      margin-bottom: 15px;
+      color: #B3B3B3;
+      font-size: 1.2em;
+      font-weight: 400; }
+  main video {
+    margin: 20px auto;
+    width: 100%; }
+  main img {
+    margin: 0 auto;
+    max-width: 100%; }
+  main .progress .content {
+    margin: 0 auto;
+    max-width: 500px; }
+  main .progress .progress-section {
+    margin-bottom: 30px; }
+  main .progress .pretty {
+    display: block;
+    margin: 10px 0; }
+  main .progress .pretty .state label {
+    color: #333333;
+    font-weight: 300; }
+
+footer {
+  width: 100%;
+  padding: 100px 20px;
+  background-color: #FFF; }
+
+.icon {
+  display: table;
+  margin: 0 auto; }
+
+h1 {
+  margin-top: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+  color: #B3B3B3;
+  font-size: 1.25em;
+  font-weight: 400; }
+
+a.download {
+  display: table;
+  margin: 40px auto 0;
+  padding: 10px 50px;
+  color: #FFF;
+  background-color: #F4DADC;
+  font-size: 1em;
+  font-weight: 300;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -ms-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s; }
+  a.download:hover {
+    opacity: 0.7; }
+
+a.github {
+  display: table;
+  margin: 50px auto 0;
+  color: #FFF;
+  font-size: 1em;
+  font-weight: 300;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -ms-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s; }
+  a.github:hover {
+    opacity: 0.7; }
+
+footer {
+  padding: 50px 0; }
+  footer p {
+    text-align: center;
+    line-height: 0.8em;
+    color: #B3B3B3;
+    font-size: 1em;
+    font-weight: 300; }
+  footer a {
+    color: #F4DADC;
+    font-weight: 300;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s; }
+    footer a:hover {
+      opacity: 0.7; }
+
+@media (max-width: 760px) {
+  .container {
+    margin: 0 2%; }
+
+  main {
+    padding: 20px 0; }
+    main .wrapper {
+      margin: 50px 0; } }
+
+/*# sourceMappingURL=index.css.map */

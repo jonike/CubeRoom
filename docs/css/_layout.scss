@@ -1,0 +1,172 @@
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+body {
+  background-color: $gray-color-white;
+}
+
+header {
+  width: 100%;
+  padding: 100px 20px;
+  background-color: $theme-color;
+
+  h1 {
+    color: $white-color;
+    font-size: 1.8em;
+  }
+  .sub {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    padding: 3px 5px;
+    border-radius: 2px;
+    color: $theme-color;
+    background-color: $white-color;
+    font-size: 0.01em;
+    font-weight: $font-weight-ultra-light;
+  }
+  p {
+    text-align: center;
+    margin-top: 80px;
+    line-height: 1.4em;
+    color: $white-color;
+    opacity: 0.9;
+    font-size: 1em;
+    font-weight: $font-weight-ultra-light;
+  }
+
+}
+
+main {
+  padding: 40px 20px;
+
+  .wrapper {
+    margin: 100px 0;
+
+    h1 {
+      margin-bottom: 50px;
+      color: $gray-color;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      color:  $gray-color;
+      font-size: 1.2em;
+      font-weight: 400;
+    }
+  }
+
+  video {
+    margin: 20px auto;
+    width: 100%;
+  }
+
+  img {
+    margin: 0 auto;
+    max-width: 100%;
+  }
+
+  .progress {
+    .content {
+      margin: 0 auto;
+      max-width: 500px;
+    }
+    .progress-section {
+      margin-bottom: 30px;
+    }
+    .pretty {
+      display: block;
+      margin: 10px 0;
+    }
+    .pretty .state label {
+      color: $gray-color-ultra-dark;
+      font-weight: 300;
+    }
+  }
+}
+
+footer {
+  width: 100%;
+  padding: 100px 20px;
+  background-color: $white-color;
+}
+
+.icon {
+  display: table;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-top: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+  color: $gray-color;
+  font-size: 1.25em;
+  font-weight: $font-weight-normal;
+
+}
+
+a.download {
+  display: table;
+  margin: 40px auto 0;
+  padding: 10px 50px;
+  color: $white-color;
+  background-color: $theme-color;
+  font-size: 1em;
+  font-weight: $font-weight-light;
+  text-decoration: none;
+  cursor: pointer;
+  @include transition(all .3s);
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+a.github {
+  display: table;
+  margin: 50px auto 0;
+  color: $white-color;
+  font-size: 1em;
+  font-weight: $font-weight-light;
+  cursor: pointer;
+  @include transition(all .3s);
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+footer {
+  padding: 50px 0;
+
+  p {
+    text-align: center;
+    line-height: 0.8em;
+    color: $gray-color;
+    font-size: 1em;
+    font-weight: $font-weight-light;
+  }
+  a {
+    color: $theme-color;
+    font-weight: $font-weight-light;
+    @include transition(all .3s);
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  .container {
+    margin: 0 2%;
+  }
+  main {
+    padding: 20px 0;
+    .wrapper {
+      margin: 50px 0;
+    }
+  }
+
+}
