@@ -8,6 +8,9 @@ using Sorumi.Util;
 
 public enum StudioMode
 {
+    Type,
+    SelectWall,
+    SelectFloor,
     SelectItem,
     EditItem,
 }
@@ -15,6 +18,7 @@ public class StudioPanel : MonoBehaviour
 {
 
     private StudioMode mode;
+    private Transform typeView;
     private DragItemCellView itemCellView;
     private Transform setView;
     private Transform editView;
@@ -82,6 +86,7 @@ public class StudioPanel : MonoBehaviour
     #endregion
     public void Init()
     {
+        typeView = transform.Find("TypeView");
         itemCellView = transform.Find("DragItemScrollView").GetComponent<DragItemCellView>();
         itemCellView.DataSource = ItemCellViewDataSource;
         itemCellView.Init();
@@ -93,10 +98,21 @@ public class StudioPanel : MonoBehaviour
         deleteButton = editView.Find("DeleteButton").GetComponent<Button>();
         rotateButton = editView.Find("RotateButton").GetComponent<RotateButton>();
 
-        // TODO
-        itemCellViewData = ItemData.GetAll();
-        itemCellView.Refresh();
-
+        Button wallButton = typeView.Find("WallButton").GetComponent<Button>();
+        wallButton.onClick.AddListener(() =>
+        {
+            SetMode(StudioMode.SelectWall, true);
+        });
+        Button floorButton = typeView.Find("FloorButton").GetComponent<Button>();
+        floorButton.onClick.AddListener(() =>
+        {
+            SetMode(StudioMode.SelectFloor, true);
+        });
+        Button itemButton = typeView.Find("ItemButton").GetComponent<Button>();
+        itemButton.onClick.AddListener(() =>
+        {
+            SetMode(StudioMode.SelectItem, true);
+        });
     }
 
     public ItemPO[] ItemCellViewDataSource()
@@ -104,24 +120,44 @@ public class StudioPanel : MonoBehaviour
         return itemCellViewData;
     }
 
-
-    private void SetEditViewActive(bool isActive)
-    {
-        editView.gameObject.SetActive(isActive);
-    }
-
-    private void SetItemCellViewActive(bool isActive)
-    {
-        itemCellView.gameObject.SetActive(isActive);
-    }
-
     #region Controller API
 
-    public void SetMode(StudioMode mode)
+    public StudioMode GetMode()
+    {
+        return mode;
+    }
+    public void SetMode(StudioMode mode, bool refreshData = false)
     {
         this.mode = mode;
-        SetItemCellViewActive(mode == StudioMode.SelectItem);
-        SetEditViewActive(mode == StudioMode.EditItem);
+        typeView.gameObject.SetActive(mode == StudioMode.Type);
+        itemCellView.gameObject.SetActive(mode == StudioMode.SelectItem);
+        editView.gameObject.SetActive(mode == StudioMode.EditItem);
+
+        if (!refreshData) return;
+
+        switch (mode)
+        {
+            case StudioMode.SelectItem:
+                itemCellViewData = ItemData.GetAll();
+                itemCellView.Refresh();
+                break;
+        }
+
+    }
+
+    public void Back()
+    {
+        switch (mode)
+        {
+            case StudioMode.EditItem:
+                SetMode(StudioMode.SelectItem);
+                break;
+            case StudioMode.SelectItem:
+            case StudioMode.SelectWall:
+            case StudioMode.SelectFloor:
+                SetMode(StudioMode.Type);
+                break;
+        }
     }
     public void SetRotateButtonValue(float degree)
     {
@@ -135,6 +171,11 @@ public class StudioPanel : MonoBehaviour
     public void SetPlaceButtonAbled(bool isAbled)
     {
         placeButton.interactable = isAbled;
+    }
+
+    public void SetResetButtonActive(bool isActive)
+    {
+        resetButton.gameObject.SetActive(isActive);
     }
 
 

@@ -4,21 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sorumi.Util;
 
-public class ItemPO
-{
-    public string name;
-    public ItemType type;
-    public Vector3Int size;
-    public bool isOccupied;
-}
-
 public class ItemData : IData<ItemData>
 {
     protected override string name { get; set; }
 
     public ItemData()
     {
-        name = "items";
+        name = "item";
     }
 
     public static int Count()

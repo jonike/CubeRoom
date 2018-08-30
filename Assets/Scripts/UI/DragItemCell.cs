@@ -7,7 +7,6 @@ using Sorumi.UI;
 
 public class DragItemCell : Cell, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-
     private ScrollRect parentScroll;
     private DragItemCellView cellView;
 
@@ -71,7 +70,7 @@ public class DragItemCell : Cell, IBeginDragHandler, IDragHandler, IEndDragHandl
     public void SetItem(ItemPO item)
     {
         nameText.text = item.name;
-        string path = string.Format("Images/{0}_512", item.name);
+        string path = string.Format("Images/Items/{0}_512", item.name);
         Sprite sprite = Resources.Load<Sprite>(path) as Sprite;
         if (sprite)
             image.sprite = sprite;

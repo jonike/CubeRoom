@@ -33,16 +33,19 @@ public class StudioController : MonoBehaviour
     private bool isUIHandleDrag;
     private bool isEditItemHandleDrag;
 
+    private bool isEditItemHandleClick;
+
     private void Start()
     {
-
-        // ItemData.Init();
-
         InitUI();
         InitTouch();
         InitView();
 
         Reset();
+
+        // Init
+        studioPanel.SetResetButtonActive(false);
+        studioPanel.SetMode(StudioMode.Type);
     }
 
     #region Init
@@ -55,7 +58,7 @@ public class StudioController : MonoBehaviour
 
         camera = Camera.main.GetComponent<RoomCamera>();
         camera.Init();
-        camera.OnCameraRotate = onCameraRotate;
+        camera.OnCameraRotate = HandleCameraRotate;
         camera.SetCameraTransform();
 
         GameObject gridGO = Instantiate(Resources.Load("Prefabs/GridGroup")) as GameObject;
@@ -71,13 +74,24 @@ public class StudioController : MonoBehaviour
         studioPanel = GameObject.Find("/Canvas/StudioPanel").GetComponent<StudioPanel>();
         studioPanel.Init();
         studioPanel.OnItemBeginDrag = HandleUIItemBeginDrag;
-        studioPanel.OnPlaceClick = PlaceItem;
-        studioPanel.OnDeleteClick = DeleteItem;
+        studioPanel.OnPlaceClick = () =>
+        {
+            isOverUI = true;
+            PlaceItem();
+        };
+        studioPanel.OnDeleteClick = () =>
+        {
+            isOverUI = true;
+            DeleteItem();
+        };
         studioPanel.OnRotateChange = RotateItem;
         studioPanel.OnResetClick = () =>
         {
+            isOverUI = true;
             camera.TriggerAnimation();
+            studioPanel.SetResetButtonActive(false);
         };
+
     }
 
     private void InitTouch()
@@ -113,6 +127,7 @@ public class StudioController : MonoBehaviour
             {
                 Vector2 delta = -(r.deltaPosition) * 0.1f;
                 camera.Rotate(delta);
+                studioPanel.SetResetButtonActive(true);
             }
         };
 
@@ -127,6 +142,7 @@ public class StudioController : MonoBehaviour
         panTwoRecognizer.gestureRecognizedEvent += (r) =>
         {
             camera.Move(r.deltaPosition * 0.05f);
+            studioPanel.SetResetButtonActive(true);
         };
 
         PinchRecognizer pinchRecognizer = new PinchRecognizer();
@@ -135,66 +151,84 @@ public class StudioController : MonoBehaviour
         pinchRecognizer.gestureRecognizedEvent += (r) =>
         {
             camera.Zoom(r.deltaDistance * 0.05f);
+            studioPanel.SetResetButtonActive(true);
+        };
+
+        TapRecognizer tapRecognizer = new TapRecognizer();
+        tapRecognizer.gestureRecognizedEvent += (r) =>
+        {
+            if (isOverUI)
+            {
+                isOverUI = false;
+                return;
+            }
+            if (IsPointerOverUIObject()) return;
+            if (isItemEdited) return;
+
+            studioPanel.Back();
         };
 
         TouchSystem.addRecognizer(panRecognizer);
         TouchSystem.addRecognizer(panTwoRecognizer);
         TouchSystem.addRecognizer(pinchRecognizer);
+        TouchSystem.addRecognizer(tapRecognizer);
 
     }
     #endregion
 
-#if UNITY_EDITOR
-    void OnGUI()
-    {
-        // if (GUI.Button(new Rect(0, 210, 60, 20), "+ H Item"))
-        // {
-        //     if (isItemEdited) return;
-        //     AddItem(ItemType.Horizontal);
-        // }
 
-        // if (GUI.Button(new Rect(80, 210, 60, 20), "+ V Item"))
-        // {
-        //     if (isItemEdited) return;
-        //     AddItem(ItemType.Vertical);
-        // }
-
-        // if (GUI.Button(new Rect(0, 240, 60, 20), "Rotate Item"))
-        // {
-        //     if (!isItemEdited) return;
-        //     RotateItem();
-        // }
-
-        // if (GUI.Button(new Rect(0, 210, 60, 20), "Ok Item"))
-        // {
-        //     if (!isItemEdited) return;
-        //     PlaceItem(null);
-        // }
-        // if (GUI.Button(new Rect(80, 210, 60, 20), "X Item"))
-        // {
-        //     if (!isItemEdited) return;
-        //     DeleteItem();
-        // }
-    }
-#endif
-
-    private void onCameraRotate(float angle)
+    private void HandleCameraRotate(float angle)
     {
         angle = Maths.mod(angle, 360);
         room.RefreshByAngle(angle);
         studioPanel.SetRotateButtonRotation(angle);
     }
 
+    private void HandleItemBeginDrag()
+    {
+        isEditItemHandleDrag = true;
+
+        Plane plane = currentItem.Item.GetOffsetPlane();
+        Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
+        editedItem.SetDragOffset(mousePosition);
+    }
+
+    private void HandleItemDrag()
+    {
+        DragItem(Input.mousePosition);
+    }
+
+    private void HandleItemEndDrag()
+    {
+        isEditItemHandleDrag = false;
+    }
+
+    private void HandleUIItemBeginDrag(ItemPO item, Vector2 screenPosition)
+    {
+        isUIHandleDrag = true;
+
+        AddItem(item);
+        Vector3 worldPosition = ScreenToWorldOfOutside(room, currentItem.Item, screenPosition, Vector2.zero);
+        SetCurrentItemPosition(room, currentItem, worldPosition);
+        editedItem.SetDragOffset(worldPosition);
+    }
+
+
     private void Reset()
     {
         isItemEdited = false;
-        studioPanel.SetMode(StudioMode.SelectItem);
 
         room.RefreshGrids(false);
         currentItem = null;
         editedItem = null;
         gridGroup.SetActive(false);
     }
+
+    #region Room
+
+    #endregion
+
+    #region Item
 
     private void AddItem(ItemPO itemPO)
     {
@@ -212,14 +246,16 @@ public class StudioController : MonoBehaviour
         suspendItem.OnClick = ClickItem;
 
         SetEdited(item);
-        
+
         Direction dir = room.ShowWallsDirection()[0];
         SetCurrentItemDirection(item, dir);
     }
 
     private void ClickItem(ItemObject item)
     {
-        if (isItemEdited && editedItem.CanPlaced) {
+        isEditItemHandleClick = true;
+        if (isItemEdited && editedItem.CanPlaced)
+        {
             PlaceItem();
         }
         if (isItemEdited) return;
@@ -253,6 +289,18 @@ public class StudioController : MonoBehaviour
         gridGroup.SetTransform(item.Item);
     }
 
+    private void DragItem(Vector2 screenPosition)
+    {
+        if (!isItemEdited) return;
+        Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, screenPosition, editedItem.DragOffset, isRestricted);
+        if (currentItem.Item.PlaceType != PlaceType.None)
+        {
+            editedItem.CanOutside = false;
+        }
+
+        SetCurrentItemPosition(room, currentItem, itemPosition);
+    }
+
     private void PlaceItem()
     {
         if (!isItemEdited) return;
@@ -270,64 +318,22 @@ public class StudioController : MonoBehaviour
         suspendItem.enabled = true;
 
         Reset();
+        studioPanel.Back();
     }
 
     private void DeleteItem()
     {
         if (!isItemEdited) return;
         Destroy(currentItem.gameObject);
+
         Reset();
+        studioPanel.Back();
     }
     private void RotateItem(float degree)
     {
         currentItem.SetDir(Direction.Degree(degree));
         Vector3 itemPoition = ItemPositionOfCurrent(room, currentItem, editedItem, isRestricted);
         SetCurrentItemPosition(room, currentItem, itemPoition);
-    }
-
-    private void HandleItemBeginDrag()
-    {
-        isEditItemHandleDrag = true;
-
-        Plane plane = currentItem.Item.GetOffsetPlane();
-        Vector3 mousePosition = Util.screenToWorldByPlane(plane, Input.mousePosition);
-        editedItem.SetDragOffset(mousePosition);
-    }
-
-    private void HandleItemDrag()
-    {
-        DragItem(Input.mousePosition);
-    }
-
-    private void HandleItemEndDrag()
-    {
-        isEditItemHandleDrag = false;
-    }
-
-    private void HandleUIItemBeginDrag(ItemPO item, Vector2 screenPosition)
-    {
-        isUIHandleDrag = true;
-
-        AddItem(item);
-        Vector3 worldPosition = ScreenToWorldOfOutside(room, currentItem.Item, screenPosition, Vector2.zero);
-        SetCurrentItemPosition(room, currentItem, worldPosition);
-        editedItem.SetDragOffset(worldPosition);
-    }
-
-    private void DragItem(Vector2 screenPosition)
-    {
-        if (!isItemEdited) return;
-        Vector3 itemPosition = ItemPositionOfScreen(room, currentItem, editedItem, screenPosition, editedItem.DragOffset, isRestricted);
-        if (currentItem.Item.PlaceType != PlaceType.None)
-        {
-            editedItem.CanOutside = false;
-        }
-
-        SetCurrentItemPosition(room, currentItem, itemPosition);
-    }
-
-    private void EndDragItem(Vector2 screenPosition)
-    {
     }
 
     private void SetCurrentItemPosition(Room room, ItemObject item, Vector3 itemPosition)
@@ -355,7 +361,9 @@ public class StudioController : MonoBehaviour
         studioPanel.SetRotateButtonValue(dir.Rotation());
     }
 
-    #region Position
+    #endregion
+
+    #region Item Position
     private Vector3 ItemPositionOfScreen(
         Room room,
         ItemObject itemObject,
@@ -768,7 +776,6 @@ public class StudioController : MonoBehaviour
                 }
             case 6:
                 {
-
                     int x = coordinate.y;
                     int y = size.y - coordinate.x - 1;
                     return new Vector2Int(x, y);
