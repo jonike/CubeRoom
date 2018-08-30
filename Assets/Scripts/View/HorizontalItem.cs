@@ -11,7 +11,7 @@ public class HorizontalItem : Item
 
     public override bool CanPlaceOfType()
     {
-        return PlaceType == PlaceType.Ground;
+        return PlaceType == PlaceType.Floor;
     }
     public override Vector2 GetDragOffset(Vector3 position)
     {

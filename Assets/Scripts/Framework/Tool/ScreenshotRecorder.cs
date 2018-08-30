@@ -61,7 +61,8 @@ public class ScreenshotRecorder : MonoBehaviour
         renderCamera.backgroundColor = Color.clear;
         renderCamera.transform.position = mainCamera.transform.position;
         renderCamera.transform.rotation = mainCamera.transform.rotation;
-
+        renderCamera.orthographicSize = mainCamera.orthographicSize;
+        
         CacheAndInitialiseFields();
         CreateNewFolderForScreenshots();
 

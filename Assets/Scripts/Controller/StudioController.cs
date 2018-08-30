@@ -32,7 +32,6 @@ public class StudioController : MonoBehaviour
     private bool isOverUI;
     private bool isUIHandleDrag;
     private bool isEditItemHandleDrag;
-
     private bool isEditItemHandleClick;
 
     private void Start()
@@ -74,6 +73,7 @@ public class StudioController : MonoBehaviour
         studioPanel = GameObject.Find("/Canvas/StudioPanel").GetComponent<StudioPanel>();
         studioPanel.Init();
         studioPanel.OnItemBeginDrag = HandleUIItemBeginDrag;
+        studioPanel.OnBuildClick = PlaceWall;
         studioPanel.OnPlaceClick = () =>
         {
             isOverUI = true;
@@ -90,6 +90,10 @@ public class StudioController : MonoBehaviour
             isOverUI = true;
             camera.TriggerAnimation();
             studioPanel.SetResetButtonActive(false);
+        };
+        studioPanel.OnTypeClick = () =>
+        {
+            isOverUI = true;
         };
 
     }
@@ -225,6 +229,15 @@ public class StudioController : MonoBehaviour
     }
 
     #region Room
+
+    private void PlaceWall(BuildPO buildPO)
+    {
+        if (buildPO.type == BuildType.Wall)
+        {
+            WallPO wallPO = (WallPO)buildPO;
+            room.PlaceWall(wallPO);
+        }
+    }
 
     #endregion
 
@@ -378,9 +391,9 @@ public class StudioController : MonoBehaviour
         if (currentItem.Type == ItemType.Horizontal)
         {
             float distance;
-            Vector3 worldPosition = ScreenToWorldOfGround(room, item, screenPosition, offset);
-            itemPostion = WorldToItemOfGround(room, item, worldPosition, isRestricted, out distance);
-            placeType = PlaceType.Ground;
+            Vector3 worldPosition = ScreenToWorldOfFloor(room, item, screenPosition, offset);
+            itemPostion = WorldToItemOfFloor(room, item, worldPosition, isRestricted, out distance);
+            placeType = PlaceType.Floor;
 
             if (editedItem.CanOutside && distance < 0)
             {
@@ -401,7 +414,7 @@ public class StudioController : MonoBehaviour
             Vector3 itemPostionR = WorldToItemOfWall(room, item, ScreenToWorldOfWall(room, item, screenPosition, offset, showWallsDirection[1]), showWallsDirection[1], isRestricted, out distanceR);
 
             float distanceG;
-            Vector3 itemPostionG = WorldToItemOfGround(room, item, ScreenToWorldOfGround(room, item, screenPosition, offset), isRestricted, out distanceG);
+            Vector3 itemPostionG = WorldToItemOfFloor(room, item, ScreenToWorldOfFloor(room, item, screenPosition, offset), isRestricted, out distanceG);
             Vector3 itemPostionO = WorldToItemOfOutside(room, item, ScreenToWorldOfOutside(room, item, screenPosition, offset), isRestricted);
 
             // Debug.Log(distanceG + " " + distanceL + " " + distanceR);
@@ -441,7 +454,7 @@ public class StudioController : MonoBehaviour
             else
             {
                 itemPostion = itemPostionG;
-                placeType = PlaceType.Ground;
+                placeType = PlaceType.Floor;
                 if (editedItem.CanOutside && distanceG < 0)
                 {
                     itemPostion = itemPostionO;
@@ -465,17 +478,17 @@ public class StudioController : MonoBehaviour
         Item item = itemObject.Item;
         Vector3 itemPostion = item.Position;
 
-        if (item.PlaceType == PlaceType.Ground || item.PlaceType == PlaceType.Wall)
+        if (item.PlaceType == PlaceType.Floor || item.PlaceType == PlaceType.Wall)
         {
             float distance;
-            itemPostion = WorldToItemOfGround(room, item, itemPostion, isRestricted, out distance);
-            item.PlaceType = PlaceType.Ground;
+            itemPostion = WorldToItemOfFloor(room, item, itemPostion, isRestricted, out distance);
+            item.PlaceType = PlaceType.Floor;
         }
 
         return itemPostion;
     }
     // distance 边缘距离
-    private Vector3 WorldToItemOfGround(
+    private Vector3 WorldToItemOfFloor(
         Room room,
         Item item,
         Vector3 worldPosition,
@@ -500,7 +513,7 @@ public class StudioController : MonoBehaviour
 
         Vector3 itemPoition = new Vector3(x, itemSize.y / 2.0f, z); ;
 
-        // if worldPosition on the ground
+        // if worldPosition on the floor
         Direction[] showWallsDirection = room.ShowWallsDirection();
 
         Vector3 axisDirL = Vector3.Cross(Vector3.up, showWallsDirection[0].Vector);
@@ -624,7 +637,7 @@ public class StudioController : MonoBehaviour
         return itemPoition;
     }
 
-    private Vector3 ScreenToWorldOfGround(Room room, Item item, Vector3 screenPosition, Vector2 offset)
+    private Vector3 ScreenToWorldOfFloor(Room room, Item item, Vector3 screenPosition, Vector2 offset)
     {
         Plane plane = new Plane(Vector3.down, offset.y + item.Size.y / 2.0f);
         Vector3 position = Util.screenToWorldByPlane(plane, screenPosition);

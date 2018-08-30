@@ -35,7 +35,7 @@ public class ClickBuildCell : Cell, IPointerUpHandler
             WallPO wall = (WallPO)build;
 
             nameText.text = wall.name;
-            string path = string.Format("Images/Walls/{0}_512", wall.name);
+            string path = string.Format("Images/Walls/wall_{0}_512", wall.name);
             Sprite sprite = Resources.Load<Sprite>(path) as Sprite;
             if (sprite)
                 image.sprite = sprite;

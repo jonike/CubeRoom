@@ -4,10 +4,12 @@ using UnityEngine;
 using Sorumi.Util;
 public class Room : MonoBehaviour
 {
+    public Material wallMaterial;
 
+    public Material floorMaterial;
     public Vector3Int Size { get; set; }
 
-    private Ground ground;
+    private Floor floor;
 
     private Wall[] walls;
 
@@ -31,8 +33,8 @@ public class Room : MonoBehaviour
         items = new List<ItemObject>();
         space = new Dictionary<int, List<ItemObject>>();
 
-        ground = transform.Find("ground").GetComponent<Ground>();
-        ground.Init(new Vector2Int(size.x, size.z));
+        floor = transform.Find("floor").GetComponent<Floor>();
+        floor.Init(new Vector2Int(size.x, size.z));
 
         walls = new Wall[4];
         pillarsV = new Pillar[4];
@@ -86,7 +88,7 @@ public class Room : MonoBehaviour
         {
             if (itemType == ItemType.Horizontal)
             {
-                ground.ShowGrid(true);
+                floor.ShowGrid(true);
             }
             else if (itemType == ItemType.Vertical)
             {
@@ -98,7 +100,7 @@ public class Room : MonoBehaviour
         }
         else
         {
-            ground.ShowGrid(isEdited);
+            floor.ShowGrid(isEdited);
             for (int i = 0; i < 4; i++)
             {
                 walls[i].ShowGrid(isEdited);
@@ -111,9 +113,9 @@ public class Room : MonoBehaviour
         return new Direction[2] { wallDirections[showWalls[0]], wallDirections[showWalls[1]] };
     }
 
-    public Ground Ground()
+    public Floor Floor()
     {
-        return ground;
+        return floor;
     }
 
 
@@ -206,6 +208,12 @@ public class Room : MonoBehaviour
             }
         }
         return conflictSpace;
+    }
+
+    public void PlaceWall(WallPO wall)
+    {
+        Texture2D tex = Resources.Load("Textures/Walls/wall_" + wall.name) as Texture2D;
+        wallMaterial.SetTexture("_DetailTex", tex);
     }
 
     private bool ItemXYZ(Item item, out int minX, out int maxX, out int minY, out int maxY, out int minZ, out int maxZ)

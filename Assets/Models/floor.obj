@@ -1,0 +1,42 @@
+g Mesh1
+# Vertex Positions: 8
+v 3 0 3
+v -3 0 3
+v -3 0.2 3
+v 3 0.2 3
+v 3 0 -3
+v 3 0.2 -3
+v -3 0 -3
+v -3 0.2 -3
+# Vertex UVs: 8
+vt 2 0
+vt -1 0
+vt -0.9999999 0.1
+vt 2 0.1
+vt 2 -1
+vt -1 -1
+vt -1 2
+vt 2 2
+# Vertex Normals: 5
+vn 0 0 1
+vn 1 0 0
+vn -1 0 0
+vn 0 0 -1
+vn 0 -1 0
+# Faces: 5
+f 4/4/1 3/3/1 2/2/1 1/1/1 
+f 6/4/2 4/3/2 1/2/2 5/1/2 
+f 3/4/3 8/3/3 7/2/3 2/1/3 
+f 8/4/4 6/3/4 5/2/4 7/1/4 
+f 1/8/5 2/7/5 7/6/5 5/5/5 
+
+
+g Mesh2
+# Vertex Positions: 0
+# Vertex UVs: 0
+# Vertex Normals: 1
+vn 0 1 0
+# Faces: 1
+f 8/7/6 3/6/6 4/5/6 6/8/6 
+
+

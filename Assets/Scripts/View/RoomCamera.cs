@@ -132,7 +132,6 @@ public class RoomCamera : MonoBehaviour
     public void Init()
     {
         camera = GetComponent<Camera>();
-        // SetCameraTransform();
     }
 
     public void Zoom(float deltaMagnitude)

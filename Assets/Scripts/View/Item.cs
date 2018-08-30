@@ -12,7 +12,7 @@ public enum PlaceType
 {
     None,
     Wall,
-    Ground,
+    Floor,
     Item,
 }
 

@@ -159,7 +159,7 @@ GameObject:
   - component: {fileID: 4460004831046020}
   - component: {fileID: 114811298408555718}
   m_Layer: 0
-  m_Name: ground
+  m_Name: floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -193,7 +193,6 @@ GameObject:
   - component: {fileID: 4352250662522554}
   - component: {fileID: 33358794214642898}
   - component: {fileID: 23639163401266380}
-  - component: {fileID: 114046802376520260}
   m_Layer: 0
   m_Name: inner
   m_TagString: Untagged
@@ -2023,18 +2022,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1181938301087486}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114046802376520260
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1294099784362660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43a2cada3ae3942ca9b43c1bbed7c01c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cubemap: {fileID: 8900000, guid: 68a94625cd28140b484f624d479a6432, type: 2}
 --- !u!114 &114232880558921316
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2101,6 +2088,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abd08535fd76418196e35fc04986e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallMaterial: {fileID: 2100000, guid: cb0a49179f8fc477fa4a3630b61ca543, type: 2}
+  floorMaterial: {fileID: 2100000, guid: 28436f69b802744cdb1d8ae28b9b5847, type: 2}
 --- !u!114 &114526126872669908
 MonoBehaviour:
   m_ObjectHideFlags: 1
