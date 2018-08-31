@@ -16,7 +16,7 @@
 #### Graphics
 - [x] Colored shadow
 - [x] Transparent shader
-- [x] Physically-inspired Shader
+- [x] Physically-inspired shader
 - [ ] Refraction shader
 - [ ] Realtime planar reflection
 - [ ] Godray / Volumetric lighting
